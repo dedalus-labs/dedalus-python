@@ -1,5 +1,5 @@
 [project]
-name = "dedalus"
+name = "dedalus-sdk"
 version = "0.0.1"
 description = "The official Python library for the dedalus API"
 dynamic = ["readme"]
