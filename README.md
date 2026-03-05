@@ -1,7 +1,7 @@
 # Dedalus Python API library
 
 <!-- prettier-ignore -->
-[![PyPI version](https://img.shields.io/pypi/v/dedalus.svg?label=pypi%20(stable))](https://pypi.org/project/dedalus/)
+[![PyPI version](https://img.shields.io/pypi/v/dedalus-sdk.svg?label=pypi%20(stable))](https://pypi.org/project/dedalus-sdk/)
 
 The Dedalus Python library provides convenient access to the Dedalus REST API from any Python 3.9+
 application. The library includes type definitions for all request params and response fields,
@@ -25,12 +25,9 @@ The full API of this library can be found in [api.md](api.md).
 ## Installation
 
 ```sh
-# install from the production repo
-pip install git+ssh://git@github.com/dedalus-labs/dedalus-python.git
+# install from PyPI
+pip install dedalus-sdk
 ```
-
-> [!NOTE]
-> Once this package is [published to PyPI](https://www.stainless.com/docs/guides/publish), this will become: `pip install dedalus`
 
 ## Usage
 
@@ -92,8 +89,8 @@ By default, the async client uses `httpx` for HTTP requests. However, for improv
 You can enable this by installing `aiohttp`:
 
 ```sh
-# install from the production repo
-pip install 'dedalus[aiohttp] @ git+ssh://git@github.com/dedalus-labs/dedalus-python.git'
+# install from PyPI
+pip install dedalus-sdk[aiohttp]
 ```
 
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
