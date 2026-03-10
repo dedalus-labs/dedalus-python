@@ -59,8 +59,11 @@
       "hidden": true
     }
   ],
+  "reviewers": [
+    "@windsornguyen"
+  ],
   "release-type": "python",
   "extra-files": [
-    "src/dedalus/_version.py"
+    "src/dedalus_sdk/_version.py"
   ]
 }
