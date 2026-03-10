@@ -36,7 +36,7 @@ $ pip install -r requirements-dev.lock
 
 Most of the SDK is generated code. Modifications to code will be persisted between generations, but may
 result in merge conflicts between manual patches and changes from the generator. The generator will never
-modify the contents of the `src/dedalus/lib/` and `examples/` directories.
+modify the contents of the `src/dedalus_sdk/lib/` and `examples/` directories.
 
 ## Adding and running examples
 
@@ -84,6 +84,12 @@ $ pip install ./path-to-wheel-file.whl
 ```
 
 ## Running tests
+
+Most tests require you to [set up a mock server](https://github.com/stoplightio/prism) against the OpenAPI spec to run the tests.
+
+```sh
+$ ./scripts/mock
+```
 
 ```sh
 $ ./scripts/test

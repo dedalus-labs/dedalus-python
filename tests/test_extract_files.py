@@ -4,8 +4,8 @@ from typing import Sequence
 
 import pytest
 
-from dedalus._types import FileTypes
-from dedalus._utils import extract_files
+from dedalus_sdk._types import FileTypes
+from dedalus_sdk._utils import extract_files
 
 
 def test_removes_files_from_input() -> None:

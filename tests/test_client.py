@@ -19,12 +19,12 @@ import pytest
 from respx import MockRouter
 from pydantic import ValidationError
 
-from dedalus import Dedalus, AsyncDedalus, APIResponseValidationError
-from dedalus._types import Omit
-from dedalus._utils import asyncify
-from dedalus._models import BaseModel, FinalRequestOptions
-from dedalus._exceptions import DedalusError, APIStatusError, APITimeoutError, APIResponseValidationError
-from dedalus._base_client import (
+from dedalus_sdk import Dedalus, AsyncDedalus, APIResponseValidationError
+from dedalus_sdk._types import Omit
+from dedalus_sdk._utils import asyncify
+from dedalus_sdk._models import BaseModel, FinalRequestOptions
+from dedalus_sdk._exceptions import APIStatusError, APITimeoutError, APIResponseValidationError
+from dedalus_sdk._base_client import (
     DEFAULT_TIMEOUT,
     HTTPX_DEFAULT_TIMEOUT,
     BaseClient,
@@ -286,10 +286,10 @@ class TestDedalus:
                         # to_raw_response_wrapper leaks through the @functools.wraps() decorator.
                         #
                         # removing the decorator fixes the leak for reasons we don't understand.
-                        "dedalus/_legacy_response.py",
-                        "dedalus/_response.py",
+                        "dedalus_sdk/_legacy_response.py",
+                        "dedalus_sdk/_response.py",
                         # pydantic.BaseModel.model_dump || pydantic.BaseModel.dict leak memory for some reason.
-                        "dedalus/_compat.py",
+                        "dedalus_sdk/_compat.py",
                         # Standard library leaks we don't care about.
                         "/logging/__init__.py",
                     ]
@@ -400,12 +400,21 @@ class TestDedalus:
     def test_validate_headers(self) -> None:
         client = Dedalus(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
-        assert request.headers.get("api_key") == api_key
+        assert request.headers.get("Authorization") == f"Bearer {api_key}"
 
-        with pytest.raises(DedalusError):
-            with update_env(**{"PETSTORE_API_KEY": Omit()}):
-                client2 = Dedalus(base_url=base_url, api_key=None, _strict_response_validation=True)
-            _ = client2
+        with update_env(**{"DEDALUS_API_KEY": Omit()}):
+            client2 = Dedalus(base_url=base_url, api_key=None, _strict_response_validation=True)
+
+        with pytest.raises(
+            TypeError,
+            match="Could not resolve authentication method. Expected either x_api_key or api_key to be set. Or for one of the `x-api-key` or `Authorization` headers to be explicitly omitted",
+        ):
+            client2._build_request(FinalRequestOptions(method="get", url="/foo"))
+
+        request2 = client2._build_request(
+            FinalRequestOptions(method="get", url="/foo", headers={"Authorization": Omit()})
+        )
+        assert request2.headers.get("Authorization") is None
 
     def test_default_query_option(self) -> None:
         client = Dedalus(
@@ -674,6 +683,37 @@ class TestDedalus:
         assert isinstance(response, Model)
         assert response.foo == 2
 
+    @pytest.mark.respx(base_url=base_url)
+    def test_idempotency_header_options(self, respx_mock: MockRouter, client: Dedalus) -> None:
+        respx_mock.post("/foo").mock(return_value=httpx.Response(200, json={}))
+
+        response = client.post("/foo", cast_to=httpx.Response)
+
+        header = response.request.headers.get("Idempotency-Key")
+        assert header is not None
+        assert header.startswith("stainless-python-retry")
+
+        # explicit header
+        response = client.post(
+            "/foo",
+            cast_to=httpx.Response,
+            options=make_request_options(extra_headers={"Idempotency-Key": "custom-key"}),
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
+        response = client.post(
+            "/foo",
+            cast_to=httpx.Response,
+            options=make_request_options(extra_headers={"idempotency-key": "custom-key"}),
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
+        # custom argument
+        response = client.post(
+            "/foo", cast_to=httpx.Response, options=make_request_options(idempotency_key="custom-key")
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
     def test_base_url_setter(self) -> None:
         client = Dedalus(base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True)
         assert client.base_url == "https://example.com/from_init/"
@@ -846,27 +886,31 @@ class TestDedalus:
         calculated = client._calculate_retry_timeout(remaining_retries, options, headers)
         assert calculated == pytest.approx(timeout, 0.5 * 0.875)  # pyright: ignore[reportUnknownMemberType]
 
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_retrying_timeout_errors_doesnt_leak(self, respx_mock: MockRouter, client: Dedalus) -> None:
-        respx_mock.get("/store/inventory").mock(side_effect=httpx.TimeoutException("Test timeout error"))
+        respx_mock.post("/v1/workspaces").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            client.store.with_streaming_response.list_inventory().__enter__()
+            client.workspaces.with_streaming_response.create(
+                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            ).__enter__()
 
         assert _get_open_connections(client) == 0
 
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, client: Dedalus) -> None:
-        respx_mock.get("/store/inventory").mock(return_value=httpx.Response(500))
+        respx_mock.post("/v1/workspaces").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            client.store.with_streaming_response.list_inventory().__enter__()
+            client.workspaces.with_streaming_response.create(
+                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            ).__enter__()
         assert _get_open_connections(client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.parametrize("failure_mode", ["status", "exception"])
     def test_retries_taken(
@@ -889,15 +933,17 @@ class TestDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = client.store.with_raw_response.list_inventory()
+        response = client.workspaces.with_raw_response.create(
+            cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+        )
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_omit_retry_count_header(
         self, client: Dedalus, failures_before_success: int, respx_mock: MockRouter
@@ -913,14 +959,20 @@ class TestDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = client.store.with_raw_response.list_inventory(extra_headers={"x-stainless-retry-count": Omit()})
+        response = client.workspaces.with_raw_response.create(
+            cpus=0,
+            image_version="image_version",
+            memory_mib=0,
+            storage_gib=0,
+            extra_headers={"x-stainless-retry-count": Omit()},
+        )
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_overwrite_retry_count_header(
         self, client: Dedalus, failures_before_success: int, respx_mock: MockRouter
@@ -936,9 +988,15 @@ class TestDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = client.store.with_raw_response.list_inventory(extra_headers={"x-stainless-retry-count": "42"})
+        response = client.workspaces.with_raw_response.create(
+            cpus=0,
+            image_version="image_version",
+            memory_mib=0,
+            storage_gib=0,
+            extra_headers={"x-stainless-retry-count": "42"},
+        )
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 
@@ -1173,10 +1231,10 @@ class TestAsyncDedalus:
                         # to_raw_response_wrapper leaks through the @functools.wraps() decorator.
                         #
                         # removing the decorator fixes the leak for reasons we don't understand.
-                        "dedalus/_legacy_response.py",
-                        "dedalus/_response.py",
+                        "dedalus_sdk/_legacy_response.py",
+                        "dedalus_sdk/_response.py",
                         # pydantic.BaseModel.model_dump || pydantic.BaseModel.dict leak memory for some reason.
-                        "dedalus/_compat.py",
+                        "dedalus_sdk/_compat.py",
                         # Standard library leaks we don't care about.
                         "/logging/__init__.py",
                     ]
@@ -1291,12 +1349,21 @@ class TestAsyncDedalus:
     def test_validate_headers(self) -> None:
         client = AsyncDedalus(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
-        assert request.headers.get("api_key") == api_key
+        assert request.headers.get("Authorization") == f"Bearer {api_key}"
 
-        with pytest.raises(DedalusError):
-            with update_env(**{"PETSTORE_API_KEY": Omit()}):
-                client2 = AsyncDedalus(base_url=base_url, api_key=None, _strict_response_validation=True)
-            _ = client2
+        with update_env(**{"DEDALUS_API_KEY": Omit()}):
+            client2 = AsyncDedalus(base_url=base_url, api_key=None, _strict_response_validation=True)
+
+        with pytest.raises(
+            TypeError,
+            match="Could not resolve authentication method. Expected either x_api_key or api_key to be set. Or for one of the `x-api-key` or `Authorization` headers to be explicitly omitted",
+        ):
+            client2._build_request(FinalRequestOptions(method="get", url="/foo"))
+
+        request2 = client2._build_request(
+            FinalRequestOptions(method="get", url="/foo", headers={"Authorization": Omit()})
+        )
+        assert request2.headers.get("Authorization") is None
 
     async def test_default_query_option(self) -> None:
         client = AsyncDedalus(
@@ -1569,6 +1636,37 @@ class TestAsyncDedalus:
         assert isinstance(response, Model)
         assert response.foo == 2
 
+    @pytest.mark.respx(base_url=base_url)
+    async def test_idempotency_header_options(self, respx_mock: MockRouter, async_client: AsyncDedalus) -> None:
+        respx_mock.post("/foo").mock(return_value=httpx.Response(200, json={}))
+
+        response = await async_client.post("/foo", cast_to=httpx.Response)
+
+        header = response.request.headers.get("Idempotency-Key")
+        assert header is not None
+        assert header.startswith("stainless-python-retry")
+
+        # explicit header
+        response = await async_client.post(
+            "/foo",
+            cast_to=httpx.Response,
+            options=make_request_options(extra_headers={"Idempotency-Key": "custom-key"}),
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
+        response = await async_client.post(
+            "/foo",
+            cast_to=httpx.Response,
+            options=make_request_options(extra_headers={"idempotency-key": "custom-key"}),
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
+        # custom argument
+        response = await async_client.post(
+            "/foo", cast_to=httpx.Response, options=make_request_options(idempotency_key="custom-key")
+        )
+        assert response.request.headers.get("Idempotency-Key") == "custom-key"
+
     async def test_base_url_setter(self) -> None:
         client = AsyncDedalus(
             base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True
@@ -1752,29 +1850,33 @@ class TestAsyncDedalus:
         calculated = async_client._calculate_retry_timeout(remaining_retries, options, headers)
         assert calculated == pytest.approx(timeout, 0.5 * 0.875)  # pyright: ignore[reportUnknownMemberType]
 
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     async def test_retrying_timeout_errors_doesnt_leak(
         self, respx_mock: MockRouter, async_client: AsyncDedalus
     ) -> None:
-        respx_mock.get("/store/inventory").mock(side_effect=httpx.TimeoutException("Test timeout error"))
+        respx_mock.post("/v1/workspaces").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            await async_client.store.with_streaming_response.list_inventory().__aenter__()
+            await async_client.workspaces.with_streaming_response.create(
+                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            ).__aenter__()
 
         assert _get_open_connections(async_client) == 0
 
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     async def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, async_client: AsyncDedalus) -> None:
-        respx_mock.get("/store/inventory").mock(return_value=httpx.Response(500))
+        respx_mock.post("/v1/workspaces").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            await async_client.store.with_streaming_response.list_inventory().__aenter__()
+            await async_client.workspaces.with_streaming_response.create(
+                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            ).__aenter__()
         assert _get_open_connections(async_client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.parametrize("failure_mode", ["status", "exception"])
     async def test_retries_taken(
@@ -1797,15 +1899,17 @@ class TestAsyncDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = await client.store.with_raw_response.list_inventory()
+        response = await client.workspaces.with_raw_response.create(
+            cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+        )
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     async def test_omit_retry_count_header(
         self, async_client: AsyncDedalus, failures_before_success: int, respx_mock: MockRouter
@@ -1821,16 +1925,20 @@ class TestAsyncDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = await client.store.with_raw_response.list_inventory(
-            extra_headers={"x-stainless-retry-count": Omit()}
+        response = await client.workspaces.with_raw_response.create(
+            cpus=0,
+            image_version="image_version",
+            memory_mib=0,
+            storage_gib=0,
+            extra_headers={"x-stainless-retry-count": Omit()},
         )
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
-    @mock.patch("dedalus._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
+    @mock.patch("dedalus_sdk._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     async def test_overwrite_retry_count_header(
         self, async_client: AsyncDedalus, failures_before_success: int, respx_mock: MockRouter
@@ -1846,9 +1954,15 @@ class TestAsyncDedalus:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/store/inventory").mock(side_effect=retry_handler)
+        respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = await client.store.with_raw_response.list_inventory(extra_headers={"x-stainless-retry-count": "42"})
+        response = await client.workspaces.with_raw_response.create(
+            cpus=0,
+            image_version="image_version",
+            memory_mib=0,
+            storage_gib=0,
+            extra_headers={"x-stainless-retry-count": "42"},
+        )
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 

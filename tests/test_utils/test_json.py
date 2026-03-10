@@ -5,8 +5,8 @@ from typing import Union
 
 import pydantic
 
-from dedalus import _compat
-from dedalus._utils._json import openapi_dumps
+from dedalus_sdk import _compat
+from dedalus_sdk._utils._json import openapi_dumps
 
 
 class TestOpenapiDumps:
