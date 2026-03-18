@@ -106,7 +106,6 @@ class WorkspacesResource(SyncAPIResource):
     def create(
         self,
         *,
-        image_version: str,
         memory_mib: int,
         storage_gib: int,
         vcpu: float,
@@ -140,7 +139,6 @@ class WorkspacesResource(SyncAPIResource):
             "/v1/workspaces",
             body=maybe_transform(
                 {
-                    "image_version": image_version,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
@@ -376,7 +374,6 @@ class AsyncWorkspacesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        image_version: str,
         memory_mib: int,
         storage_gib: int,
         vcpu: float,
@@ -410,7 +407,6 @@ class AsyncWorkspacesResource(AsyncAPIResource):
             "/v1/workspaces",
             body=await async_maybe_transform(
                 {
-                    "image_version": image_version,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,

@@ -13,8 +13,6 @@ __all__ = ["ExecutionCreateParams"]
 class ExecutionCreateParams(TypedDict, total=False):
     command: Required[Optional[SequenceNotStr[str]]]
 
-    capture_paths: Optional[SequenceNotStr[str]]
-
     cwd: str
 
     env: Dict[str, str]

@@ -28,5 +28,3 @@ class Workspace(BaseModel):
 
     schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
     """A URL to the JSON Schema for this object."""
-
-    image_version: Optional[str] = None

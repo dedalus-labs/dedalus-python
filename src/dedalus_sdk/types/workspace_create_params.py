@@ -8,8 +8,6 @@ __all__ = ["WorkspaceCreateParams"]
 
 
 class WorkspaceCreateParams(TypedDict, total=False):
-    image_version: Required[str]
-
     memory_mib: Required[int]
     """Memory in MiB."""
 

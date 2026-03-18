@@ -35,7 +35,6 @@ class TestExecutions:
         execution = client.workspaces.executions.create(
             workspace_id="workspace_id",
             command=["string"],
-            capture_paths=["string"],
             cwd="cwd",
             env={"foo": "string"},
             stdin="stdin",
@@ -346,7 +345,6 @@ class TestAsyncExecutions:
         execution = await async_client.workspaces.executions.create(
             workspace_id="workspace_id",
             command=["string"],
-            capture_paths=["string"],
             cwd="cwd",
             env={"foo": "string"},
             stdin="stdin",
