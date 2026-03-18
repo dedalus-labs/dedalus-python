@@ -14,7 +14,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncSSHSessionList, AsyncSSHSessionList
+from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspaces import ssh_list_params, ssh_create_params
 from ...types.workspaces.ssh_session import SSHSession
@@ -139,7 +139,7 @@ class SSHResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncSSHSessionList[SSHSession]:
+    ) -> SyncCursorPage[SSHSession]:
         """
         List SSH sessions
 
@@ -156,7 +156,7 @@ class SSHResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/ssh",
-            page=SyncSSHSessionList[SSHSession],
+            page=SyncCursorPage[SSHSession],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -334,7 +334,7 @@ class AsyncSSHResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[SSHSession, AsyncSSHSessionList[SSHSession]]:
+    ) -> AsyncPaginator[SSHSession, AsyncCursorPage[SSHSession]]:
         """
         List SSH sessions
 
@@ -351,7 +351,7 @@ class AsyncSSHResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/ssh",
-            page=AsyncSSHSessionList[SSHSession],
+            page=AsyncCursorPage[SSHSession],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

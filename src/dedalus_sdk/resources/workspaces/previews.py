@@ -16,7 +16,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncPreviewList, AsyncPreviewList
+from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspaces import preview_list_params, preview_create_params
 from ...types.workspaces.preview import Preview
@@ -143,7 +143,7 @@ class PreviewsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncPreviewList[Preview]:
+    ) -> SyncCursorPage[Preview]:
         """
         List previews
 
@@ -160,7 +160,7 @@ class PreviewsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/previews",
-            page=SyncPreviewList[Preview],
+            page=SyncCursorPage[Preview],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -340,7 +340,7 @@ class AsyncPreviewsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[Preview, AsyncPreviewList[Preview]]:
+    ) -> AsyncPaginator[Preview, AsyncCursorPage[Preview]]:
         """
         List previews
 
@@ -357,7 +357,7 @@ class AsyncPreviewsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/previews",
-            page=AsyncPreviewList[Preview],
+            page=AsyncCursorPage[Preview],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

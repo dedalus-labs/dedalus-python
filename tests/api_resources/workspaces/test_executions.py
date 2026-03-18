@@ -9,7 +9,7 @@ import pytest
 
 from dedalus_sdk import Dedalus, AsyncDedalus
 from tests.utils import assert_matches_type
-from dedalus_sdk.pagination import SyncExecutionList, AsyncExecutionList, SyncExecutionEvents, AsyncExecutionEvents
+from dedalus_sdk.pagination import SyncCursorPage, AsyncCursorPage
 from dedalus_sdk.types.workspaces import (
     Execution,
     ExecutionEvent,
@@ -130,7 +130,7 @@ class TestExecutions:
         execution = client.workspaces.executions.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
@@ -139,7 +139,7 @@ class TestExecutions:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
@@ -150,7 +150,7 @@ class TestExecutions:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         execution = response.parse()
-        assert_matches_type(SyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
@@ -161,7 +161,7 @@ class TestExecutions:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             execution = response.parse()
-            assert_matches_type(SyncExecutionList[Execution], execution, path=["response"])
+            assert_matches_type(SyncCursorPage[Execution], execution, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -226,7 +226,7 @@ class TestExecutions:
             execution_id="execution_id",
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     def test_method_events_with_all_params(self, client: Dedalus) -> None:
@@ -236,7 +236,7 @@ class TestExecutions:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     def test_raw_response_events(self, client: Dedalus) -> None:
@@ -248,7 +248,7 @@ class TestExecutions:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         execution = response.parse()
-        assert_matches_type(SyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(SyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     def test_streaming_response_events(self, client: Dedalus) -> None:
@@ -260,7 +260,7 @@ class TestExecutions:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             execution = response.parse()
-            assert_matches_type(SyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+            assert_matches_type(SyncCursorPage[ExecutionEvent], execution, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -440,7 +440,7 @@ class TestAsyncExecutions:
         execution = await async_client.workspaces.executions.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -449,7 +449,7 @@ class TestAsyncExecutions:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
@@ -460,7 +460,7 @@ class TestAsyncExecutions:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         execution = await response.parse()
-        assert_matches_type(AsyncExecutionList[Execution], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
@@ -471,7 +471,7 @@ class TestAsyncExecutions:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             execution = await response.parse()
-            assert_matches_type(AsyncExecutionList[Execution], execution, path=["response"])
+            assert_matches_type(AsyncCursorPage[Execution], execution, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -536,7 +536,7 @@ class TestAsyncExecutions:
             execution_id="execution_id",
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     async def test_method_events_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -546,7 +546,7 @@ class TestAsyncExecutions:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     async def test_raw_response_events(self, async_client: AsyncDedalus) -> None:
@@ -558,7 +558,7 @@ class TestAsyncExecutions:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         execution = await response.parse()
-        assert_matches_type(AsyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+        assert_matches_type(AsyncCursorPage[ExecutionEvent], execution, path=["response"])
 
     @parametrize
     async def test_streaming_response_events(self, async_client: AsyncDedalus) -> None:
@@ -570,7 +570,7 @@ class TestAsyncExecutions:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             execution = await response.parse()
-            assert_matches_type(AsyncExecutionEvents[ExecutionEvent], execution, path=["response"])
+            assert_matches_type(AsyncCursorPage[ExecutionEvent], execution, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
