@@ -16,7 +16,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncExecutionList, AsyncExecutionList, SyncExecutionEvents, AsyncExecutionEvents
+from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspaces import execution_list_params, execution_create_params, execution_events_params
 from ...types.workspaces.execution import Execution
@@ -151,7 +151,7 @@ class ExecutionsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncExecutionList[Execution]:
+    ) -> SyncCursorPage[Execution]:
         """
         List executions
 
@@ -168,7 +168,7 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/executions",
-            page=SyncExecutionList[Execution],
+            page=SyncCursorPage[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -241,7 +241,7 @@ class ExecutionsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncExecutionEvents[ExecutionEvent]:
+    ) -> SyncCursorPage[ExecutionEvent]:
         """
         List execution events
 
@@ -260,7 +260,7 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
-            page=SyncExecutionEvents[ExecutionEvent],
+            page=SyncCursorPage[ExecutionEvent],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -439,7 +439,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[Execution, AsyncExecutionList[Execution]]:
+    ) -> AsyncPaginator[Execution, AsyncCursorPage[Execution]]:
         """
         List executions
 
@@ -456,7 +456,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/executions",
-            page=AsyncExecutionList[Execution],
+            page=AsyncCursorPage[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -529,7 +529,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[ExecutionEvent, AsyncExecutionEvents[ExecutionEvent]]:
+    ) -> AsyncPaginator[ExecutionEvent, AsyncCursorPage[ExecutionEvent]]:
         """
         List execution events
 
@@ -548,7 +548,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
-            page=AsyncExecutionEvents[ExecutionEvent],
+            page=AsyncCursorPage[ExecutionEvent],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

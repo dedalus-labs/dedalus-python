@@ -55,7 +55,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncWorkspaceList, AsyncWorkspaceList
+from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspace import Workspace
 from ...types.workspace_list import Item
@@ -256,7 +256,7 @@ class WorkspacesResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncWorkspaceList[Item]:
+    ) -> SyncCursorPage[Item]:
         """
         List workspaces
 
@@ -271,7 +271,7 @@ class WorkspacesResource(SyncAPIResource):
         """
         return self._get_api_list(
             "/v1/workspaces",
-            page=SyncWorkspaceList[Item],
+            page=SyncCursorPage[Item],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -524,7 +524,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[Item, AsyncWorkspaceList[Item]]:
+    ) -> AsyncPaginator[Item, AsyncCursorPage[Item]]:
         """
         List workspaces
 
@@ -539,7 +539,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         """
         return self._get_api_list(
             "/v1/workspaces",
-            page=AsyncWorkspaceList[Item],
+            page=AsyncCursorPage[Item],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

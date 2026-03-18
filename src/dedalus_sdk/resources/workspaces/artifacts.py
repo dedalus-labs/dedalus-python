@@ -14,7 +14,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncArtifactList, AsyncArtifactList
+from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspaces import artifact_list_params
 from ...types.workspaces.artifact import Artifact
@@ -90,7 +90,7 @@ class ArtifactsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncArtifactList[Artifact]:
+    ) -> SyncCursorPage[Artifact]:
         """
         List artifacts
 
@@ -107,7 +107,7 @@ class ArtifactsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/artifacts",
-            page=SyncArtifactList[Artifact],
+            page=SyncCursorPage[Artifact],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -236,7 +236,7 @@ class AsyncArtifactsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[Artifact, AsyncArtifactList[Artifact]]:
+    ) -> AsyncPaginator[Artifact, AsyncCursorPage[Artifact]]:
         """
         List artifacts
 
@@ -253,7 +253,7 @@ class AsyncArtifactsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
             f"/v1/workspaces/{workspace_id}/artifacts",
-            page=AsyncArtifactList[Artifact],
+            page=AsyncCursorPage[Artifact],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -9,7 +9,7 @@ import pytest
 
 from dedalus_sdk import Dedalus, AsyncDedalus
 from tests.utils import assert_matches_type
-from dedalus_sdk.pagination import SyncTerminalList, AsyncTerminalList
+from dedalus_sdk.pagination import SyncCursorPage, AsyncCursorPage
 from dedalus_sdk.types.workspaces import Terminal
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
@@ -130,7 +130,7 @@ class TestTerminals:
         terminal = client.workspaces.terminals.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(SyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
@@ -139,7 +139,7 @@ class TestTerminals:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(SyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
@@ -150,7 +150,7 @@ class TestTerminals:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         terminal = response.parse()
-        assert_matches_type(SyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(SyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
@@ -161,7 +161,7 @@ class TestTerminals:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             terminal = response.parse()
-            assert_matches_type(SyncTerminalList[Terminal], terminal, path=["response"])
+            assert_matches_type(SyncCursorPage[Terminal], terminal, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -338,7 +338,7 @@ class TestAsyncTerminals:
         terminal = await async_client.workspaces.terminals.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(AsyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -347,7 +347,7 @@ class TestAsyncTerminals:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(AsyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
@@ -358,7 +358,7 @@ class TestAsyncTerminals:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         terminal = await response.parse()
-        assert_matches_type(AsyncTerminalList[Terminal], terminal, path=["response"])
+        assert_matches_type(AsyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
@@ -369,7 +369,7 @@ class TestAsyncTerminals:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             terminal = await response.parse()
-            assert_matches_type(AsyncTerminalList[Terminal], terminal, path=["response"])
+            assert_matches_type(AsyncCursorPage[Terminal], terminal, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 

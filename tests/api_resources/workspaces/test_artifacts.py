@@ -9,7 +9,7 @@ import pytest
 
 from dedalus_sdk import Dedalus, AsyncDedalus
 from tests.utils import assert_matches_type
-from dedalus_sdk.pagination import SyncArtifactList, AsyncArtifactList
+from dedalus_sdk.pagination import SyncCursorPage, AsyncCursorPage
 from dedalus_sdk.types.workspaces import Artifact
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
@@ -71,7 +71,7 @@ class TestArtifacts:
         artifact = client.workspaces.artifacts.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(SyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
@@ -80,7 +80,7 @@ class TestArtifacts:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(SyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
@@ -91,7 +91,7 @@ class TestArtifacts:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         artifact = response.parse()
-        assert_matches_type(SyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(SyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
@@ -102,7 +102,7 @@ class TestArtifacts:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             artifact = response.parse()
-            assert_matches_type(SyncArtifactList[Artifact], artifact, path=["response"])
+            assert_matches_type(SyncCursorPage[Artifact], artifact, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -220,7 +220,7 @@ class TestAsyncArtifacts:
         artifact = await async_client.workspaces.artifacts.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(AsyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -229,7 +229,7 @@ class TestAsyncArtifacts:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(AsyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
@@ -240,7 +240,7 @@ class TestAsyncArtifacts:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         artifact = await response.parse()
-        assert_matches_type(AsyncArtifactList[Artifact], artifact, path=["response"])
+        assert_matches_type(AsyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
@@ -251,7 +251,7 @@ class TestAsyncArtifacts:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             artifact = await response.parse()
-            assert_matches_type(AsyncArtifactList[Artifact], artifact, path=["response"])
+            assert_matches_type(AsyncCursorPage[Artifact], artifact, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
