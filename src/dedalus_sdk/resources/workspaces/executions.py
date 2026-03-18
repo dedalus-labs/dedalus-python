@@ -51,7 +51,6 @@ class ExecutionsResource(SyncAPIResource):
         workspace_id: str,
         *,
         command: Optional[SequenceNotStr[str]],
-        capture_paths: Optional[SequenceNotStr[str]] | Omit = omit,
         cwd: str | Omit = omit,
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
@@ -86,7 +85,6 @@ class ExecutionsResource(SyncAPIResource):
             body=maybe_transform(
                 {
                     "command": command,
-                    "capture_paths": capture_paths,
                     "cwd": cwd,
                     "env": env,
                     "stdin": stdin,
@@ -341,7 +339,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         workspace_id: str,
         *,
         command: Optional[SequenceNotStr[str]],
-        capture_paths: Optional[SequenceNotStr[str]] | Omit = omit,
         cwd: str | Omit = omit,
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
@@ -376,7 +373,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
             body=await async_maybe_transform(
                 {
                     "command": command,
-                    "capture_paths": capture_paths,
                     "cwd": cwd,
                     "env": env,
                     "stdin": stdin,

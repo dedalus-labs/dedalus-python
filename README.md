@@ -42,7 +42,6 @@ client = Dedalus(
 )
 
 workspace = client.workspaces.create(
-    image_version="noble@golden",
     memory_mib=2048,
     storage_gib=10,
     vcpu=1,
@@ -71,7 +70,6 @@ client = AsyncDedalus(
 
 async def main() -> None:
     workspace = await client.workspaces.create(
-        image_version="noble@golden",
         memory_mib=2048,
         storage_gib=10,
         vcpu=1,
@@ -110,7 +108,6 @@ async def main() -> None:
         http_client=DefaultAioHttpClient(),
     ) as client:
         workspace = await client.workspaces.create(
-            image_version="noble@golden",
             memory_mib=2048,
             storage_gib=10,
             vcpu=1,
@@ -210,7 +207,6 @@ client = Dedalus()
 
 try:
     client.workspaces.create(
-        image_version="noble@golden",
         memory_mib=2048,
         storage_gib=10,
         vcpu=1,
@@ -258,7 +254,6 @@ client = Dedalus(
 
 # Or, configure per-request:
 client.with_options(max_retries=5).workspaces.create(
-    image_version="noble@golden",
     memory_mib=2048,
     storage_gib=10,
     vcpu=1,
@@ -286,7 +281,6 @@ client = Dedalus(
 
 # Override per-request:
 client.with_options(timeout=5.0).workspaces.create(
-    image_version="noble@golden",
     memory_mib=2048,
     storage_gib=10,
     vcpu=1,
@@ -332,7 +326,6 @@ from dedalus_sdk import Dedalus
 
 client = Dedalus()
 response = client.workspaces.with_raw_response.create(
-    image_version="noble@golden",
     memory_mib=2048,
     storage_gib=10,
     vcpu=1,
@@ -355,7 +348,6 @@ To stream the response body, use `.with_streaming_response` instead, which requi
 
 ```python
 with client.workspaces.with_streaming_response.create(
-    image_version="noble@golden",
     memory_mib=2048,
     storage_gib=10,
     vcpu=1,

@@ -29,8 +29,6 @@ class Item(BaseModel):
 
     workspace_id: str
 
-    image_version: Optional[str] = None
-
 
 class WorkspaceList(BaseModel):
     items: Optional[List[Item]] = None

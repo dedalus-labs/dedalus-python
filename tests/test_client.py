@@ -892,9 +892,7 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            client.workspaces.with_streaming_response.create(
-                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
-            ).__enter__()
+            client.workspaces.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__enter__()
 
         assert _get_open_connections(client) == 0
 
@@ -904,9 +902,7 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            client.workspaces.with_streaming_response.create(
-                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
-            ).__enter__()
+            client.workspaces.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__enter__()
         assert _get_open_connections(client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -935,9 +931,7 @@ class TestDedalus:
 
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = client.workspaces.with_raw_response.create(
-            image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
-        )
+        response = client.workspaces.with_raw_response.create(memory_mib=0, storage_gib=0, vcpu=0)
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -962,11 +956,7 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = client.workspaces.with_raw_response.create(
-            image_version="image_version",
-            memory_mib=0,
-            storage_gib=0,
-            vcpu=0,
-            extra_headers={"x-stainless-retry-count": Omit()},
+            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": Omit()}
         )
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
@@ -991,11 +981,7 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = client.workspaces.with_raw_response.create(
-            image_version="image_version",
-            memory_mib=0,
-            storage_gib=0,
-            vcpu=0,
-            extra_headers={"x-stainless-retry-count": "42"},
+            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": "42"}
         )
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
@@ -1859,7 +1845,7 @@ class TestAsyncDedalus:
 
         with pytest.raises(APITimeoutError):
             await async_client.workspaces.with_streaming_response.create(
-                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
+                memory_mib=0, storage_gib=0, vcpu=0
             ).__aenter__()
 
         assert _get_open_connections(async_client) == 0
@@ -1871,7 +1857,7 @@ class TestAsyncDedalus:
 
         with pytest.raises(APIStatusError):
             await async_client.workspaces.with_streaming_response.create(
-                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
+                memory_mib=0, storage_gib=0, vcpu=0
             ).__aenter__()
         assert _get_open_connections(async_client) == 0
 
@@ -1901,9 +1887,7 @@ class TestAsyncDedalus:
 
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
-        response = await client.workspaces.with_raw_response.create(
-            image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
-        )
+        response = await client.workspaces.with_raw_response.create(memory_mib=0, storage_gib=0, vcpu=0)
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -1928,11 +1912,7 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = await client.workspaces.with_raw_response.create(
-            image_version="image_version",
-            memory_mib=0,
-            storage_gib=0,
-            vcpu=0,
-            extra_headers={"x-stainless-retry-count": Omit()},
+            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": Omit()}
         )
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
@@ -1957,11 +1937,7 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = await client.workspaces.with_raw_response.create(
-            image_version="image_version",
-            memory_mib=0,
-            storage_gib=0,
-            vcpu=0,
-            extra_headers={"x-stainless-retry-count": "42"},
+            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": "42"}
         )
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
