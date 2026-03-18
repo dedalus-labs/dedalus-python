@@ -893,7 +893,7 @@ class TestDedalus:
 
         with pytest.raises(APITimeoutError):
             client.workspaces.with_streaming_response.create(
-                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
             ).__enter__()
 
         assert _get_open_connections(client) == 0
@@ -905,7 +905,7 @@ class TestDedalus:
 
         with pytest.raises(APIStatusError):
             client.workspaces.with_streaming_response.create(
-                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
             ).__enter__()
         assert _get_open_connections(client) == 0
 
@@ -936,7 +936,7 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = client.workspaces.with_raw_response.create(
-            cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
         )
 
         assert response.retries_taken == failures_before_success
@@ -962,10 +962,10 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
             extra_headers={"x-stainless-retry-count": Omit()},
         )
 
@@ -991,10 +991,10 @@ class TestDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
             extra_headers={"x-stainless-retry-count": "42"},
         )
 
@@ -1859,7 +1859,7 @@ class TestAsyncDedalus:
 
         with pytest.raises(APITimeoutError):
             await async_client.workspaces.with_streaming_response.create(
-                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
             ).__aenter__()
 
         assert _get_open_connections(async_client) == 0
@@ -1871,7 +1871,7 @@ class TestAsyncDedalus:
 
         with pytest.raises(APIStatusError):
             await async_client.workspaces.with_streaming_response.create(
-                cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+                image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
             ).__aenter__()
         assert _get_open_connections(async_client) == 0
 
@@ -1902,7 +1902,7 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = await client.workspaces.with_raw_response.create(
-            cpus=0, image_version="image_version", memory_mib=0, storage_gib=0
+            image_version="image_version", memory_mib=0, storage_gib=0, vcpu=0
         )
 
         assert response.retries_taken == failures_before_success
@@ -1928,10 +1928,10 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = await client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
             extra_headers={"x-stainless-retry-count": Omit()},
         )
 
@@ -1957,10 +1957,10 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/workspaces").mock(side_effect=retry_handler)
 
         response = await client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
             extra_headers={"x-stainless-retry-count": "42"},
         )
 

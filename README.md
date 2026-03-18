@@ -42,10 +42,10 @@ client = Dedalus(
 )
 
 workspace = client.workspaces.create(
-    cpus=1,
-    image_version="noble@2026-03-01.1",
+    image_version="noble@golden",
     memory_mib=2048,
-    storage_gib=20,
+    storage_gib=10,
+    vcpu=1,
 )
 print(workspace.workspace_id)
 ```
@@ -71,10 +71,10 @@ client = AsyncDedalus(
 
 async def main() -> None:
     workspace = await client.workspaces.create(
-        cpus=1,
-        image_version="noble@2026-03-01.1",
+        image_version="noble@golden",
         memory_mib=2048,
-        storage_gib=20,
+        storage_gib=10,
+        vcpu=1,
     )
     print(workspace.workspace_id)
 
@@ -110,10 +110,10 @@ async def main() -> None:
         http_client=DefaultAioHttpClient(),
     ) as client:
         workspace = await client.workspaces.create(
-            cpus=1,
-            image_version="noble@2026-03-01.1",
+            image_version="noble@golden",
             memory_mib=2048,
-            storage_gib=20,
+            storage_gib=10,
+            vcpu=1,
         )
         print(workspace.workspace_id)
 
@@ -210,10 +210,10 @@ client = Dedalus()
 
 try:
     client.workspaces.create(
-        cpus=1,
-        image_version="noble@2026-03-01.1",
+        image_version="noble@golden",
         memory_mib=2048,
-        storage_gib=20,
+        storage_gib=10,
+        vcpu=1,
     )
 except dedalus_sdk.APIConnectionError as e:
     print("The server could not be reached")
@@ -258,10 +258,10 @@ client = Dedalus(
 
 # Or, configure per-request:
 client.with_options(max_retries=5).workspaces.create(
-    cpus=1,
-    image_version="noble@2026-03-01.1",
+    image_version="noble@golden",
     memory_mib=2048,
-    storage_gib=20,
+    storage_gib=10,
+    vcpu=1,
 )
 ```
 
@@ -286,10 +286,10 @@ client = Dedalus(
 
 # Override per-request:
 client.with_options(timeout=5.0).workspaces.create(
-    cpus=1,
-    image_version="noble@2026-03-01.1",
+    image_version="noble@golden",
     memory_mib=2048,
-    storage_gib=20,
+    storage_gib=10,
+    vcpu=1,
 )
 ```
 
@@ -332,10 +332,10 @@ from dedalus_sdk import Dedalus
 
 client = Dedalus()
 response = client.workspaces.with_raw_response.create(
-    cpus=1,
-    image_version="noble@2026-03-01.1",
+    image_version="noble@golden",
     memory_mib=2048,
-    storage_gib=20,
+    storage_gib=10,
+    vcpu=1,
 )
 print(response.headers.get('X-My-Header'))
 
@@ -355,10 +355,10 @@ To stream the response body, use `.with_streaming_response` instead, which requi
 
 ```python
 with client.workspaces.with_streaming_response.create(
-    cpus=1,
-    image_version="noble@2026-03-01.1",
+    image_version="noble@golden",
     memory_mib=2048,
-    storage_gib=20,
+    storage_gib=10,
+    vcpu=1,
 ) as response:
     print(response.headers.get("X-My-Header"))
 

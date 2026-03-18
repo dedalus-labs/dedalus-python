@@ -12,8 +12,10 @@ __all__ = ["WorkspaceUpdateParams"]
 class WorkspaceUpdateParams(TypedDict, total=False):
     if_match: Required[Annotated[str, PropertyInfo(alias="If-Match")]]
 
-    cpus: int
-
     memory_mib: int
+    """Memory in MiB."""
 
     storage_gib: int
+
+    vcpu: float
+    """CPU in vCPUs."""

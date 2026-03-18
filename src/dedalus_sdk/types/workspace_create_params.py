@@ -8,10 +8,12 @@ __all__ = ["WorkspaceCreateParams"]
 
 
 class WorkspaceCreateParams(TypedDict, total=False):
-    cpus: Required[int]
-
     image_version: Required[str]
 
     memory_mib: Required[int]
+    """Memory in MiB."""
 
     storage_gib: Required[int]
+
+    vcpu: Required[float]
+    """CPU in vCPUs."""

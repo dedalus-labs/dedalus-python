@@ -34,7 +34,7 @@ from ._base_client import (
 
 if TYPE_CHECKING:
     from .resources import workspaces
-    from .resources.workspaces import WorkspacesResource, AsyncWorkspacesResource
+    from .resources.workspaces.workspaces import WorkspacesResource, AsyncWorkspacesResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Dedalus", "AsyncDedalus", "Client", "AsyncClient"]
 
@@ -45,6 +45,14 @@ class Dedalus(SyncAPIClient):
     x_api_key: str | None
     dedalus_org_id: str | None
 
+    websocket_base_url: str | httpx.URL | None
+    """Base URL for WebSocket connections.
+
+    If not specified, the default base URL will be used, with 'wss://' replacing the
+    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
+    'wss://example.com'
+    """
+
     def __init__(
         self,
         *,
@@ -52,6 +60,7 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
         base_url: str | httpx.URL | None = None,
+        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -88,6 +97,8 @@ class Dedalus(SyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+
+        self.websocket_base_url = websocket_base_url
 
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
@@ -175,6 +186,7 @@ class Dedalus(SyncAPIClient):
         api_key: str | None = None,
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
+        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -211,6 +223,7 @@ class Dedalus(SyncAPIClient):
             api_key=api_key or self.api_key,
             x_api_key=x_api_key or self.x_api_key,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -264,6 +277,14 @@ class AsyncDedalus(AsyncAPIClient):
     x_api_key: str | None
     dedalus_org_id: str | None
 
+    websocket_base_url: str | httpx.URL | None
+    """Base URL for WebSocket connections.
+
+    If not specified, the default base URL will be used, with 'wss://' replacing the
+    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
+    'wss://example.com'
+    """
+
     def __init__(
         self,
         *,
@@ -271,6 +292,7 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
         base_url: str | httpx.URL | None = None,
+        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -307,6 +329,8 @@ class AsyncDedalus(AsyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+
+        self.websocket_base_url = websocket_base_url
 
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
@@ -394,6 +418,7 @@ class AsyncDedalus(AsyncAPIClient):
         api_key: str | None = None,
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
+        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -430,6 +455,7 @@ class AsyncDedalus(AsyncAPIClient):
             api_key=api_key or self.api_key,
             x_api_key=x_api_key or self.x_api_key,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
