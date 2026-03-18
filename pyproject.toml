@@ -1,17 +1,17 @@
 [project]
-name = "dedalus"
+name = "dedalus-sdk"
 version = "0.0.1"
-description = "The official Python library for the dedalus API"
+description = "The official Python library for the Dedalus API"
 dynamic = ["readme"]
-license = "Apache-2.0"
+license = "MIT"
 authors = [
-{ name = "Dedalus", email = "" },
+{ name = "Dedalus", email = "oss@dedaluslabs.ai" },
 ]
 
 dependencies = [
   "httpx>=0.23.0, <1",
   "pydantic>=1.9.0, <3",
-  "typing-extensions>=4.10, <5",
+  "typing-extensions>=4.14, <5",
   "anyio>=3.5.0, <5",
   "distro>=1.7.0, <2",
   "sniffio",
@@ -33,15 +33,16 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Operating System :: Microsoft :: Windows",
   "Topic :: Software Development :: Libraries :: Python Modules",
-  "License :: OSI Approved :: Apache Software License"
+  "License :: OSI Approved :: MIT License"
 ]
 
 [project.urls]
-Homepage = "https://github.com/stainless-sdks/dedalus-python"
-Repository = "https://github.com/stainless-sdks/dedalus-python"
+Homepage = "https://github.com/dedalus-labs/dedalus-python"
+Repository = "https://github.com/dedalus-labs/dedalus-python"
 
 [project.optional-dependencies]
 aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]
+websockets = ["websockets >= 13, < 16"]
 
 [tool.uv]
 managed = true
@@ -86,7 +87,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/dedalus"]
+packages = ["src/dedalus_sdk"]
 
 [tool.hatch.build.targets.sdist]
 # Basically everything except hidden files/directories (such as .github, .devcontainers, .python-version, etc)
@@ -112,7 +113,7 @@ path = "README.md"
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
 # replace relative links with absolute links
 pattern = '\[(.+?)\]\(((?!https?://)\S+?)\)'
-replacement = '[\1](https://github.com/stainless-sdks/dedalus-python/tree/main/\g<2>)'
+replacement = '[\1](https://github.com/dedalus-labs/dedalus-python/tree/main/\g<2>)'
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -154,7 +155,7 @@ show_error_codes = true
 #
 # We also exclude our `tests` as mypy doesn't always infer
 # types correctly and Pyright will still catch any type errors.
-exclude = ['src/dedalus/_files.py', '_dev/.*.py', 'tests/.*']
+exclude = ['src/dedalus_sdk/_files.py', '_dev/.*.py', 'tests/.*']
 
 strict_equality = true
 implicit_reexport = true
@@ -246,7 +247,7 @@ length-sort = true
 length-sort-straight = true
 combine-as-imports = true
 extra-standard-library = ["typing_extensions"]
-known-first-party = ["dedalus", "tests"]
+known-first-party = ["dedalus_sdk", "tests"]
 
 [tool.ruff.lint.per-file-ignores]
 "bin/**.py" = ["T201", "T203"]

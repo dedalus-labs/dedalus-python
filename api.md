@@ -1,68 +1,116 @@
-# Shared Types
-
-```python
-from dedalus.types import Order
-```
-
-# Pets
+# Workspaces
 
 Types:
 
 ```python
-from dedalus.types import (
-    Category,
-    Pet,
-    PetFindByStatusResponse,
-    PetFindByTagsResponse,
-    PetUploadImageResponse,
+from dedalus_sdk.types import CreateParams, LifecycleStatus, UpdateParams, Workspace, WorkspaceList
+```
+
+Methods:
+
+- <code title="post /v1/workspaces">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">create</a>(\*\*<a href="src/dedalus_sdk/types/workspace_create_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
+- <code title="get /v1/workspaces/{workspace_id}">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">retrieve</a>(workspace_id) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
+- <code title="patch /v1/workspaces/{workspace_id}">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">update</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspace_update_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
+- <code title="get /v1/workspaces">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">list</a>(\*\*<a href="src/dedalus_sdk/types/workspace_list_params.py">params</a>) -> SyncWorkspaceList[Item]</code>
+- <code title="delete /v1/workspaces/{workspace_id}">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">delete</a>(workspace_id) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
+
+## Artifacts
+
+Types:
+
+```python
+from dedalus_sdk.types.workspaces import Artifact, ArtifactList
+```
+
+Methods:
+
+- <code title="get /v1/workspaces/{workspace_id}/artifacts/{artifact_id}">client.workspaces.artifacts.<a href="./src/dedalus_sdk/resources/workspaces/artifacts.py">retrieve</a>(artifact_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/artifact.py">Artifact</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/artifacts">client.workspaces.artifacts.<a href="./src/dedalus_sdk/resources/workspaces/artifacts.py">list</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/artifact_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/artifact.py">SyncArtifactList[Artifact]</a></code>
+- <code title="delete /v1/workspaces/{workspace_id}/artifacts/{artifact_id}">client.workspaces.artifacts.<a href="./src/dedalus_sdk/resources/workspaces/artifacts.py">delete</a>(artifact_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/artifact.py">Artifact</a></code>
+
+## Previews
+
+Types:
+
+```python
+from dedalus_sdk.types.workspaces import Preview, PreviewCreateParams, PreviewList
+```
+
+Methods:
+
+- <code title="post /v1/workspaces/{workspace_id}/previews">client.workspaces.previews.<a href="./src/dedalus_sdk/resources/workspaces/previews.py">create</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/preview_create_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/preview.py">Preview</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/previews/{preview_id}">client.workspaces.previews.<a href="./src/dedalus_sdk/resources/workspaces/previews.py">retrieve</a>(preview_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/preview.py">Preview</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/previews">client.workspaces.previews.<a href="./src/dedalus_sdk/resources/workspaces/previews.py">list</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/preview_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/preview.py">SyncPreviewList[Preview]</a></code>
+- <code title="delete /v1/workspaces/{workspace_id}/previews/{preview_id}">client.workspaces.previews.<a href="./src/dedalus_sdk/resources/workspaces/previews.py">delete</a>(preview_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/preview.py">Preview</a></code>
+
+## SSH
+
+Types:
+
+```python
+from dedalus_sdk.types.workspaces import (
+    SSHConnection,
+    SSHHostTrust,
+    SSHSession,
+    SSHSessionCreateParams,
+    SSHSessionList,
 )
 ```
 
 Methods:
 
-- <code title="post /pet">client.pets.<a href="./src/dedalus/resources/pets.py">create</a>(\*\*<a href="src/dedalus/types/pet_create_params.py">params</a>) -> <a href="./src/dedalus/types/pet.py">Pet</a></code>
-- <code title="get /pet/{petId}">client.pets.<a href="./src/dedalus/resources/pets.py">retrieve</a>(pet_id) -> <a href="./src/dedalus/types/pet.py">Pet</a></code>
-- <code title="put /pet">client.pets.<a href="./src/dedalus/resources/pets.py">update</a>(\*\*<a href="src/dedalus/types/pet_update_params.py">params</a>) -> <a href="./src/dedalus/types/pet.py">Pet</a></code>
-- <code title="delete /pet/{petId}">client.pets.<a href="./src/dedalus/resources/pets.py">delete</a>(pet_id) -> None</code>
-- <code title="get /pet/findByStatus">client.pets.<a href="./src/dedalus/resources/pets.py">find_by_status</a>(\*\*<a href="src/dedalus/types/pet_find_by_status_params.py">params</a>) -> <a href="./src/dedalus/types/pet_find_by_status_response.py">PetFindByStatusResponse</a></code>
-- <code title="get /pet/findByTags">client.pets.<a href="./src/dedalus/resources/pets.py">find_by_tags</a>(\*\*<a href="src/dedalus/types/pet_find_by_tags_params.py">params</a>) -> <a href="./src/dedalus/types/pet_find_by_tags_response.py">PetFindByTagsResponse</a></code>
-- <code title="post /pet/{petId}">client.pets.<a href="./src/dedalus/resources/pets.py">update_by_id</a>(pet_id, \*\*<a href="src/dedalus/types/pet_update_by_id_params.py">params</a>) -> None</code>
-- <code title="post /pet/{petId}/uploadImage">client.pets.<a href="./src/dedalus/resources/pets.py">upload_image</a>(pet_id, image, \*\*<a href="src/dedalus/types/pet_upload_image_params.py">params</a>) -> <a href="./src/dedalus/types/pet_upload_image_response.py">PetUploadImageResponse</a></code>
+- <code title="post /v1/workspaces/{workspace_id}/ssh">client.workspaces.ssh.<a href="./src/dedalus_sdk/resources/workspaces/ssh.py">create</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/ssh_create_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/ssh_session.py">SSHSession</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/ssh/{session_id}">client.workspaces.ssh.<a href="./src/dedalus_sdk/resources/workspaces/ssh.py">retrieve</a>(session_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/ssh_session.py">SSHSession</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/ssh">client.workspaces.ssh.<a href="./src/dedalus_sdk/resources/workspaces/ssh.py">list</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/ssh_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/ssh_session.py">SyncSSHSessionList[SSHSession]</a></code>
+- <code title="delete /v1/workspaces/{workspace_id}/ssh/{session_id}">client.workspaces.ssh.<a href="./src/dedalus_sdk/resources/workspaces/ssh.py">delete</a>(session_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/ssh_session.py">SSHSession</a></code>
 
-# Store
+## Executions
 
 Types:
 
 ```python
-from dedalus.types import StoreListInventoryResponse
+from dedalus_sdk.types.workspaces import (
+    ArtifactRef,
+    Execution,
+    ExecutionCreateParams,
+    ExecutionEvent,
+    ExecutionEvents,
+    ExecutionList,
+    ExecutionOutput,
+)
 ```
 
 Methods:
 
-- <code title="get /store/inventory">client.store.<a href="./src/dedalus/resources/store/store.py">list_inventory</a>() -> <a href="./src/dedalus/types/store_list_inventory_response.py">StoreListInventoryResponse</a></code>
+- <code title="post /v1/workspaces/{workspace_id}/executions">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">create</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/execution_create_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/execution.py">Execution</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/executions/{execution_id}">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">retrieve</a>(execution_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/execution.py">Execution</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/executions">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">list</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/execution_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/execution.py">SyncExecutionList[Execution]</a></code>
+- <code title="delete /v1/workspaces/{workspace_id}/executions/{execution_id}">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">delete</a>(execution_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/execution.py">Execution</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/executions/{execution_id}/events">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">events</a>(execution_id, \*, workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/execution_events_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/execution_event.py">SyncExecutionEvents[ExecutionEvent]</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/executions/{execution_id}/output">client.workspaces.executions.<a href="./src/dedalus_sdk/resources/workspaces/executions.py">output</a>(execution_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/execution_output.py">ExecutionOutput</a></code>
 
-## Orders
-
-Methods:
-
-- <code title="post /store/order">client.store.orders.<a href="./src/dedalus/resources/store/orders.py">create</a>(\*\*<a href="src/dedalus/types/store/order_create_params.py">params</a>) -> <a href="./src/dedalus/types/shared/order.py">Order</a></code>
-- <code title="get /store/order/{orderId}">client.store.orders.<a href="./src/dedalus/resources/store/orders.py">retrieve</a>(order_id) -> <a href="./src/dedalus/types/shared/order.py">Order</a></code>
-- <code title="delete /store/order/{orderId}">client.store.orders.<a href="./src/dedalus/resources/store/orders.py">delete</a>(order_id) -> None</code>
-
-# Users
+## Terminals
 
 Types:
 
 ```python
-from dedalus.types import User, UserLoginResponse
+from dedalus_sdk.types.workspaces import (
+    Terminal,
+    TerminalClientEvent,
+    TerminalClosedEvent,
+    TerminalCreateParams,
+    TerminalErrorEvent,
+    TerminalInputEvent,
+    TerminalList,
+    TerminalOutputEvent,
+    TerminalResizeEvent,
+    TerminalServerEvent,
+)
 ```
 
 Methods:
 
-- <code title="post /user">client.users.<a href="./src/dedalus/resources/users.py">create</a>(\*\*<a href="src/dedalus/types/user_create_params.py">params</a>) -> <a href="./src/dedalus/types/user.py">User</a></code>
-- <code title="get /user/{username}">client.users.<a href="./src/dedalus/resources/users.py">retrieve</a>(username) -> <a href="./src/dedalus/types/user.py">User</a></code>
-- <code title="put /user/{username}">client.users.<a href="./src/dedalus/resources/users.py">update</a>(existing_username, \*\*<a href="src/dedalus/types/user_update_params.py">params</a>) -> None</code>
-- <code title="delete /user/{username}">client.users.<a href="./src/dedalus/resources/users.py">delete</a>(username) -> None</code>
-- <code title="post /user/createWithList">client.users.<a href="./src/dedalus/resources/users.py">create_with_list</a>(\*\*<a href="src/dedalus/types/user_create_with_list_params.py">params</a>) -> <a href="./src/dedalus/types/user.py">User</a></code>
-- <code title="get /user/login">client.users.<a href="./src/dedalus/resources/users.py">login</a>(\*\*<a href="src/dedalus/types/user_login_params.py">params</a>) -> str</code>
-- <code title="get /user/logout">client.users.<a href="./src/dedalus/resources/users.py">logout</a>() -> None</code>
+- <code title="post /v1/workspaces/{workspace_id}/terminals">client.workspaces.terminals.<a href="./src/dedalus_sdk/resources/workspaces/terminals.py">create</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/terminal_create_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/terminal.py">Terminal</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/terminals/{terminal_id}">client.workspaces.terminals.<a href="./src/dedalus_sdk/resources/workspaces/terminals.py">retrieve</a>(terminal_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/terminal.py">Terminal</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/terminals">client.workspaces.terminals.<a href="./src/dedalus_sdk/resources/workspaces/terminals.py">list</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspaces/terminal_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspaces/terminal.py">SyncTerminalList[Terminal]</a></code>
+- <code title="delete /v1/workspaces/{workspace_id}/terminals/{terminal_id}">client.workspaces.terminals.<a href="./src/dedalus_sdk/resources/workspaces/terminals.py">delete</a>(terminal_id, \*, workspace_id) -> <a href="./src/dedalus_sdk/types/workspaces/terminal.py">Terminal</a></code>

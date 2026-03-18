@@ -8,15 +8,15 @@ from typing_extensions import Required, Annotated, TypedDict
 
 import pytest
 
-from dedalus._types import Base64FileInput, omit, not_given
-from dedalus._utils import (
+from dedalus_sdk._types import Base64FileInput, omit, not_given
+from dedalus_sdk._utils import (
     PropertyInfo,
     transform as _transform,
     parse_datetime,
     async_transform as _async_transform,
 )
-from dedalus._compat import PYDANTIC_V1
-from dedalus._models import BaseModel
+from dedalus_sdk._compat import PYDANTIC_V1
+from dedalus_sdk._models import BaseModel
 
 _T = TypeVar("_T")
 

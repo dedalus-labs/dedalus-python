@@ -10,15 +10,15 @@ import httpx
 import pytest
 from pytest_asyncio import is_async_test
 
-from dedalus import Dedalus, AsyncDedalus, DefaultAioHttpClient
-from dedalus._utils import is_dict
+from dedalus_sdk import Dedalus, AsyncDedalus, DefaultAioHttpClient
+from dedalus_sdk._utils import is_dict
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest  # pyright: ignore[reportPrivateImportUsage]
 
 pytest.register_assert_rewrite("tests.utils")
 
-logging.getLogger("dedalus").setLevel(logging.DEBUG)
+logging.getLogger("dedalus_sdk").setLevel(logging.DEBUG)
 
 
 # automatically add `pytest.mark.asyncio()` to all of our async tests

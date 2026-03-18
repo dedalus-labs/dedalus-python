@@ -1,7 +1,7 @@
 # Dedalus Python API library
 
 <!-- prettier-ignore -->
-[![PyPI version](https://img.shields.io/pypi/v/dedalus.svg?label=pypi%20(stable))](https://pypi.org/project/dedalus/)
+[![PyPI version](https://img.shields.io/pypi/v/dedalus-sdk.svg?label=pypi%20(stable))](https://pypi.org/project/dedalus-sdk/)
 
 The Dedalus Python library provides convenient access to the Dedalus REST API from any Python 3.9+
 application. The library includes type definitions for all request params and response fields,
@@ -13,24 +13,21 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 Use the Dedalus MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
 
-[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-mcp&config=eyJuYW1lIjoiZGVkYWx1cy1tY3AiLCJ0cmFuc3BvcnQiOiJodHRwIiwidXJsIjoiaHR0cHM6Ly9kZWRhbHVzLnN0bG1jcC5jb20iLCJoZWFkZXJzIjp7ImFwaV9rZXkiOiJNeSBBUEkgS2V5In19)
-[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-mcp%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fdedalus.stlmcp.com%22%2C%22headers%22%3A%7B%22api_key%22%3A%22My%20API%20Key%22%7D%7D)
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=dedalus-mcp&config=eyJuYW1lIjoiZGVkYWx1cy1tY3AiLCJ0cmFuc3BvcnQiOiJodHRwIiwidXJsIjoiaHR0cHM6Ly9kZWRhbHVzLnN0bG1jcC5jb20iLCJoZWFkZXJzIjp7IngtYXBpLWtleSI6Ik15IFggQVBJIEtleSIsIngtZGVkYWx1cy1hcGkta2V5IjoiTXkgQVBJIEtleSJ9fQ)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22dedalus-mcp%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fdedalus.stlmcp.com%22%2C%22headers%22%3A%7B%22x-api-key%22%3A%22My%20X%20API%20Key%22%2C%22x-dedalus-api-key%22%3A%22My%20API%20Key%22%7D%7D)
 
 > Note: You may need to set environment variables in your MCP client.
 
 ## Documentation
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.dedaluslabs.ai](https://docs.dedaluslabs.ai). The full API of this library can be found in [api.md](api.md).
 
 ## Installation
 
 ```sh
-# install from this staging repo
-pip install git+ssh://git@github.com/stainless-sdks/dedalus-python.git
+# install from PyPI
+pip install dedalus-sdk
 ```
-
-> [!NOTE]
-> Once this package is [published to PyPI](https://www.stainless.com/docs/guides/publish), this will become: `pip install dedalus`
 
 ## Usage
 
@@ -38,24 +35,24 @@ The full API of this library can be found in [api.md](api.md).
 
 ```python
 import os
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    api_key=os.environ.get("PETSTORE_API_KEY"),  # This is the default and can be omitted
+    api_key=os.environ.get("DEDALUS_API_KEY"),  # This is the default and can be omitted
 )
 
-order = client.store.orders.create(
-    pet_id=1,
-    quantity=1,
-    status="placed",
+workspace = client.workspaces.create(
+    memory_mib=2048,
+    storage_gib=10,
+    vcpu=1,
 )
-print(order.id)
+print(workspace.workspace_id)
 ```
 
-While you can provide an `api_key` keyword argument,
+While you can provide a `x_api_key` keyword argument,
 we recommend using [python-dotenv](https://pypi.org/project/python-dotenv/)
-to add `PETSTORE_API_KEY="My API Key"` to your `.env` file
-so that your API Key is not stored in source control.
+to add `DEDALUS_X_API_KEY="My X API Key"` to your `.env` file
+so that your X API Key is not stored in source control.
 
 ## Async usage
 
@@ -64,20 +61,20 @@ Simply import `AsyncDedalus` instead of `Dedalus` and use `await` with each API 
 ```python
 import os
 import asyncio
-from dedalus import AsyncDedalus
+from dedalus_sdk import AsyncDedalus
 
 client = AsyncDedalus(
-    api_key=os.environ.get("PETSTORE_API_KEY"),  # This is the default and can be omitted
+    api_key=os.environ.get("DEDALUS_API_KEY"),  # This is the default and can be omitted
 )
 
 
 async def main() -> None:
-    order = await client.store.orders.create(
-        pet_id=1,
-        quantity=1,
-        status="placed",
+    workspace = await client.workspaces.create(
+        memory_mib=2048,
+        storage_gib=10,
+        vcpu=1,
     )
-    print(order.id)
+    print(workspace.workspace_id)
 
 
 asyncio.run(main())
@@ -92,8 +89,8 @@ By default, the async client uses `httpx` for HTTP requests. However, for improv
 You can enable this by installing `aiohttp`:
 
 ```sh
-# install from this staging repo
-pip install 'dedalus[aiohttp] @ git+ssh://git@github.com/stainless-sdks/dedalus-python.git'
+# install from PyPI
+pip install dedalus-sdk[aiohttp]
 ```
 
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
@@ -101,21 +98,21 @@ Then you can enable it by instantiating the client with `http_client=DefaultAioH
 ```python
 import os
 import asyncio
-from dedalus import DefaultAioHttpClient
-from dedalus import AsyncDedalus
+from dedalus_sdk import DefaultAioHttpClient
+from dedalus_sdk import AsyncDedalus
 
 
 async def main() -> None:
     async with AsyncDedalus(
-        api_key=os.environ.get("PETSTORE_API_KEY"),  # This is the default and can be omitted
+        api_key=os.environ.get("DEDALUS_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        order = await client.store.orders.create(
-            pet_id=1,
-            quantity=1,
-            status="placed",
+        workspace = await client.workspaces.create(
+            memory_mib=2048,
+            storage_gib=10,
+            vcpu=1,
         )
-        print(order.id)
+        print(workspace.workspace_id)
 
 
 asyncio.run(main())
@@ -130,46 +127,96 @@ Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typ
 
 Typed requests and responses provide autocomplete and documentation within your editor. If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode` to `basic`.
 
-## Nested params
+## Pagination
 
-Nested parameters are dictionaries, typed using `TypedDict`, for example:
+List methods in the Dedalus API are paginated.
+
+This library provides auto-paginating iterators with each list response, so you do not have to request successive pages manually:
 
 ```python
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 client = Dedalus()
 
-pet = client.pets.create(
-    name="doggie",
-    photo_urls=["string"],
-    category={},
-)
-print(pet.category)
+all_workspaces = []
+# Automatically fetches more pages as needed.
+for workspace in client.workspaces.list():
+    # Do something with workspace here
+    all_workspaces.append(workspace)
+print(all_workspaces)
+```
+
+Or, asynchronously:
+
+```python
+import asyncio
+from dedalus_sdk import AsyncDedalus
+
+client = AsyncDedalus()
+
+
+async def main() -> None:
+    all_workspaces = []
+    # Iterate through items across all pages, issuing requests as needed.
+    async for workspace in client.workspaces.list():
+        all_workspaces.append(workspace)
+    print(all_workspaces)
+
+
+asyncio.run(main())
+```
+
+Alternatively, you can use the `.has_next_page()`, `.next_page_info()`, or `.get_next_page()` methods for more granular control working with pages:
+
+```python
+first_page = await client.workspaces.list()
+if first_page.has_next_page():
+    print(f"will fetch next page using these details: {first_page.next_page_info()}")
+    next_page = await first_page.get_next_page()
+    print(f"number of items we just fetched: {len(next_page.items)}")
+
+# Remove `await` for non-async usage.
+```
+
+Or just work directly with the returned data:
+
+```python
+first_page = await client.workspaces.list()
+
+print(f"next page cursor: {first_page.next_cursor}")  # => "next page cursor: ..."
+for workspace in first_page.items:
+    print(workspace.workspace_id)
+
+# Remove `await` for non-async usage.
 ```
 
 ## Handling errors
 
-When the library is unable to connect to the API (for example, due to network connection problems or a timeout), a subclass of `dedalus.APIConnectionError` is raised.
+When the library is unable to connect to the API (for example, due to network connection problems or a timeout), a subclass of `dedalus_sdk.APIConnectionError` is raised.
 
 When the API returns a non-success status code (that is, 4xx or 5xx
-response), a subclass of `dedalus.APIStatusError` is raised, containing `status_code` and `response` properties.
+response), a subclass of `dedalus_sdk.APIStatusError` is raised, containing `status_code` and `response` properties.
 
-All errors inherit from `dedalus.APIError`.
+All errors inherit from `dedalus_sdk.APIError`.
 
 ```python
-import dedalus
-from dedalus import Dedalus
+import dedalus_sdk
+from dedalus_sdk import Dedalus
 
 client = Dedalus()
 
 try:
-    client.store.list_inventory()
-except dedalus.APIConnectionError as e:
+    client.workspaces.create(
+        memory_mib=2048,
+        storage_gib=10,
+        vcpu=1,
+    )
+except dedalus_sdk.APIConnectionError as e:
     print("The server could not be reached")
     print(e.__cause__)  # an underlying Exception, likely raised within httpx.
-except dedalus.RateLimitError as e:
+except dedalus_sdk.RateLimitError as e:
     print("A 429 status code was received; we should back off a bit.")
-except dedalus.APIStatusError as e:
+except dedalus_sdk.APIStatusError as e:
     print("Another non-200-range status code was received")
     print(e.status_code)
     print(e.response)
@@ -197,7 +244,7 @@ Connection errors (for example, due to a network connectivity problem), 408 Requ
 You can use the `max_retries` option to configure or disable retry settings:
 
 ```python
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 # Configure the default for all requests:
 client = Dedalus(
@@ -206,7 +253,11 @@ client = Dedalus(
 )
 
 # Or, configure per-request:
-client.with_options(max_retries=5).store.list_inventory()
+client.with_options(max_retries=5).workspaces.create(
+    memory_mib=2048,
+    storage_gib=10,
+    vcpu=1,
+)
 ```
 
 ### Timeouts
@@ -215,7 +266,7 @@ By default requests time out after 1 minute. You can configure this with a `time
 which accepts a float or an [`httpx.Timeout`](https://www.python-httpx.org/advanced/timeouts/#fine-tuning-the-configuration) object:
 
 ```python
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 # Configure the default for all requests:
 client = Dedalus(
@@ -229,7 +280,11 @@ client = Dedalus(
 )
 
 # Override per-request:
-client.with_options(timeout=5.0).store.list_inventory()
+client.with_options(timeout=5.0).workspaces.create(
+    memory_mib=2048,
+    storage_gib=10,
+    vcpu=1,
+)
 ```
 
 On timeout, an `APITimeoutError` is thrown.
@@ -267,19 +322,23 @@ if response.my_field is None:
 The "raw" Response object can be accessed by prefixing `.with_raw_response.` to any HTTP method call, e.g.,
 
 ```py
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 client = Dedalus()
-response = client.store.with_raw_response.list_inventory()
+response = client.workspaces.with_raw_response.create(
+    memory_mib=2048,
+    storage_gib=10,
+    vcpu=1,
+)
 print(response.headers.get('X-My-Header'))
 
-store = response.parse()  # get the object that `store.list_inventory()` would have returned
-print(store)
+workspace = response.parse()  # get the object that `workspaces.create()` would have returned
+print(workspace.workspace_id)
 ```
 
-These methods return an [`APIResponse`](https://github.com/stainless-sdks/dedalus-python/tree/main/src/dedalus/_response.py) object.
+These methods return an [`APIResponse`](https://github.com/dedalus-labs/dedalus-python/tree/main/src/dedalus_sdk/_response.py) object.
 
-The async client returns an [`AsyncAPIResponse`](https://github.com/stainless-sdks/dedalus-python/tree/main/src/dedalus/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
+The async client returns an [`AsyncAPIResponse`](https://github.com/dedalus-labs/dedalus-python/tree/main/src/dedalus_sdk/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
 
 #### `.with_streaming_response`
 
@@ -288,7 +347,11 @@ The above interface eagerly reads the full response body when you make the reque
 To stream the response body, use `.with_streaming_response` instead, which requires a context manager and only reads the response body once you call `.read()`, `.text()`, `.json()`, `.iter_bytes()`, `.iter_text()`, `.iter_lines()` or `.parse()`. In the async client, these are async methods.
 
 ```python
-with client.store.with_streaming_response.list_inventory() as response:
+with client.workspaces.with_streaming_response.create(
+    memory_mib=2048,
+    storage_gib=10,
+    vcpu=1,
+) as response:
     print(response.headers.get("X-My-Header"))
 
     for line in response.iter_lines():
@@ -341,7 +404,7 @@ You can directly override the [httpx client](https://www.python-httpx.org/api/#c
 
 ```python
 import httpx
-from dedalus import Dedalus, DefaultHttpxClient
+from dedalus_sdk import Dedalus, DefaultHttpxClient
 
 client = Dedalus(
     # Or use the `DEDALUS_BASE_URL` env var
@@ -364,7 +427,7 @@ client.with_options(http_client=DefaultHttpxClient(...))
 By default the library closes underlying HTTP connections whenever the client is [garbage collected](https://docs.python.org/3/reference/datamodel.html#object.__del__). You can manually close the client using the `.close()` method if desired, or with a context manager that closes when exiting.
 
 ```py
-from dedalus import Dedalus
+from dedalus_sdk import Dedalus
 
 with Dedalus() as client:
   # make requests here
@@ -383,7 +446,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/dedalus-python/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/dedalus-labs/dedalus-python/issues) with questions, bugs, or suggestions.
 
 ### Determining the installed version
 
@@ -392,8 +455,8 @@ If you've upgraded to the latest version but aren't seeing any new features you 
 You can determine the version that is being used at runtime with:
 
 ```py
-import dedalus
-print(dedalus.__version__)
+import dedalus_sdk
+print(dedalus_sdk.__version__)
 ```
 
 ## Requirements

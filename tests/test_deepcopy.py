@@ -1,4 +1,4 @@
-from dedalus._utils import deepcopy_minimal
+from dedalus_sdk._utils import deepcopy_minimal
 
 
 def assert_different_identities(obj1: object, obj2: object) -> None:

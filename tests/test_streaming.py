@@ -5,8 +5,8 @@ from typing import Iterator, AsyncIterator
 import httpx
 import pytest
 
-from dedalus import Dedalus, AsyncDedalus
-from dedalus._streaming import Stream, AsyncStream, ServerSentEvent
+from dedalus_sdk import Dedalus, AsyncDedalus
+from dedalus_sdk._streaming import Stream, AsyncStream, ServerSentEvent
 
 
 @pytest.mark.asyncio
