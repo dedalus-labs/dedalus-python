@@ -14,9 +14,19 @@ __all__ = ["Workspace"]
 class Workspace(BaseModel):
     desired_state: Literal["active", "inactive", "destroyed"]
 
+    memory_mib: int
+    """Memory in MiB."""
+
     status: LifecycleStatus
+
+    storage_gib: int
+
+    vcpu: float
+    """CPU in vCPUs."""
 
     workspace_id: str
 
     schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
     """A URL to the JSON Schema for this object."""
+
+    image_version: Optional[str] = None

@@ -2,54 +2,61 @@
 
 from __future__ import annotations
 
+from typing import Dict, Optional
+
 import httpx
 
-from ..types import workspace_list_params, workspace_create_params, workspace_update_params
-from .._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from .._utils import maybe_transform, async_maybe_transform
-from .._compat import cached_property
-from .._resource import SyncAPIResource, AsyncAPIResource
-from .._response import (
+from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
+from ..._utils import maybe_transform, async_maybe_transform
+from ..._compat import cached_property
+from ..._resource import SyncAPIResource, AsyncAPIResource
+from ..._response import (
     to_raw_response_wrapper,
     to_streamed_response_wrapper,
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ..pagination import SyncWorkspaceList, AsyncWorkspaceList
-from .._base_client import AsyncPaginator, make_request_options
-from ..types.workspace import Workspace
-from ..types.workspace_list import Item
+from ...pagination import SyncExecutionList, AsyncExecutionList, SyncExecutionEvents, AsyncExecutionEvents
+from ..._base_client import AsyncPaginator, make_request_options
+from ...types.workspaces import execution_list_params, execution_create_params, execution_events_params
+from ...types.workspaces.execution import Execution
+from ...types.workspaces.execution_event import ExecutionEvent
+from ...types.workspaces.execution_output import ExecutionOutput
 
-__all__ = ["WorkspacesResource", "AsyncWorkspacesResource"]
+__all__ = ["ExecutionsResource", "AsyncExecutionsResource"]
 
 
-class WorkspacesResource(SyncAPIResource):
+class ExecutionsResource(SyncAPIResource):
     @cached_property
-    def with_raw_response(self) -> WorkspacesResourceWithRawResponse:
+    def with_raw_response(self) -> ExecutionsResourceWithRawResponse:
         """
         This property can be used as a prefix for any HTTP method call to return
         the raw response object instead of the parsed content.
 
         For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
         """
-        return WorkspacesResourceWithRawResponse(self)
+        return ExecutionsResourceWithRawResponse(self)
 
     @cached_property
-    def with_streaming_response(self) -> WorkspacesResourceWithStreamingResponse:
+    def with_streaming_response(self) -> ExecutionsResourceWithStreamingResponse:
         """
         An alternative to `.with_raw_response` that doesn't eagerly read the response body.
 
         For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
         """
-        return WorkspacesResourceWithStreamingResponse(self)
+        return ExecutionsResourceWithStreamingResponse(self)
 
     def create(
         self,
+        workspace_id: str,
         *,
-        cpus: int,
-        image_version: str,
-        memory_mib: int,
-        storage_gib: int,
+        command: Optional[SequenceNotStr[str]],
+        capture_paths: Optional[SequenceNotStr[str]] | Omit = omit,
+        cwd: str | Omit = omit,
+        env: Dict[str, str] | Omit = omit,
+        stdin: str | Omit = omit,
+        timeout_ms: int | Omit = omit,
+        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -57,9 +64,9 @@ class WorkspacesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Create workspace
+        Create execution
 
         Args:
           extra_headers: Send extra headers
@@ -72,16 +79,21 @@ class WorkspacesResource(SyncAPIResource):
 
           idempotency_key: Specify a custom idempotency key for this request
         """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._post(
-            "/v1/workspaces",
+            f"/v1/workspaces/{workspace_id}/executions",
             body=maybe_transform(
                 {
-                    "cpus": cpus,
-                    "image_version": image_version,
-                    "memory_mib": memory_mib,
-                    "storage_gib": storage_gib,
+                    "command": command,
+                    "capture_paths": capture_paths,
+                    "cwd": cwd,
+                    "env": env,
+                    "stdin": stdin,
+                    "timeout_ms": timeout_ms,
+                    "wake_if_needed": wake_if_needed,
                 },
-                workspace_create_params.WorkspaceCreateParams,
+                execution_create_params.ExecutionCreateParams,
             ),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -90,22 +102,23 @@ class WorkspacesResource(SyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Workspace,
+            cast_to=Execution,
         )
 
     def retrieve(
         self,
-        workspace_id: str,
+        execution_id: str,
         *,
+        workspace_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Get workspace
+        Get execution
 
         Args:
           extra_headers: Send extra headers
@@ -118,69 +131,19 @@ class WorkspacesResource(SyncAPIResource):
         """
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}",
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Workspace,
-        )
-
-    def update(
-        self,
-        workspace_id: str,
-        *,
-        if_match: str,
-        cpus: int | Omit = omit,
-        memory_mib: int | Omit = omit,
-        storage_gib: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-        idempotency_key: str | None = None,
-    ) -> Workspace:
-        """
-        Update workspace
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
-        """
-        if not workspace_id:
-            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
-        return self._patch(
-            f"/v1/workspaces/{workspace_id}",
-            body=maybe_transform(
-                {
-                    "cpus": cpus,
-                    "memory_mib": memory_mib,
-                    "storage_gib": storage_gib,
-                },
-                workspace_update_params.WorkspaceUpdateParams,
-            ),
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                idempotency_key=idempotency_key,
-            ),
-            cast_to=Workspace,
+            cast_to=Execution,
         )
 
     def list(
         self,
+        workspace_id: str,
         *,
         cursor: str | Omit = omit,
         limit: int | Omit = omit,
@@ -190,9 +153,9 @@ class WorkspacesResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncWorkspaceList[Item]:
+    ) -> SyncExecutionList[Execution]:
         """
-        List workspaces
+        List executions
 
         Args:
           extra_headers: Send extra headers
@@ -203,9 +166,11 @@ class WorkspacesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            "/v1/workspaces",
-            page=SyncWorkspaceList[Item],
+            f"/v1/workspaces/{workspace_id}/executions",
+            page=SyncExecutionList[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -216,17 +181,17 @@ class WorkspacesResource(SyncAPIResource):
                         "cursor": cursor,
                         "limit": limit,
                     },
-                    workspace_list_params.WorkspaceListParams,
+                    execution_list_params.ExecutionListParams,
                 ),
             ),
-            model=Item,
+            model=Execution,
         )
 
     def delete(
         self,
-        workspace_id: str,
+        execution_id: str,
         *,
-        if_match: str,
+        workspace_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -234,9 +199,9 @@ class WorkspacesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Destroy workspace
+        Delete execution
 
         Args:
           extra_headers: Send extra headers
@@ -251,9 +216,10 @@ class WorkspacesResource(SyncAPIResource):
         """
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._delete(
-            f"/v1/workspaces/{workspace_id}",
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -261,37 +227,126 @@ class WorkspacesResource(SyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Workspace,
+            cast_to=Execution,
+        )
+
+    def events(
+        self,
+        execution_id: str,
+        *,
+        workspace_id: str,
+        cursor: str | Omit = omit,
+        limit: int | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> SyncExecutionEvents[ExecutionEvent]:
+        """
+        List execution events
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
+        return self._get_api_list(
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+            page=SyncExecutionEvents[ExecutionEvent],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform(
+                    {
+                        "cursor": cursor,
+                        "limit": limit,
+                    },
+                    execution_events_params.ExecutionEventsParams,
+                ),
+            ),
+            model=ExecutionEvent,
+        )
+
+    def output(
+        self,
+        execution_id: str,
+        *,
+        workspace_id: str,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> ExecutionOutput:
+        """
+        Get execution output
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
+        return self._get(
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=ExecutionOutput,
         )
 
 
-class AsyncWorkspacesResource(AsyncAPIResource):
+class AsyncExecutionsResource(AsyncAPIResource):
     @cached_property
-    def with_raw_response(self) -> AsyncWorkspacesResourceWithRawResponse:
+    def with_raw_response(self) -> AsyncExecutionsResourceWithRawResponse:
         """
         This property can be used as a prefix for any HTTP method call to return
         the raw response object instead of the parsed content.
 
         For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
         """
-        return AsyncWorkspacesResourceWithRawResponse(self)
+        return AsyncExecutionsResourceWithRawResponse(self)
 
     @cached_property
-    def with_streaming_response(self) -> AsyncWorkspacesResourceWithStreamingResponse:
+    def with_streaming_response(self) -> AsyncExecutionsResourceWithStreamingResponse:
         """
         An alternative to `.with_raw_response` that doesn't eagerly read the response body.
 
         For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
         """
-        return AsyncWorkspacesResourceWithStreamingResponse(self)
+        return AsyncExecutionsResourceWithStreamingResponse(self)
 
     async def create(
         self,
+        workspace_id: str,
         *,
-        cpus: int,
-        image_version: str,
-        memory_mib: int,
-        storage_gib: int,
+        command: Optional[SequenceNotStr[str]],
+        capture_paths: Optional[SequenceNotStr[str]] | Omit = omit,
+        cwd: str | Omit = omit,
+        env: Dict[str, str] | Omit = omit,
+        stdin: str | Omit = omit,
+        timeout_ms: int | Omit = omit,
+        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -299,9 +354,9 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Create workspace
+        Create execution
 
         Args:
           extra_headers: Send extra headers
@@ -314,16 +369,21 @@ class AsyncWorkspacesResource(AsyncAPIResource):
 
           idempotency_key: Specify a custom idempotency key for this request
         """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return await self._post(
-            "/v1/workspaces",
+            f"/v1/workspaces/{workspace_id}/executions",
             body=await async_maybe_transform(
                 {
-                    "cpus": cpus,
-                    "image_version": image_version,
-                    "memory_mib": memory_mib,
-                    "storage_gib": storage_gib,
+                    "command": command,
+                    "capture_paths": capture_paths,
+                    "cwd": cwd,
+                    "env": env,
+                    "stdin": stdin,
+                    "timeout_ms": timeout_ms,
+                    "wake_if_needed": wake_if_needed,
                 },
-                workspace_create_params.WorkspaceCreateParams,
+                execution_create_params.ExecutionCreateParams,
             ),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -332,22 +392,23 @@ class AsyncWorkspacesResource(AsyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Workspace,
+            cast_to=Execution,
         )
 
     async def retrieve(
         self,
-        workspace_id: str,
+        execution_id: str,
         *,
+        workspace_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Get workspace
+        Get execution
 
         Args:
           extra_headers: Send extra headers
@@ -360,69 +421,19 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         """
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}",
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Workspace,
-        )
-
-    async def update(
-        self,
-        workspace_id: str,
-        *,
-        if_match: str,
-        cpus: int | Omit = omit,
-        memory_mib: int | Omit = omit,
-        storage_gib: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-        idempotency_key: str | None = None,
-    ) -> Workspace:
-        """
-        Update workspace
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
-        """
-        if not workspace_id:
-            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
-        return await self._patch(
-            f"/v1/workspaces/{workspace_id}",
-            body=await async_maybe_transform(
-                {
-                    "cpus": cpus,
-                    "memory_mib": memory_mib,
-                    "storage_gib": storage_gib,
-                },
-                workspace_update_params.WorkspaceUpdateParams,
-            ),
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                idempotency_key=idempotency_key,
-            ),
-            cast_to=Workspace,
+            cast_to=Execution,
         )
 
     def list(
         self,
+        workspace_id: str,
         *,
         cursor: str | Omit = omit,
         limit: int | Omit = omit,
@@ -432,9 +443,9 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[Item, AsyncWorkspaceList[Item]]:
+    ) -> AsyncPaginator[Execution, AsyncExecutionList[Execution]]:
         """
-        List workspaces
+        List executions
 
         Args:
           extra_headers: Send extra headers
@@ -445,9 +456,11 @@ class AsyncWorkspacesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            "/v1/workspaces",
-            page=AsyncWorkspaceList[Item],
+            f"/v1/workspaces/{workspace_id}/executions",
+            page=AsyncExecutionList[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -458,17 +471,17 @@ class AsyncWorkspacesResource(AsyncAPIResource):
                         "cursor": cursor,
                         "limit": limit,
                     },
-                    workspace_list_params.WorkspaceListParams,
+                    execution_list_params.ExecutionListParams,
                 ),
             ),
-            model=Item,
+            model=Execution,
         )
 
     async def delete(
         self,
-        workspace_id: str,
+        execution_id: str,
         *,
-        if_match: str,
+        workspace_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -476,9 +489,9 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Workspace:
+    ) -> Execution:
         """
-        Destroy workspace
+        Delete execution
 
         Args:
           extra_headers: Send extra headers
@@ -493,9 +506,10 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         """
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return await self._delete(
-            f"/v1/workspaces/{workspace_id}",
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -503,89 +517,186 @@ class AsyncWorkspacesResource(AsyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Workspace,
+            cast_to=Execution,
+        )
+
+    def events(
+        self,
+        execution_id: str,
+        *,
+        workspace_id: str,
+        cursor: str | Omit = omit,
+        limit: int | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> AsyncPaginator[ExecutionEvent, AsyncExecutionEvents[ExecutionEvent]]:
+        """
+        List execution events
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
+        return self._get_api_list(
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+            page=AsyncExecutionEvents[ExecutionEvent],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform(
+                    {
+                        "cursor": cursor,
+                        "limit": limit,
+                    },
+                    execution_events_params.ExecutionEventsParams,
+                ),
+            ),
+            model=ExecutionEvent,
+        )
+
+    async def output(
+        self,
+        execution_id: str,
+        *,
+        workspace_id: str,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> ExecutionOutput:
+        """
+        Get execution output
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        if not execution_id:
+            raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
+        return await self._get(
+            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=ExecutionOutput,
         )
 
 
-class WorkspacesResourceWithRawResponse:
-    def __init__(self, workspaces: WorkspacesResource) -> None:
-        self._workspaces = workspaces
+class ExecutionsResourceWithRawResponse:
+    def __init__(self, executions: ExecutionsResource) -> None:
+        self._executions = executions
 
         self.create = to_raw_response_wrapper(
-            workspaces.create,
+            executions.create,
         )
         self.retrieve = to_raw_response_wrapper(
-            workspaces.retrieve,
-        )
-        self.update = to_raw_response_wrapper(
-            workspaces.update,
+            executions.retrieve,
         )
         self.list = to_raw_response_wrapper(
-            workspaces.list,
+            executions.list,
         )
         self.delete = to_raw_response_wrapper(
-            workspaces.delete,
+            executions.delete,
+        )
+        self.events = to_raw_response_wrapper(
+            executions.events,
+        )
+        self.output = to_raw_response_wrapper(
+            executions.output,
         )
 
 
-class AsyncWorkspacesResourceWithRawResponse:
-    def __init__(self, workspaces: AsyncWorkspacesResource) -> None:
-        self._workspaces = workspaces
+class AsyncExecutionsResourceWithRawResponse:
+    def __init__(self, executions: AsyncExecutionsResource) -> None:
+        self._executions = executions
 
         self.create = async_to_raw_response_wrapper(
-            workspaces.create,
+            executions.create,
         )
         self.retrieve = async_to_raw_response_wrapper(
-            workspaces.retrieve,
-        )
-        self.update = async_to_raw_response_wrapper(
-            workspaces.update,
+            executions.retrieve,
         )
         self.list = async_to_raw_response_wrapper(
-            workspaces.list,
+            executions.list,
         )
         self.delete = async_to_raw_response_wrapper(
-            workspaces.delete,
+            executions.delete,
+        )
+        self.events = async_to_raw_response_wrapper(
+            executions.events,
+        )
+        self.output = async_to_raw_response_wrapper(
+            executions.output,
         )
 
 
-class WorkspacesResourceWithStreamingResponse:
-    def __init__(self, workspaces: WorkspacesResource) -> None:
-        self._workspaces = workspaces
+class ExecutionsResourceWithStreamingResponse:
+    def __init__(self, executions: ExecutionsResource) -> None:
+        self._executions = executions
 
         self.create = to_streamed_response_wrapper(
-            workspaces.create,
+            executions.create,
         )
         self.retrieve = to_streamed_response_wrapper(
-            workspaces.retrieve,
-        )
-        self.update = to_streamed_response_wrapper(
-            workspaces.update,
+            executions.retrieve,
         )
         self.list = to_streamed_response_wrapper(
-            workspaces.list,
+            executions.list,
         )
         self.delete = to_streamed_response_wrapper(
-            workspaces.delete,
+            executions.delete,
+        )
+        self.events = to_streamed_response_wrapper(
+            executions.events,
+        )
+        self.output = to_streamed_response_wrapper(
+            executions.output,
         )
 
 
-class AsyncWorkspacesResourceWithStreamingResponse:
-    def __init__(self, workspaces: AsyncWorkspacesResource) -> None:
-        self._workspaces = workspaces
+class AsyncExecutionsResourceWithStreamingResponse:
+    def __init__(self, executions: AsyncExecutionsResource) -> None:
+        self._executions = executions
 
         self.create = async_to_streamed_response_wrapper(
-            workspaces.create,
+            executions.create,
         )
         self.retrieve = async_to_streamed_response_wrapper(
-            workspaces.retrieve,
-        )
-        self.update = async_to_streamed_response_wrapper(
-            workspaces.update,
+            executions.retrieve,
         )
         self.list = async_to_streamed_response_wrapper(
-            workspaces.list,
+            executions.list,
         )
         self.delete = async_to_streamed_response_wrapper(
-            workspaces.delete,
+            executions.delete,
+        )
+        self.events = async_to_streamed_response_wrapper(
+            executions.events,
+        )
+        self.output = async_to_streamed_response_wrapper(
+            executions.output,
         )

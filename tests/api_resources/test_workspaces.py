@@ -22,20 +22,20 @@ class TestWorkspaces:
     @parametrize
     def test_method_create(self, client: Dedalus) -> None:
         workspace = client.workspaces.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
         assert_matches_type(Workspace, workspace, path=["response"])
 
     @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
 
         assert response.is_closed is True
@@ -46,10 +46,10 @@ class TestWorkspaces:
     @parametrize
     def test_streaming_response_create(self, client: Dedalus) -> None:
         with client.workspaces.with_streaming_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -110,9 +110,9 @@ class TestWorkspaces:
         workspace = client.workspaces.update(
             workspace_id="workspace_id",
             if_match="If-Match",
-            cpus=0,
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
         assert_matches_type(Workspace, workspace, path=["response"])
 
@@ -234,20 +234,20 @@ class TestAsyncWorkspaces:
     @parametrize
     async def test_method_create(self, async_client: AsyncDedalus) -> None:
         workspace = await async_client.workspaces.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
         assert_matches_type(Workspace, workspace, path=["response"])
 
     @parametrize
     async def test_raw_response_create(self, async_client: AsyncDedalus) -> None:
         response = await async_client.workspaces.with_raw_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
 
         assert response.is_closed is True
@@ -258,10 +258,10 @@ class TestAsyncWorkspaces:
     @parametrize
     async def test_streaming_response_create(self, async_client: AsyncDedalus) -> None:
         async with async_client.workspaces.with_streaming_response.create(
-            cpus=0,
             image_version="image_version",
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -322,9 +322,9 @@ class TestAsyncWorkspaces:
         workspace = await async_client.workspaces.update(
             workspace_id="workspace_id",
             if_match="If-Match",
-            cpus=0,
             memory_mib=0,
             storage_gib=0,
+            vcpu=0,
         )
         assert_matches_type(Workspace, workspace, path=["response"])
 

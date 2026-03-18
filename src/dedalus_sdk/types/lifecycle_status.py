@@ -37,3 +37,9 @@ class LifecycleStatus(BaseModel):
     assigned_host: Optional[str] = None
 
     last_error: Optional[str] = None
+
+    memory_assigned_mib: Optional[int] = None
+
+    memory_resize_state: Optional[str] = None
+
+    memory_target_mib: Optional[int] = None

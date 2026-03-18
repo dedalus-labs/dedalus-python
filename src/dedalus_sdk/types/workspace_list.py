@@ -13,17 +13,19 @@ __all__ = ["WorkspaceList", "Item"]
 
 
 class Item(BaseModel):
-    cpus: int
-
     created_at: datetime
 
     desired_state: Literal["active", "inactive", "destroyed"]
 
     memory_mib: int
+    """Memory in MiB."""
 
     status: LifecycleStatus
 
     storage_gib: int
+
+    vcpu: float
+    """CPU in vCPUs."""
 
     workspace_id: str
 
