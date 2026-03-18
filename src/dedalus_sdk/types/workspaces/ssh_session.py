@@ -4,8 +4,6 @@ from typing import Optional
 from datetime import datetime
 from typing_extensions import Literal
 
-from pydantic import Field as FieldInfo
-
 from ..._models import BaseModel
 from .ssh_connection import SSHConnection
 
@@ -20,9 +18,6 @@ class SSHSession(BaseModel):
     status: Literal["wake_in_progress", "ready", "closed", "expired", "failed"]
 
     workspace_id: str
-
-    schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
-    """A URL to the JSON Schema for this object."""
 
     connection: Optional[SSHConnection] = None
 

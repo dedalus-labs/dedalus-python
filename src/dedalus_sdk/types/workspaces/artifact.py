@@ -3,8 +3,6 @@
 from typing import Optional
 from datetime import datetime
 
-from pydantic import Field as FieldInfo
-
 from ..._models import BaseModel
 
 __all__ = ["Artifact"]
@@ -20,9 +18,6 @@ class Artifact(BaseModel):
     size_bytes: int
 
     workspace_id: str
-
-    schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
-    """A URL to the JSON Schema for this object."""
 
     download_url: Optional[str] = None
 

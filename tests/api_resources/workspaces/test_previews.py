@@ -9,7 +9,7 @@ import pytest
 
 from dedalus_sdk import Dedalus, AsyncDedalus
 from tests.utils import assert_matches_type
-from dedalus_sdk.pagination import SyncPreviewList, AsyncPreviewList
+from dedalus_sdk.pagination import SyncCursorPage, AsyncCursorPage
 from dedalus_sdk.types.workspaces import Preview
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
@@ -123,7 +123,7 @@ class TestPreviews:
         preview = client.workspaces.previews.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(SyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
@@ -132,7 +132,7 @@ class TestPreviews:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(SyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
@@ -143,7 +143,7 @@ class TestPreviews:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         preview = response.parse()
-        assert_matches_type(SyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(SyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
@@ -154,7 +154,7 @@ class TestPreviews:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             preview = response.parse()
-            assert_matches_type(SyncPreviewList[Preview], preview, path=["response"])
+            assert_matches_type(SyncCursorPage[Preview], preview, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -324,7 +324,7 @@ class TestAsyncPreviews:
         preview = await async_client.workspaces.previews.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(AsyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -333,7 +333,7 @@ class TestAsyncPreviews:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(AsyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
@@ -344,7 +344,7 @@ class TestAsyncPreviews:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         preview = await response.parse()
-        assert_matches_type(AsyncPreviewList[Preview], preview, path=["response"])
+        assert_matches_type(AsyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
@@ -355,7 +355,7 @@ class TestAsyncPreviews:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             preview = await response.parse()
-            assert_matches_type(AsyncPreviewList[Preview], preview, path=["response"])
+            assert_matches_type(AsyncCursorPage[Preview], preview, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 

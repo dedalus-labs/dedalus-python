@@ -9,7 +9,7 @@ import pytest
 
 from dedalus_sdk import Dedalus, AsyncDedalus
 from tests.utils import assert_matches_type
-from dedalus_sdk.pagination import SyncSSHSessionList, AsyncSSHSessionList
+from dedalus_sdk.pagination import SyncCursorPage, AsyncCursorPage
 from dedalus_sdk.types.workspaces import SSHSession
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
@@ -122,7 +122,7 @@ class TestSSH:
         ssh = client.workspaces.ssh.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(SyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(SyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
@@ -131,7 +131,7 @@ class TestSSH:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(SyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(SyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
@@ -142,7 +142,7 @@ class TestSSH:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         ssh = response.parse()
-        assert_matches_type(SyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(SyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
@@ -153,7 +153,7 @@ class TestSSH:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             ssh = response.parse()
-            assert_matches_type(SyncSSHSessionList[SSHSession], ssh, path=["response"])
+            assert_matches_type(SyncCursorPage[SSHSession], ssh, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 
@@ -322,7 +322,7 @@ class TestAsyncSSH:
         ssh = await async_client.workspaces.ssh.list(
             workspace_id="workspace_id",
         )
-        assert_matches_type(AsyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(AsyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
@@ -331,7 +331,7 @@ class TestAsyncSSH:
             cursor="cursor",
             limit=0,
         )
-        assert_matches_type(AsyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(AsyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
@@ -342,7 +342,7 @@ class TestAsyncSSH:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         ssh = await response.parse()
-        assert_matches_type(AsyncSSHSessionList[SSHSession], ssh, path=["response"])
+        assert_matches_type(AsyncCursorPage[SSHSession], ssh, path=["response"])
 
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
@@ -353,7 +353,7 @@ class TestAsyncSSH:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             ssh = await response.parse()
-            assert_matches_type(AsyncSSHSessionList[SSHSession], ssh, path=["response"])
+            assert_matches_type(AsyncCursorPage[SSHSession], ssh, path=["response"])
 
         assert cast(Any, response.is_closed) is True
 

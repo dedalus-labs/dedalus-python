@@ -4,8 +4,6 @@ from typing import List, Optional
 from datetime import datetime
 from typing_extensions import Literal
 
-from pydantic import Field as FieldInfo
-
 from ..._models import BaseModel
 from .artifact_ref import ArtifactRef
 
@@ -22,9 +20,6 @@ class Execution(BaseModel):
     status: Literal["wake_in_progress", "queued", "running", "succeeded", "failed", "cancelled", "expired"]
 
     workspace_id: str
-
-    schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
-    """A URL to the JSON Schema for this object."""
 
     artifacts: Optional[List[ArtifactRef]] = None
 

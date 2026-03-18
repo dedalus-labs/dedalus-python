@@ -4,6 +4,19 @@
 
 Full Changelog: [v0.0.1...v0.0.1](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.1...v0.0.1)
 
+### Bug Fixes
+
+* **api:** consolidate pagination & disable websockets ([f5c935c](https://github.com/dedalus-labs/dedalus-python/commit/f5c935c4c01861bd455825cde5b3aa0c7ed36765))
+
+
+### Chores
+
+* **api:** update homebrew tap and code samples ([8efa47d](https://github.com/dedalus-labs/dedalus-python/commit/8efa47d77d66dc5aa692b05fb92131e87100b397))
+
+## 0.0.1 (2026-03-18)
+
+Full Changelog: [v0.0.1...v0.0.1](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.1...v0.0.1)
+
 ### Features
 
 * **api:** stable beta ([e6391a9](https://github.com/dedalus-labs/dedalus-python/commit/e6391a959ccc51ad1f9c5072e2190ea7bfb5a94a))

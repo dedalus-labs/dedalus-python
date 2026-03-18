@@ -4,8 +4,6 @@ from typing import List, Optional
 from datetime import datetime
 from typing_extensions import Literal
 
-from pydantic import Field as FieldInfo
-
 from .._models import BaseModel
 from .lifecycle_status import LifecycleStatus
 
@@ -32,8 +30,5 @@ class Item(BaseModel):
 
 class WorkspaceList(BaseModel):
     items: Optional[List[Item]] = None
-
-    schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
-    """A URL to the JSON Schema for this object."""
 
     next_cursor: Optional[str] = None

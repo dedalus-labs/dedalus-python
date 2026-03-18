@@ -4,8 +4,6 @@ from typing import Optional
 from datetime import datetime
 from typing_extensions import Literal
 
-from pydantic import Field as FieldInfo
-
 from ..._models import BaseModel
 
 __all__ = ["Terminal"]
@@ -23,9 +21,6 @@ class Terminal(BaseModel):
     width: int
 
     workspace_id: str
-
-    schema_: Optional[str] = FieldInfo(alias="$schema", default=None)
-    """A URL to the JSON Schema for this object."""
 
     error_code: Optional[str] = None
 
