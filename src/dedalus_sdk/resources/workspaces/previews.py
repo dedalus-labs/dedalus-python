@@ -7,7 +7,7 @@ from typing_extensions import Literal
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -76,7 +76,7 @@ class PreviewsResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._post(
-            f"/v1/workspaces/{workspace_id}/previews",
+            path_template("/v1/workspaces/{workspace_id}/previews", workspace_id=workspace_id),
             body=maybe_transform(
                 {
                     "port": port,
@@ -124,7 +124,9 @@ class PreviewsResource(SyncAPIResource):
         if not preview_id:
             raise ValueError(f"Expected a non-empty value for `preview_id` but received {preview_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}/previews/{preview_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/previews/{preview_id}", workspace_id=workspace_id, preview_id=preview_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -159,7 +161,7 @@ class PreviewsResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/previews",
+            path_template("/v1/workspaces/{workspace_id}/previews", workspace_id=workspace_id),
             page=SyncCursorPage[Preview],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -209,7 +211,9 @@ class PreviewsResource(SyncAPIResource):
         if not preview_id:
             raise ValueError(f"Expected a non-empty value for `preview_id` but received {preview_id!r}")
         return self._delete(
-            f"/v1/workspaces/{workspace_id}/previews/{preview_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/previews/{preview_id}", workspace_id=workspace_id, preview_id=preview_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -273,7 +277,7 @@ class AsyncPreviewsResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return await self._post(
-            f"/v1/workspaces/{workspace_id}/previews",
+            path_template("/v1/workspaces/{workspace_id}/previews", workspace_id=workspace_id),
             body=await async_maybe_transform(
                 {
                     "port": port,
@@ -321,7 +325,9 @@ class AsyncPreviewsResource(AsyncAPIResource):
         if not preview_id:
             raise ValueError(f"Expected a non-empty value for `preview_id` but received {preview_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}/previews/{preview_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/previews/{preview_id}", workspace_id=workspace_id, preview_id=preview_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -356,7 +362,7 @@ class AsyncPreviewsResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/previews",
+            path_template("/v1/workspaces/{workspace_id}/previews", workspace_id=workspace_id),
             page=AsyncCursorPage[Preview],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -406,7 +412,9 @@ class AsyncPreviewsResource(AsyncAPIResource):
         if not preview_id:
             raise ValueError(f"Expected a non-empty value for `preview_id` but received {preview_id!r}")
         return await self._delete(
-            f"/v1/workspaces/{workspace_id}/previews/{preview_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/previews/{preview_id}", workspace_id=workspace_id, preview_id=preview_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

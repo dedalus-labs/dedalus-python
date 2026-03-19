@@ -7,7 +7,7 @@ from typing import Dict, Optional
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -81,7 +81,7 @@ class ExecutionsResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._post(
-            f"/v1/workspaces/{workspace_id}/executions",
+            path_template("/v1/workspaces/{workspace_id}/executions", workspace_id=workspace_id),
             body=maybe_transform(
                 {
                     "command": command,
@@ -132,7 +132,11 @@ class ExecutionsResource(SyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -167,7 +171,7 @@ class ExecutionsResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/executions",
+            path_template("/v1/workspaces/{workspace_id}/executions", workspace_id=workspace_id),
             page=SyncCursorPage[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -217,7 +221,11 @@ class ExecutionsResource(SyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._delete(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -259,7 +267,11 @@ class ExecutionsResource(SyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             page=SyncCursorPage[ExecutionEvent],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -306,7 +318,11 @@ class ExecutionsResource(SyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -369,7 +385,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return await self._post(
-            f"/v1/workspaces/{workspace_id}/executions",
+            path_template("/v1/workspaces/{workspace_id}/executions", workspace_id=workspace_id),
             body=await async_maybe_transform(
                 {
                     "command": command,
@@ -420,7 +436,11 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -455,7 +475,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/executions",
+            path_template("/v1/workspaces/{workspace_id}/executions", workspace_id=workspace_id),
             page=AsyncCursorPage[Execution],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -505,7 +525,11 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return await self._delete(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -547,7 +571,11 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}/events",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             page=AsyncCursorPage[ExecutionEvent],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -594,7 +622,11 @@ class AsyncExecutionsResource(AsyncAPIResource):
         if not execution_id:
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+            path_template(
+                "/v1/workspaces/{workspace_id}/executions/{execution_id}/output",
+                workspace_id=workspace_id,
+                execution_id=execution_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
