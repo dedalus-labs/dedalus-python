@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform
+from ..._utils import path_template, maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -71,7 +71,11 @@ class ArtifactsResource(SyncAPIResource):
         if not artifact_id:
             raise ValueError(f"Expected a non-empty value for `artifact_id` but received {artifact_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+                workspace_id=workspace_id,
+                artifact_id=artifact_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -106,7 +110,7 @@ class ArtifactsResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/artifacts",
+            path_template("/v1/workspaces/{workspace_id}/artifacts", workspace_id=workspace_id),
             page=SyncCursorPage[Artifact],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -156,7 +160,11 @@ class ArtifactsResource(SyncAPIResource):
         if not artifact_id:
             raise ValueError(f"Expected a non-empty value for `artifact_id` but received {artifact_id!r}")
         return self._delete(
-            f"/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+                workspace_id=workspace_id,
+                artifact_id=artifact_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -217,7 +225,11 @@ class AsyncArtifactsResource(AsyncAPIResource):
         if not artifact_id:
             raise ValueError(f"Expected a non-empty value for `artifact_id` but received {artifact_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+                workspace_id=workspace_id,
+                artifact_id=artifact_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -252,7 +264,7 @@ class AsyncArtifactsResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get_api_list(
-            f"/v1/workspaces/{workspace_id}/artifacts",
+            path_template("/v1/workspaces/{workspace_id}/artifacts", workspace_id=workspace_id),
             page=AsyncCursorPage[Artifact],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -302,7 +314,11 @@ class AsyncArtifactsResource(AsyncAPIResource):
         if not artifact_id:
             raise ValueError(f"Expected a non-empty value for `artifact_id` but received {artifact_id!r}")
         return await self._delete(
-            f"/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+            path_template(
+                "/v1/workspaces/{workspace_id}/artifacts/{artifact_id}",
+                workspace_id=workspace_id,
+                artifact_id=artifact_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

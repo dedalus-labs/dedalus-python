@@ -14,7 +14,7 @@ from .ssh import (
 )
 from ...types import workspace_list_params, workspace_create_params, workspace_update_params
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from .previews import (
     PreviewsResource,
     AsyncPreviewsResource,
@@ -181,7 +181,7 @@ class WorkspacesResource(SyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._get(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -226,7 +226,7 @@ class WorkspacesResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._patch(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             body=maybe_transform(
                 {
                     "memory_mib": memory_mib,
@@ -319,7 +319,7 @@ class WorkspacesResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._delete(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -449,7 +449,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         if not workspace_id:
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return await self._get(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -494,7 +494,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._patch(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             body=await async_maybe_transform(
                 {
                     "memory_mib": memory_mib,
@@ -587,7 +587,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._delete(
-            f"/v1/workspaces/{workspace_id}",
+            path_template("/v1/workspaces/{workspace_id}", workspace_id=workspace_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
