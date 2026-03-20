@@ -14,7 +14,7 @@ from .ssh import (
 )
 from ...types import workspace_list_params, workspace_create_params, workspace_update_params
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, strip_not_given, async_maybe_transform
 from .previews import (
     PreviewsResource,
     AsyncPreviewsResource,
@@ -55,6 +55,7 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
+from ..._streaming import Stream, AsyncStream
 from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.workspace import Workspace
@@ -330,6 +331,47 @@ class WorkspacesResource(SyncAPIResource):
             cast_to=Workspace,
         )
 
+    def stream_status(
+        self,
+        workspace_id: str,
+        *,
+        last_event_id: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Stream[Workspace]:
+        """Streams workspace lifecycle updates over Server-Sent Events.
+
+        Each `status` event
+        contains a full `LifecycleResponse` payload. The stream closes after the
+        workspace reaches its current desired state.
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        extra_headers = {"Accept": "text/event-stream", **(extra_headers or {})}
+        extra_headers = {**strip_not_given({"Last-Event-ID": last_event_id}), **(extra_headers or {})}
+        return self._get(
+            path_template("/v1/workspaces/{workspace_id}/status/stream", workspace_id=workspace_id),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Workspace,
+            stream=True,
+            stream_cls=Stream[Workspace],
+        )
+
 
 class AsyncWorkspacesResource(AsyncAPIResource):
     @cached_property
@@ -598,6 +640,47 @@ class AsyncWorkspacesResource(AsyncAPIResource):
             cast_to=Workspace,
         )
 
+    async def stream_status(
+        self,
+        workspace_id: str,
+        *,
+        last_event_id: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> AsyncStream[Workspace]:
+        """Streams workspace lifecycle updates over Server-Sent Events.
+
+        Each `status` event
+        contains a full `LifecycleResponse` payload. The stream closes after the
+        workspace reaches its current desired state.
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        if not workspace_id:
+            raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
+        extra_headers = {"Accept": "text/event-stream", **(extra_headers or {})}
+        extra_headers = {**strip_not_given({"Last-Event-ID": last_event_id}), **(extra_headers or {})}
+        return await self._get(
+            path_template("/v1/workspaces/{workspace_id}/status/stream", workspace_id=workspace_id),
+            options=make_request_options(
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            ),
+            cast_to=Workspace,
+            stream=True,
+            stream_cls=AsyncStream[Workspace],
+        )
+
 
 class WorkspacesResourceWithRawResponse:
     def __init__(self, workspaces: WorkspacesResource) -> None:
@@ -617,6 +700,9 @@ class WorkspacesResourceWithRawResponse:
         )
         self.delete = to_raw_response_wrapper(
             workspaces.delete,
+        )
+        self.stream_status = to_raw_response_wrapper(
+            workspaces.stream_status,
         )
 
     @cached_property
@@ -659,6 +745,9 @@ class AsyncWorkspacesResourceWithRawResponse:
         self.delete = async_to_raw_response_wrapper(
             workspaces.delete,
         )
+        self.stream_status = async_to_raw_response_wrapper(
+            workspaces.stream_status,
+        )
 
     @cached_property
     def artifacts(self) -> AsyncArtifactsResourceWithRawResponse:
@@ -700,6 +789,9 @@ class WorkspacesResourceWithStreamingResponse:
         self.delete = to_streamed_response_wrapper(
             workspaces.delete,
         )
+        self.stream_status = to_streamed_response_wrapper(
+            workspaces.stream_status,
+        )
 
     @cached_property
     def artifacts(self) -> ArtifactsResourceWithStreamingResponse:
@@ -740,6 +832,9 @@ class AsyncWorkspacesResourceWithStreamingResponse:
         )
         self.delete = async_to_streamed_response_wrapper(
             workspaces.delete,
+        )
+        self.stream_status = async_to_streamed_response_wrapper(
+            workspaces.stream_status,
         )
 
     @cached_property
