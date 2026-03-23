@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.0.2 (2026-03-23)
+
+Full Changelog: [v0.0.1...v0.0.2](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.1...v0.0.2)
+
+### Bug Fixes
+
+* **api:** add stream_status SSE endpoint, websocket terminals, websocket_base_url param ([b377c15](https://github.com/dedalus-labs/dedalus-python/commit/b377c15509fd024a3a26d24907ddb1a6426eca79))
+* sanitize endpoint path params ([ddb7735](https://github.com/dedalus-labs/dedalus-python/commit/ddb7735faa56c28c05775dc625f2db7fede23c7c))
+
+
+### Chores
+
+* **internal:** update gitignore ([54dd954](https://github.com/dedalus-labs/dedalus-python/commit/54dd954d904154caa3ba532a22c08c809d840676))
+* **tests:** bump steady to v0.19.4 ([c6813af](https://github.com/dedalus-labs/dedalus-python/commit/c6813af7f4f6c8995ca644160b30aac303160bee))
+* **tests:** bump steady to v0.19.5 ([6b3f3df](https://github.com/dedalus-labs/dedalus-python/commit/6b3f3dff25d9416ebd57e1be69cbb6b94747018f))
+* **tests:** bump steady to v0.19.6 ([7e6cdf9](https://github.com/dedalus-labs/dedalus-python/commit/7e6cdf9d37fd9f5bddaea9c707534c3b2ceab0e5))
+
+
+### Refactors
+
+* **tests:** switch from prism to steady ([1766adf](https://github.com/dedalus-labs/dedalus-python/commit/1766adfac04d3544abff0e45830865dca9fbec38))
+
 ## 0.0.1 (2026-03-18)
 
 Full Changelog: [v0.0.1...v0.0.1](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.1...v0.0.1)
