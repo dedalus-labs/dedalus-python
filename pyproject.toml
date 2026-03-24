@@ -1,6 +1,6 @@
 [project]
 name = "dedalus-sdk"
-version = "0.0.1"
+version = "0.0.2"
 description = "The official Python library for the Dedalus API"
 dynamic = ["readme"]
 license = "MIT"
@@ -42,6 +42,7 @@ Repository = "https://github.com/dedalus-labs/dedalus-python"
 
 [project.optional-dependencies]
 aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]
+websockets = ["websockets >= 13, < 16"]
 
 [tool.uv]
 managed = true

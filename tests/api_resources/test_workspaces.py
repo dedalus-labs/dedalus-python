@@ -222,6 +222,51 @@ class TestWorkspaces:
                 if_match="If-Match",
             )
 
+    @parametrize
+    def test_method_stream_status(self, client: Dedalus) -> None:
+        workspace_stream = client.workspaces.stream_status(
+            workspace_id="workspace_id",
+        )
+        workspace_stream.response.close()
+
+    @parametrize
+    def test_method_stream_status_with_all_params(self, client: Dedalus) -> None:
+        workspace_stream = client.workspaces.stream_status(
+            workspace_id="workspace_id",
+            last_event_id="Last-Event-ID",
+        )
+        workspace_stream.response.close()
+
+    @parametrize
+    def test_raw_response_stream_status(self, client: Dedalus) -> None:
+        response = client.workspaces.with_raw_response.stream_status(
+            workspace_id="workspace_id",
+        )
+
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        stream = response.parse()
+        stream.close()
+
+    @parametrize
+    def test_streaming_response_stream_status(self, client: Dedalus) -> None:
+        with client.workspaces.with_streaming_response.stream_status(
+            workspace_id="workspace_id",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            stream = response.parse()
+            stream.close()
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    def test_path_params_stream_status(self, client: Dedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `workspace_id` but received ''"):
+            client.workspaces.with_raw_response.stream_status(
+                workspace_id="",
+            )
+
 
 class TestAsyncWorkspaces:
     parametrize = pytest.mark.parametrize(
@@ -429,4 +474,49 @@ class TestAsyncWorkspaces:
             await async_client.workspaces.with_raw_response.delete(
                 workspace_id="",
                 if_match="If-Match",
+            )
+
+    @parametrize
+    async def test_method_stream_status(self, async_client: AsyncDedalus) -> None:
+        workspace_stream = await async_client.workspaces.stream_status(
+            workspace_id="workspace_id",
+        )
+        await workspace_stream.response.aclose()
+
+    @parametrize
+    async def test_method_stream_status_with_all_params(self, async_client: AsyncDedalus) -> None:
+        workspace_stream = await async_client.workspaces.stream_status(
+            workspace_id="workspace_id",
+            last_event_id="Last-Event-ID",
+        )
+        await workspace_stream.response.aclose()
+
+    @parametrize
+    async def test_raw_response_stream_status(self, async_client: AsyncDedalus) -> None:
+        response = await async_client.workspaces.with_raw_response.stream_status(
+            workspace_id="workspace_id",
+        )
+
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        stream = await response.parse()
+        await stream.close()
+
+    @parametrize
+    async def test_streaming_response_stream_status(self, async_client: AsyncDedalus) -> None:
+        async with async_client.workspaces.with_streaming_response.stream_status(
+            workspace_id="workspace_id",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            stream = await response.parse()
+            await stream.close()
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    async def test_path_params_stream_status(self, async_client: AsyncDedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `workspace_id` but received ''"):
+            await async_client.workspaces.with_raw_response.stream_status(
+                workspace_id="",
             )
