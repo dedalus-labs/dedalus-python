@@ -39,7 +39,6 @@ class TestExecutions:
             env={"foo": "string"},
             stdin="stdin",
             timeout_ms=0,
-            wake_if_needed=True,
         )
         assert_matches_type(Execution, execution, path=["response"])
 
@@ -349,7 +348,6 @@ class TestAsyncExecutions:
             env={"foo": "string"},
             stdin="stdin",
             timeout_ms=0,
-            wake_if_needed=True,
         )
         assert_matches_type(Execution, execution, path=["response"])
 

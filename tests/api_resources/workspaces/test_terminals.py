@@ -36,7 +36,6 @@ class TestTerminals:
             cwd="cwd",
             env={"foo": "string"},
             shell="shell",
-            wake_if_needed=True,
         )
         assert_matches_type(Terminal, terminal, path=["response"])
 
@@ -244,7 +243,6 @@ class TestAsyncTerminals:
             cwd="cwd",
             env={"foo": "string"},
             shell="shell",
-            wake_if_needed=True,
         )
         assert_matches_type(Terminal, terminal, path=["response"])
 

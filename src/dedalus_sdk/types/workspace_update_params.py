@@ -16,6 +16,7 @@ class WorkspaceUpdateParams(TypedDict, total=False):
     """Memory in MiB."""
 
     storage_gib: int
+    """Storage in GiB."""
 
     vcpu: float
     """CPU in vCPUs."""

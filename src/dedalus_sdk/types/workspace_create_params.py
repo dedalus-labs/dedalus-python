@@ -12,6 +12,7 @@ class WorkspaceCreateParams(TypedDict, total=False):
     """Memory in MiB."""
 
     storage_gib: Required[int]
+    """Storage in GiB."""
 
     vcpu: Required[float]
     """CPU in vCPUs."""

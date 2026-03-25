@@ -11,5 +11,3 @@ class PreviewCreateParams(TypedDict, total=False):
     port: Required[int]
 
     protocol: Literal["http", "https"]
-
-    wake_if_needed: bool

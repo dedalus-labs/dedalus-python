@@ -27,15 +27,6 @@ class TestSSH:
         assert_matches_type(SSHSession, ssh, path=["response"])
 
     @parametrize
-    def test_method_create_with_all_params(self, client: Dedalus) -> None:
-        ssh = client.workspaces.ssh.create(
-            workspace_id="workspace_id",
-            public_key="public_key",
-            wake_if_needed=True,
-        )
-        assert_matches_type(SSHSession, ssh, path=["response"])
-
-    @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.workspaces.ssh.with_raw_response.create(
             workspace_id="workspace_id",
@@ -223,15 +214,6 @@ class TestAsyncSSH:
         ssh = await async_client.workspaces.ssh.create(
             workspace_id="workspace_id",
             public_key="public_key",
-        )
-        assert_matches_type(SSHSession, ssh, path=["response"])
-
-    @parametrize
-    async def test_method_create_with_all_params(self, async_client: AsyncDedalus) -> None:
-        ssh = await async_client.workspaces.ssh.create(
-            workspace_id="workspace_id",
-            public_key="public_key",
-            wake_if_needed=True,
         )
         assert_matches_type(SSHSession, ssh, path=["response"])
 

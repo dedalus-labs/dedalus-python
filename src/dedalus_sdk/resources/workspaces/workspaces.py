@@ -124,6 +124,8 @@ class WorkspacesResource(SyncAPIResource):
         Args:
           memory_mib: Memory in MiB.
 
+          storage_gib: Storage in GiB.
+
           vcpu: CPU in vCPUs.
 
           extra_headers: Send extra headers
@@ -210,6 +212,8 @@ class WorkspacesResource(SyncAPIResource):
 
         Args:
           memory_mib: Memory in MiB.
+
+          storage_gib: Storage in GiB.
 
           vcpu: CPU in vCPUs.
 
@@ -331,7 +335,7 @@ class WorkspacesResource(SyncAPIResource):
             cast_to=Workspace,
         )
 
-    def stream_status(
+    def watch(
         self,
         workspace_id: str,
         *,
@@ -433,6 +437,8 @@ class AsyncWorkspacesResource(AsyncAPIResource):
         Args:
           memory_mib: Memory in MiB.
 
+          storage_gib: Storage in GiB.
+
           vcpu: CPU in vCPUs.
 
           extra_headers: Send extra headers
@@ -519,6 +525,8 @@ class AsyncWorkspacesResource(AsyncAPIResource):
 
         Args:
           memory_mib: Memory in MiB.
+
+          storage_gib: Storage in GiB.
 
           vcpu: CPU in vCPUs.
 
@@ -640,7 +648,7 @@ class AsyncWorkspacesResource(AsyncAPIResource):
             cast_to=Workspace,
         )
 
-    async def stream_status(
+    async def watch(
         self,
         workspace_id: str,
         *,
@@ -701,8 +709,8 @@ class WorkspacesResourceWithRawResponse:
         self.delete = to_raw_response_wrapper(
             workspaces.delete,
         )
-        self.stream_status = to_raw_response_wrapper(
-            workspaces.stream_status,
+        self.watch = to_raw_response_wrapper(
+            workspaces.watch,
         )
 
     @cached_property
@@ -745,8 +753,8 @@ class AsyncWorkspacesResourceWithRawResponse:
         self.delete = async_to_raw_response_wrapper(
             workspaces.delete,
         )
-        self.stream_status = async_to_raw_response_wrapper(
-            workspaces.stream_status,
+        self.watch = async_to_raw_response_wrapper(
+            workspaces.watch,
         )
 
     @cached_property
@@ -789,8 +797,8 @@ class WorkspacesResourceWithStreamingResponse:
         self.delete = to_streamed_response_wrapper(
             workspaces.delete,
         )
-        self.stream_status = to_streamed_response_wrapper(
-            workspaces.stream_status,
+        self.watch = to_streamed_response_wrapper(
+            workspaces.watch,
         )
 
     @cached_property
@@ -833,8 +841,8 @@ class AsyncWorkspacesResourceWithStreamingResponse:
         self.delete = async_to_streamed_response_wrapper(
             workspaces.delete,
         )
-        self.stream_status = async_to_streamed_response_wrapper(
-            workspaces.stream_status,
+        self.watch = async_to_streamed_response_wrapper(
+            workspaces.watch,
         )
 
     @cached_property
