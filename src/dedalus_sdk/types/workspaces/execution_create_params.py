@@ -20,5 +20,3 @@ class ExecutionCreateParams(TypedDict, total=False):
     stdin: str
 
     timeout_ms: int
-
-    wake_if_needed: bool

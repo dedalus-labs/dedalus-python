@@ -9,7 +9,7 @@ __all__ = ["Workspace"]
 
 
 class Workspace(BaseModel):
-    desired_state: Literal["active", "inactive", "destroyed"]
+    desired_state: Literal["running", "sleeping", "destroyed"]
 
     memory_mib: int
     """Memory in MiB."""

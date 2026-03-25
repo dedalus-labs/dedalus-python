@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.3 (2026-03-25)
+
+Full Changelog: [v0.0.2...v0.0.3](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.2...v0.0.3)
+
+### Bug Fixes
+
+* **api:** rename stream_status to watch, remove wake_if_needed from workspace methods ([453d5c3](https://github.com/dedalus-labs/dedalus-python/commit/453d5c37afde54a6b1603b2485b0100f894acfd1))
+* sync uv.lock version with pyproject.toml ([45e2a3f](https://github.com/dedalus-labs/dedalus-python/commit/45e2a3fbb28cc4a3f4d8183827ec17d46113ee3e))
+
+
+### Chores
+
+* **ci:** skip lint on metadata-only changes ([d38d11a](https://github.com/dedalus-labs/dedalus-python/commit/d38d11a241f8b47dcf62ecb2933f72f70e80aca4))
+* **tests:** bump steady to v0.19.7 ([ea163fc](https://github.com/dedalus-labs/dedalus-python/commit/ea163fc51951aca7687bbb7936113c1432df3a2e))
+
 ## 0.0.2 (2026-03-23)
 
 Full Changelog: [v0.0.1...v0.0.2](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.1...v0.0.2)

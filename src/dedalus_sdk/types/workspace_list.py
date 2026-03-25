@@ -13,7 +13,7 @@ __all__ = ["WorkspaceList", "Item"]
 class Item(BaseModel):
     created_at: datetime
 
-    desired_state: Literal["active", "inactive", "destroyed"]
+    desired_state: Literal["running", "sleeping", "destroyed"]
 
     memory_mib: int
     """Memory in MiB."""

@@ -127,7 +127,7 @@ from dedalus_sdk import Dedalus
 
 client = Dedalus()
 
-stream = client.workspaces.stream_status(
+stream = client.workspaces.watch(
     workspace_id="workspace_id",
 )
 for workspace in stream:
@@ -141,7 +141,7 @@ from dedalus_sdk import AsyncDedalus
 
 client = AsyncDedalus()
 
-stream = await client.workspaces.stream_status(
+stream = await client.workspaces.watch(
     workspace_id="workspace_id",
 )
 async for workspace in stream:
