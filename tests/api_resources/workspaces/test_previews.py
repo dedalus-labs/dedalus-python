@@ -32,7 +32,6 @@ class TestPreviews:
             workspace_id="workspace_id",
             port=0,
             protocol="http",
-            wake_if_needed=True,
         )
         assert_matches_type(Preview, preview, path=["response"])
 
@@ -233,7 +232,6 @@ class TestAsyncPreviews:
             workspace_id="workspace_id",
             port=0,
             protocol="http",
-            wake_if_needed=True,
         )
         assert_matches_type(Preview, preview, path=["response"])
 

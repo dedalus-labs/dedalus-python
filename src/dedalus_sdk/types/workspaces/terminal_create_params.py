@@ -18,5 +18,3 @@ class TerminalCreateParams(TypedDict, total=False):
     env: Dict[str, str]
 
     shell: str
-
-    wake_if_needed: bool

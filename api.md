@@ -13,7 +13,7 @@ Methods:
 - <code title="patch /v1/workspaces/{workspace_id}">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">update</a>(workspace_id, \*\*<a href="src/dedalus_sdk/types/workspace_update_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
 - <code title="get /v1/workspaces">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">list</a>(\*\*<a href="src/dedalus_sdk/types/workspace_list_params.py">params</a>) -> SyncCursorPage[Item]</code>
 - <code title="delete /v1/workspaces/{workspace_id}">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">delete</a>(workspace_id) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
-- <code title="get /v1/workspaces/{workspace_id}/status/stream">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">stream_status</a>(workspace_id) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
+- <code title="get /v1/workspaces/{workspace_id}/status/stream">client.workspaces.<a href="./src/dedalus_sdk/resources/workspaces/workspaces.py">watch</a>(workspace_id) -> <a href="./src/dedalus_sdk/types/workspace.py">Workspace</a></code>
 
 ## Artifacts
 

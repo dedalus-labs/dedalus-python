@@ -47,7 +47,6 @@ class SSHResource(SyncAPIResource):
         workspace_id: str,
         *,
         public_key: str,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -74,13 +73,7 @@ class SSHResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return self._post(
             path_template("/v1/workspaces/{workspace_id}/ssh", workspace_id=workspace_id),
-            body=maybe_transform(
-                {
-                    "public_key": public_key,
-                    "wake_if_needed": wake_if_needed,
-                },
-                ssh_create_params.SSHCreateParams,
-            ),
+            body=maybe_transform({"public_key": public_key}, ssh_create_params.SSHCreateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -246,7 +239,6 @@ class AsyncSSHResource(AsyncAPIResource):
         workspace_id: str,
         *,
         public_key: str,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -273,13 +265,7 @@ class AsyncSSHResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `workspace_id` but received {workspace_id!r}")
         return await self._post(
             path_template("/v1/workspaces/{workspace_id}/ssh", workspace_id=workspace_id),
-            body=await async_maybe_transform(
-                {
-                    "public_key": public_key,
-                    "wake_if_needed": wake_if_needed,
-                },
-                ssh_create_params.SSHCreateParams,
-            ),
+            body=await async_maybe_transform({"public_key": public_key}, ssh_create_params.SSHCreateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

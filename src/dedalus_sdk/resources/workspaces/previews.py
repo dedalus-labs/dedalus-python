@@ -50,7 +50,6 @@ class PreviewsResource(SyncAPIResource):
         *,
         port: int,
         protocol: Literal["http", "https"] | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -81,7 +80,6 @@ class PreviewsResource(SyncAPIResource):
                 {
                     "port": port,
                     "protocol": protocol,
-                    "wake_if_needed": wake_if_needed,
                 },
                 preview_create_params.PreviewCreateParams,
             ),
@@ -251,7 +249,6 @@ class AsyncPreviewsResource(AsyncAPIResource):
         *,
         port: int,
         protocol: Literal["http", "https"] | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -282,7 +279,6 @@ class AsyncPreviewsResource(AsyncAPIResource):
                 {
                     "port": port,
                     "protocol": protocol,
-                    "wake_if_needed": wake_if_needed,
                 },
                 preview_create_params.PreviewCreateParams,
             ),

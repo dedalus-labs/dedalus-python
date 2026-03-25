@@ -223,23 +223,23 @@ class TestWorkspaces:
             )
 
     @parametrize
-    def test_method_stream_status(self, client: Dedalus) -> None:
-        workspace_stream = client.workspaces.stream_status(
+    def test_method_watch(self, client: Dedalus) -> None:
+        workspace_stream = client.workspaces.watch(
             workspace_id="workspace_id",
         )
         workspace_stream.response.close()
 
     @parametrize
-    def test_method_stream_status_with_all_params(self, client: Dedalus) -> None:
-        workspace_stream = client.workspaces.stream_status(
+    def test_method_watch_with_all_params(self, client: Dedalus) -> None:
+        workspace_stream = client.workspaces.watch(
             workspace_id="workspace_id",
             last_event_id="Last-Event-ID",
         )
         workspace_stream.response.close()
 
     @parametrize
-    def test_raw_response_stream_status(self, client: Dedalus) -> None:
-        response = client.workspaces.with_raw_response.stream_status(
+    def test_raw_response_watch(self, client: Dedalus) -> None:
+        response = client.workspaces.with_raw_response.watch(
             workspace_id="workspace_id",
         )
 
@@ -248,8 +248,8 @@ class TestWorkspaces:
         stream.close()
 
     @parametrize
-    def test_streaming_response_stream_status(self, client: Dedalus) -> None:
-        with client.workspaces.with_streaming_response.stream_status(
+    def test_streaming_response_watch(self, client: Dedalus) -> None:
+        with client.workspaces.with_streaming_response.watch(
             workspace_id="workspace_id",
         ) as response:
             assert not response.is_closed
@@ -261,9 +261,9 @@ class TestWorkspaces:
         assert cast(Any, response.is_closed) is True
 
     @parametrize
-    def test_path_params_stream_status(self, client: Dedalus) -> None:
+    def test_path_params_watch(self, client: Dedalus) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `workspace_id` but received ''"):
-            client.workspaces.with_raw_response.stream_status(
+            client.workspaces.with_raw_response.watch(
                 workspace_id="",
             )
 
@@ -477,23 +477,23 @@ class TestAsyncWorkspaces:
             )
 
     @parametrize
-    async def test_method_stream_status(self, async_client: AsyncDedalus) -> None:
-        workspace_stream = await async_client.workspaces.stream_status(
+    async def test_method_watch(self, async_client: AsyncDedalus) -> None:
+        workspace_stream = await async_client.workspaces.watch(
             workspace_id="workspace_id",
         )
         await workspace_stream.response.aclose()
 
     @parametrize
-    async def test_method_stream_status_with_all_params(self, async_client: AsyncDedalus) -> None:
-        workspace_stream = await async_client.workspaces.stream_status(
+    async def test_method_watch_with_all_params(self, async_client: AsyncDedalus) -> None:
+        workspace_stream = await async_client.workspaces.watch(
             workspace_id="workspace_id",
             last_event_id="Last-Event-ID",
         )
         await workspace_stream.response.aclose()
 
     @parametrize
-    async def test_raw_response_stream_status(self, async_client: AsyncDedalus) -> None:
-        response = await async_client.workspaces.with_raw_response.stream_status(
+    async def test_raw_response_watch(self, async_client: AsyncDedalus) -> None:
+        response = await async_client.workspaces.with_raw_response.watch(
             workspace_id="workspace_id",
         )
 
@@ -502,8 +502,8 @@ class TestAsyncWorkspaces:
         await stream.close()
 
     @parametrize
-    async def test_streaming_response_stream_status(self, async_client: AsyncDedalus) -> None:
-        async with async_client.workspaces.with_streaming_response.stream_status(
+    async def test_streaming_response_watch(self, async_client: AsyncDedalus) -> None:
+        async with async_client.workspaces.with_streaming_response.watch(
             workspace_id="workspace_id",
         ) as response:
             assert not response.is_closed
@@ -515,8 +515,8 @@ class TestAsyncWorkspaces:
         assert cast(Any, response.is_closed) is True
 
     @parametrize
-    async def test_path_params_stream_status(self, async_client: AsyncDedalus) -> None:
+    async def test_path_params_watch(self, async_client: AsyncDedalus) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `workspace_id` but received ''"):
-            await async_client.workspaces.with_raw_response.stream_status(
+            await async_client.workspaces.with_raw_response.watch(
                 workspace_id="",
             )

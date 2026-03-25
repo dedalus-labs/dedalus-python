@@ -9,5 +9,3 @@ __all__ = ["SSHCreateParams"]
 
 class SSHCreateParams(TypedDict, total=False):
     public_key: Required[str]
-
-    wake_if_needed: bool

@@ -55,7 +55,6 @@ class ExecutionsResource(SyncAPIResource):
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
         timeout_ms: int | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -89,7 +88,6 @@ class ExecutionsResource(SyncAPIResource):
                     "env": env,
                     "stdin": stdin,
                     "timeout_ms": timeout_ms,
-                    "wake_if_needed": wake_if_needed,
                 },
                 execution_create_params.ExecutionCreateParams,
             ),
@@ -359,7 +357,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
         timeout_ms: int | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -393,7 +390,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
                     "env": env,
                     "stdin": stdin,
                     "timeout_ms": timeout_ms,
-                    "wake_if_needed": wake_if_needed,
                 },
                 execution_create_params.ExecutionCreateParams,
             ),

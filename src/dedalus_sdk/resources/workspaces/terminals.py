@@ -72,7 +72,6 @@ class TerminalsResource(SyncAPIResource):
         cwd: str | Omit = omit,
         env: Dict[str, str] | Omit = omit,
         shell: str | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -106,7 +105,6 @@ class TerminalsResource(SyncAPIResource):
                     "cwd": cwd,
                     "env": env,
                     "shell": shell,
-                    "wake_if_needed": wake_if_needed,
                 },
                 terminal_create_params.TerminalCreateParams,
             ),
@@ -296,7 +294,6 @@ class AsyncTerminalsResource(AsyncAPIResource):
         cwd: str | Omit = omit,
         env: Dict[str, str] | Omit = omit,
         shell: str | Omit = omit,
-        wake_if_needed: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -330,7 +327,6 @@ class AsyncTerminalsResource(AsyncAPIResource):
                     "cwd": cwd,
                     "env": env,
                     "shell": shell,
-                    "wake_if_needed": wake_if_needed,
                 },
                 terminal_create_params.TerminalCreateParams,
             ),
