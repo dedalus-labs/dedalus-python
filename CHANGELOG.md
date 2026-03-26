@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0 (2026-03-26)
+
+Full Changelog: [v0.0.3...v0.1.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.3...v0.1.0)
+
+### Features
+
+* **internal:** implement indices array format for query and form serialization ([964fbdf](https://github.com/dedalus-labs/dedalus-python/commit/964fbdfd66a57ce61c8db07cca40032c877a20ed))
+
 ## 0.0.3 (2026-03-25)
 
 Full Changelog: [v0.0.2...v0.0.3](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.2...v0.0.3)
