@@ -33,8 +33,8 @@ from ._base_client import (
 )
 
 if TYPE_CHECKING:
-    from .resources import workspaces
-    from .resources.workspaces.workspaces import WorkspacesResource, AsyncWorkspacesResource
+    from .resources import machines
+    from .resources.machines.machines import MachinesResource, AsyncMachinesResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Dedalus", "AsyncDedalus", "Client", "AsyncClient"]
 
@@ -121,10 +121,10 @@ class Dedalus(SyncAPIClient):
         self._default_stream_cls = Stream
 
     @cached_property
-    def workspaces(self) -> WorkspacesResource:
-        from .resources.workspaces import WorkspacesResource
+    def machines(self) -> MachinesResource:
+        from .resources.machines import MachinesResource
 
-        return WorkspacesResource(self)
+        return MachinesResource(self)
 
     @cached_property
     def with_raw_response(self) -> DedalusWithRawResponse:
@@ -137,7 +137,7 @@ class Dedalus(SyncAPIClient):
     @property
     @override
     def qs(self) -> Querystring:
-        return Querystring(array_format="comma")
+        return Querystring(array_format="repeat")
 
     @override
     def _auth_headers(self, security: SecurityOptions) -> dict[str, str]:
@@ -355,10 +355,10 @@ class AsyncDedalus(AsyncAPIClient):
         self._default_stream_cls = AsyncStream
 
     @cached_property
-    def workspaces(self) -> AsyncWorkspacesResource:
-        from .resources.workspaces import AsyncWorkspacesResource
+    def machines(self) -> AsyncMachinesResource:
+        from .resources.machines import AsyncMachinesResource
 
-        return AsyncWorkspacesResource(self)
+        return AsyncMachinesResource(self)
 
     @cached_property
     def with_raw_response(self) -> AsyncDedalusWithRawResponse:
@@ -371,7 +371,7 @@ class AsyncDedalus(AsyncAPIClient):
     @property
     @override
     def qs(self) -> Querystring:
-        return Querystring(array_format="comma")
+        return Querystring(array_format="repeat")
 
     @override
     def _auth_headers(self, security: SecurityOptions) -> dict[str, str]:
@@ -514,10 +514,10 @@ class DedalusWithRawResponse:
         self._client = client
 
     @cached_property
-    def workspaces(self) -> workspaces.WorkspacesResourceWithRawResponse:
-        from .resources.workspaces import WorkspacesResourceWithRawResponse
+    def machines(self) -> machines.MachinesResourceWithRawResponse:
+        from .resources.machines import MachinesResourceWithRawResponse
 
-        return WorkspacesResourceWithRawResponse(self._client.workspaces)
+        return MachinesResourceWithRawResponse(self._client.machines)
 
 
 class AsyncDedalusWithRawResponse:
@@ -527,10 +527,10 @@ class AsyncDedalusWithRawResponse:
         self._client = client
 
     @cached_property
-    def workspaces(self) -> workspaces.AsyncWorkspacesResourceWithRawResponse:
-        from .resources.workspaces import AsyncWorkspacesResourceWithRawResponse
+    def machines(self) -> machines.AsyncMachinesResourceWithRawResponse:
+        from .resources.machines import AsyncMachinesResourceWithRawResponse
 
-        return AsyncWorkspacesResourceWithRawResponse(self._client.workspaces)
+        return AsyncMachinesResourceWithRawResponse(self._client.machines)
 
 
 class DedalusWithStreamedResponse:
@@ -540,10 +540,10 @@ class DedalusWithStreamedResponse:
         self._client = client
 
     @cached_property
-    def workspaces(self) -> workspaces.WorkspacesResourceWithStreamingResponse:
-        from .resources.workspaces import WorkspacesResourceWithStreamingResponse
+    def machines(self) -> machines.MachinesResourceWithStreamingResponse:
+        from .resources.machines import MachinesResourceWithStreamingResponse
 
-        return WorkspacesResourceWithStreamingResponse(self._client.workspaces)
+        return MachinesResourceWithStreamingResponse(self._client.machines)
 
 
 class AsyncDedalusWithStreamedResponse:
@@ -553,10 +553,10 @@ class AsyncDedalusWithStreamedResponse:
         self._client = client
 
     @cached_property
-    def workspaces(self) -> workspaces.AsyncWorkspacesResourceWithStreamingResponse:
-        from .resources.workspaces import AsyncWorkspacesResourceWithStreamingResponse
+    def machines(self) -> machines.AsyncMachinesResourceWithStreamingResponse:
+        from .resources.machines import AsyncMachinesResourceWithStreamingResponse
 
-        return AsyncWorkspacesResourceWithStreamingResponse(self._client.workspaces)
+        return AsyncMachinesResourceWithStreamingResponse(self._client.machines)
 
 
 Client = Dedalus

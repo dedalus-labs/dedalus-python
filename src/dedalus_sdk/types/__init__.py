@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from .workspace import Workspace as Workspace
-from .workspace_list import WorkspaceList as WorkspaceList
+from .machine import Machine as Machine
+from .machine_list import MachineList as MachineList
 from .lifecycle_status import LifecycleStatus as LifecycleStatus
-from .workspace_list_params import WorkspaceListParams as WorkspaceListParams
-from .workspace_create_params import WorkspaceCreateParams as WorkspaceCreateParams
-from .workspace_update_params import WorkspaceUpdateParams as WorkspaceUpdateParams
+from .machine_list_item import MachineListItem as MachineListItem
+from .machine_list_params import MachineListParams as MachineListParams
+from .machine_create_params import MachineCreateParams as MachineCreateParams
+from .machine_update_params import MachineUpdateParams as MachineUpdateParams
 from .websocket_connection_options import WebSocketConnectionOptions as WebSocketConnectionOptions
