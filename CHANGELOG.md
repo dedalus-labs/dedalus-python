@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.4 (2026-04-01)
+
+Full Changelog: [v0.0.3...v0.0.4](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.3...v0.0.4)
+
+### Features
+
+* **internal:** implement indices array format for query and form serialization ([964fbdf](https://github.com/dedalus-labs/dedalus-python/commit/964fbdfd66a57ce61c8db07cca40032c877a20ed))
+
+
+### Chores
+
+* **api:** rename workspaces to machines ([ebbdaee](https://github.com/dedalus-labs/dedalus-python/commit/ebbdaeefd99fb507499f2d9ec5c68f258ccc900e))
+* **tests:** bump steady to v0.20.1 ([fe9a91b](https://github.com/dedalus-labs/dedalus-python/commit/fe9a91b905ce79bd75487c4d1ad7b7e027d1c99e))
+* **tests:** bump steady to v0.20.2 ([e4097a4](https://github.com/dedalus-labs/dedalus-python/commit/e4097a4700e2ccc894504a796e5fa8511d36eacb))
+
 ## 0.0.3 (2026-03-25)
 
 Full Changelog: [v0.0.2...v0.0.3](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.2...v0.0.3)
