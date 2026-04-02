@@ -20,6 +20,8 @@ Methods:
 - <code title="patch /v1/machines/{machine_id}">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">update</a>(\*, machine_id, \*\*<a href="src/dedalus_sdk/types/machine_update_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/machine.py">Machine</a></code>
 - <code title="get /v1/machines">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">list</a>(\*\*<a href="src/dedalus_sdk/types/machine_list_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/machine_list_item.py">SyncCursorPage[MachineListItem]</a></code>
 - <code title="delete /v1/machines/{machine_id}">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">delete</a>(\*, machine_id) -> <a href="./src/dedalus_sdk/types/machine.py">Machine</a></code>
+- <code title="post /v1/machines/{machine_id}/sleep">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">sleep</a>(\*, machine_id) -> <a href="./src/dedalus_sdk/types/machine.py">Machine</a></code>
+- <code title="post /v1/machines/{machine_id}/wake">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">wake</a>(\*, machine_id) -> <a href="./src/dedalus_sdk/types/machine.py">Machine</a></code>
 - <code title="get /v1/machines/{machine_id}/status/stream">client.machines.<a href="./src/dedalus_sdk/resources/machines/machines.py">watch</a>(\*, machine_id) -> <a href="./src/dedalus_sdk/types/machine.py">Machine</a></code>
 
 ## Artifacts
