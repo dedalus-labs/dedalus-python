@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0 (2026-04-02)
+
+Full Changelog: [v0.0.4...v0.1.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.4...v0.1.0)
+
+### Features
+
+* **api:** add sleep & wake methods ([e9709ab](https://github.com/dedalus-labs/dedalus-python/commit/e9709abd85042a51ca1fab6bc4270e3b0ddbe602))
+
 ## 0.0.4 (2026-04-01)
 
 Full Changelog: [v0.0.3...v0.0.4](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.3...v0.0.4)

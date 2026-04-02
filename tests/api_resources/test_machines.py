@@ -225,6 +225,90 @@ class TestMachines:
             )
 
     @parametrize
+    def test_method_sleep(self, client: Dedalus) -> None:
+        machine = client.machines.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    def test_raw_response_sleep(self, client: Dedalus) -> None:
+        response = client.machines.with_raw_response.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        machine = response.parse()
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    def test_streaming_response_sleep(self, client: Dedalus) -> None:
+        with client.machines.with_streaming_response.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            machine = response.parse()
+            assert_matches_type(Machine, machine, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    def test_path_params_sleep(self, client: Dedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
+            client.machines.with_raw_response.sleep(
+                machine_id="",
+                if_match="If-Match",
+            )
+
+    @parametrize
+    def test_method_wake(self, client: Dedalus) -> None:
+        machine = client.machines.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    def test_raw_response_wake(self, client: Dedalus) -> None:
+        response = client.machines.with_raw_response.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        machine = response.parse()
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    def test_streaming_response_wake(self, client: Dedalus) -> None:
+        with client.machines.with_streaming_response.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            machine = response.parse()
+            assert_matches_type(Machine, machine, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    def test_path_params_wake(self, client: Dedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
+            client.machines.with_raw_response.wake(
+                machine_id="",
+                if_match="If-Match",
+            )
+
+    @parametrize
     def test_method_watch(self, client: Dedalus) -> None:
         machine_stream = client.machines.watch(
             machine_id="machine_id",
@@ -474,6 +558,90 @@ class TestAsyncMachines:
     async def test_path_params_delete(self, async_client: AsyncDedalus) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             await async_client.machines.with_raw_response.delete(
+                machine_id="",
+                if_match="If-Match",
+            )
+
+    @parametrize
+    async def test_method_sleep(self, async_client: AsyncDedalus) -> None:
+        machine = await async_client.machines.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    async def test_raw_response_sleep(self, async_client: AsyncDedalus) -> None:
+        response = await async_client.machines.with_raw_response.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        machine = await response.parse()
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    async def test_streaming_response_sleep(self, async_client: AsyncDedalus) -> None:
+        async with async_client.machines.with_streaming_response.sleep(
+            machine_id="machine_id",
+            if_match="If-Match",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            machine = await response.parse()
+            assert_matches_type(Machine, machine, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    async def test_path_params_sleep(self, async_client: AsyncDedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
+            await async_client.machines.with_raw_response.sleep(
+                machine_id="",
+                if_match="If-Match",
+            )
+
+    @parametrize
+    async def test_method_wake(self, async_client: AsyncDedalus) -> None:
+        machine = await async_client.machines.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    async def test_raw_response_wake(self, async_client: AsyncDedalus) -> None:
+        response = await async_client.machines.with_raw_response.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        )
+
+        assert response.is_closed is True
+        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+        machine = await response.parse()
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    async def test_streaming_response_wake(self, async_client: AsyncDedalus) -> None:
+        async with async_client.machines.with_streaming_response.wake(
+            machine_id="machine_id",
+            if_match="If-Match",
+        ) as response:
+            assert not response.is_closed
+            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
+
+            machine = await response.parse()
+            assert_matches_type(Machine, machine, path=["response"])
+
+        assert cast(Any, response.is_closed) is True
+
+    @parametrize
+    async def test_path_params_wake(self, async_client: AsyncDedalus) -> None:
+        with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
+            await async_client.machines.with_raw_response.wake(
                 machine_id="",
                 if_match="If-Match",
             )
