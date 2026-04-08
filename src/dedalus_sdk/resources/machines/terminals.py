@@ -249,6 +249,9 @@ class TerminalsResource(SyncAPIResource):
 
     def connect(
         self,
+        *,
+        machine_id: str,
+        terminal_id: str,
         extra_query: Query = {},
         extra_headers: Headers = {},
         websocket_connection_options: WebSocketConnectionOptions = {},
@@ -258,6 +261,8 @@ class TerminalsResource(SyncAPIResource):
             extra_query=extra_query,
             extra_headers=extra_headers,
             websocket_connection_options=websocket_connection_options,
+            machine_id=machine_id,
+            terminal_id=terminal_id,
         )
 
 
@@ -467,6 +472,9 @@ class AsyncTerminalsResource(AsyncAPIResource):
 
     def connect(
         self,
+        *,
+        machine_id: str,
+        terminal_id: str,
         extra_query: Query = {},
         extra_headers: Headers = {},
         websocket_connection_options: WebSocketConnectionOptions = {},
@@ -476,6 +484,8 @@ class AsyncTerminalsResource(AsyncAPIResource):
             extra_query=extra_query,
             extra_headers=extra_headers,
             websocket_connection_options=websocket_connection_options,
+            machine_id=machine_id,
+            terminal_id=terminal_id,
         )
 
 
@@ -641,11 +651,15 @@ class AsyncTerminalsResourceConnectionManager:
         self,
         *,
         client: AsyncDedalus,
+        machine_id: str,
+        terminal_id: str,
         extra_query: Query,
         extra_headers: Headers,
         websocket_connection_options: WebSocketConnectionOptions,
     ) -> None:
         self.__client = client
+        self.__machine_id = machine_id
+        self.__terminal_id = terminal_id
         self.__connection: AsyncTerminalsResourceConnection | None = None
         self.__extra_query = extra_query
         self.__extra_headers = extra_headers
@@ -805,11 +819,15 @@ class TerminalsResourceConnectionManager:
         self,
         *,
         client: Dedalus,
+        machine_id: str,
+        terminal_id: str,
         extra_query: Query,
         extra_headers: Headers,
         websocket_connection_options: WebSocketConnectionOptions,
     ) -> None:
         self.__client = client
+        self.__machine_id = machine_id
+        self.__terminal_id = terminal_id
         self.__connection: TerminalsResourceConnection | None = None
         self.__extra_query = extra_query
         self.__extra_headers = extra_headers
