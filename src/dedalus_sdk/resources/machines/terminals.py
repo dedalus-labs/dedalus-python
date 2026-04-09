@@ -819,6 +819,10 @@ class AsyncTerminalsResourceConnectionManager:
         except ImportError as exc:
             raise DedalusError("You need to install `dedalus-sdk[websockets]` to use this method") from exc
 
+        if not self.__machine_id:
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {self.__machine_id!r}")
+        if not self.__terminal_id:
+            raise ValueError(f"Expected a non-empty value for `terminal_id` but received {self.__terminal_id!r}")
         url = self._prepare_url().copy_with(
             params={
                 **self.__client.base_url.params,
@@ -849,7 +853,11 @@ class AsyncTerminalsResourceConnectionManager:
             ws_scheme = "ws" if scheme == "http" else "wss"
             base_url = self.__client._base_url.copy_with(scheme=ws_scheme)
 
-        merge_raw_path = base_url.raw_path.rstrip(b"/") + b"/v1/machines/{machine_id}/terminals/{terminal_id}/stream"
+        merge_raw_path = base_url.raw_path.rstrip(b"/") + path_template(
+            "/v1/machines/{machine_id}/terminals/{terminal_id}/stream",
+            machine_id=self.__machine_id,
+            terminal_id=self.__terminal_id,
+        ).encode("utf-8")
         return base_url.copy_with(raw_path=merge_raw_path)
 
     async def __aexit__(
@@ -1096,6 +1104,10 @@ class TerminalsResourceConnectionManager:
         except ImportError as exc:
             raise DedalusError("You need to install `dedalus-sdk[websockets]` to use this method") from exc
 
+        if not self.__machine_id:
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {self.__machine_id!r}")
+        if not self.__terminal_id:
+            raise ValueError(f"Expected a non-empty value for `terminal_id` but received {self.__terminal_id!r}")
         url = self._prepare_url().copy_with(
             params={
                 **self.__client.base_url.params,
@@ -1126,7 +1138,11 @@ class TerminalsResourceConnectionManager:
             ws_scheme = "ws" if scheme == "http" else "wss"
             base_url = self.__client._base_url.copy_with(scheme=ws_scheme)
 
-        merge_raw_path = base_url.raw_path.rstrip(b"/") + b"/v1/machines/{machine_id}/terminals/{terminal_id}/stream"
+        merge_raw_path = base_url.raw_path.rstrip(b"/") + path_template(
+            "/v1/machines/{machine_id}/terminals/{terminal_id}/stream",
+            machine_id=self.__machine_id,
+            terminal_id=self.__terminal_id,
+        ).encode("utf-8")
         return base_url.copy_with(raw_path=merge_raw_path)
 
     def __exit__(
