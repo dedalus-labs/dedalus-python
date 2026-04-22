@@ -9,4 +9,8 @@ from .machine_list_item import MachineListItem as MachineListItem
 from .machine_list_params import MachineListParams as MachineListParams
 from .machine_create_params import MachineCreateParams as MachineCreateParams
 from .machine_update_params import MachineUpdateParams as MachineUpdateParams
+from .websocket_reconnection import (
+    ReconnectingEvent as ReconnectingEvent,
+    ReconnectingOverrides as ReconnectingOverrides,
+)
 from .websocket_connection_options import WebSocketConnectionOptions as WebSocketConnectionOptions
