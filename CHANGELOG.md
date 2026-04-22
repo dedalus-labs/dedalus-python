@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.2.0 (2026-04-22)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* **client:** add event handler implementation for websockets ([d46b70f](https://github.com/dedalus-labs/dedalus-python/commit/d46b70f7330c7441113cc3aa3cb61b41880c2894))
+* **client:** add path parameters for web sockets ([a805582](https://github.com/dedalus-labs/dedalus-python/commit/a8055824a4bf357d1e8394f02995eb9811df4b18))
+* **client:** allow enqueuing to websockets even when not connected ([3c790cf](https://github.com/dedalus-labs/dedalus-python/commit/3c790cf35c3a28645cf65b2fa199fceb53677990))
+* **client:** support reconnection in websockets ([e5e6c38](https://github.com/dedalus-labs/dedalus-python/commit/e5e6c38b62bf19f8d85538555251650f6ab1dd91))
+* **client:** support sending raw data over websockets ([235869c](https://github.com/dedalus-labs/dedalus-python/commit/235869ccaad5bd8d9c7cffc82df7902b2e324205))
+
+
+### Bug Fixes
+
+* **client:** preserve hardcoded query params when merging with user params ([9d1b3a5](https://github.com/dedalus-labs/dedalus-python/commit/9d1b3a5b6c3a44600ea52faa57188fc7c8b6a56c))
+* ensure file data are only sent as 1 parameter ([41853cb](https://github.com/dedalus-labs/dedalus-python/commit/41853cbc3978376af90de18138b9aaa6518a8c28))
+
+
+### Performance Improvements
+
+* **client:** optimize file structure copying in multipart requests ([f1a1920](https://github.com/dedalus-labs/dedalus-python/commit/f1a1920db2ae8618db678ca4a48ed4bac1c07c4a))
+
+
+### Chores
+
+* **ci:** remove release-doctor workflow ([20dab67](https://github.com/dedalus-labs/dedalus-python/commit/20dab671a0fef62c936a1fd1c23c71ece9101b31))
+* **internal:** codegen related update ([126141f](https://github.com/dedalus-labs/dedalus-python/commit/126141f2387570bbff3e841a011a5ccd4e75e1ae))
+* **internal:** more robust bootstrap script ([7aa05e9](https://github.com/dedalus-labs/dedalus-python/commit/7aa05e9b067a3db4475e95ababd9f39730d080ea))
+* remove custom code ([84a40a9](https://github.com/dedalus-labs/dedalus-python/commit/84a40a90c844ce8029fb1a67bd9b6d922ab954ba))
+* **tests:** bump steady to v0.22.1 ([b1e0be9](https://github.com/dedalus-labs/dedalus-python/commit/b1e0be98f18c4d06c5f46abaf3c3491b875ad7da))
+
 ## 0.1.0 (2026-04-02)
 
 Full Changelog: [v0.0.4...v0.1.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.0.4...v0.1.0)
