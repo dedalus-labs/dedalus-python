@@ -10,6 +10,9 @@ __all__ = ["MachineListItem"]
 
 
 class MachineListItem(BaseModel):
+    autosleep_seconds: int
+    """Seconds of inactivity before autosleep. 0 disables autosleep."""
+
     created_at: datetime
 
     desired_state: Literal["running", "sleeping", "destroyed"]

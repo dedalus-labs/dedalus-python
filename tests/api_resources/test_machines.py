@@ -31,6 +31,16 @@ class TestMachines:
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
+    def test_method_create_with_all_params(self, client: Dedalus) -> None:
+        machine = client.machines.create(
+            memory_mib=0,
+            storage_gib=0,
+            vcpu=0,
+            autosleep="autosleep",
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.create(
             memory_mib=0,
@@ -61,14 +71,14 @@ class TestMachines:
     @parametrize
     def test_method_retrieve(self, client: Dedalus) -> None:
         machine = client.machines.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     def test_raw_response_retrieve(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -79,7 +89,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_retrieve(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -99,16 +109,15 @@ class TestMachines:
     @parametrize
     def test_method_update(self, client: Dedalus) -> None:
         machine = client.machines.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     def test_method_update_with_all_params(self, client: Dedalus) -> None:
         machine = client.machines.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
+            autosleep="autosleep",
             memory_mib=0,
             storage_gib=0,
             vcpu=0,
@@ -118,8 +127,7 @@ class TestMachines:
     @parametrize
     def test_raw_response_update(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -130,8 +138,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_update(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -146,7 +153,6 @@ class TestMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             client.machines.with_raw_response.update(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
@@ -185,16 +191,14 @@ class TestMachines:
     @parametrize
     def test_method_delete(self, client: Dedalus) -> None:
         machine = client.machines.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     def test_raw_response_delete(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -205,8 +209,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_delete(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -221,22 +224,19 @@ class TestMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             client.machines.with_raw_response.delete(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     def test_method_sleep(self, client: Dedalus) -> None:
         machine = client.machines.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     def test_raw_response_sleep(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -247,8 +247,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_sleep(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -263,22 +262,19 @@ class TestMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             client.machines.with_raw_response.sleep(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     def test_method_wake(self, client: Dedalus) -> None:
         machine = client.machines.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     def test_raw_response_wake(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -289,8 +285,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_wake(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -305,20 +300,19 @@ class TestMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             client.machines.with_raw_response.wake(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     def test_method_watch(self, client: Dedalus) -> None:
         machine_stream = client.machines.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         machine_stream.response.close()
 
     @parametrize
     def test_method_watch_with_all_params(self, client: Dedalus) -> None:
         machine_stream = client.machines.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
             last_event_id="Last-Event-ID",
         )
         machine_stream.response.close()
@@ -326,7 +320,7 @@ class TestMachines:
     @parametrize
     def test_raw_response_watch(self, client: Dedalus) -> None:
         response = client.machines.with_raw_response.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -336,7 +330,7 @@ class TestMachines:
     @parametrize
     def test_streaming_response_watch(self, client: Dedalus) -> None:
         with client.machines.with_streaming_response.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -365,6 +359,16 @@ class TestAsyncMachines:
             memory_mib=0,
             storage_gib=0,
             vcpu=0,
+        )
+        assert_matches_type(Machine, machine, path=["response"])
+
+    @parametrize
+    async def test_method_create_with_all_params(self, async_client: AsyncDedalus) -> None:
+        machine = await async_client.machines.create(
+            memory_mib=0,
+            storage_gib=0,
+            vcpu=0,
+            autosleep="autosleep",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
@@ -399,14 +403,14 @@ class TestAsyncMachines:
     @parametrize
     async def test_method_retrieve(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     async def test_raw_response_retrieve(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -417,7 +421,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_retrieve(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -437,16 +441,15 @@ class TestAsyncMachines:
     @parametrize
     async def test_method_update(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     async def test_method_update_with_all_params(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
+            autosleep="autosleep",
             memory_mib=0,
             storage_gib=0,
             vcpu=0,
@@ -456,8 +459,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_raw_response_update(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -468,8 +470,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_update(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.update(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -484,7 +485,6 @@ class TestAsyncMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             await async_client.machines.with_raw_response.update(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
@@ -523,16 +523,14 @@ class TestAsyncMachines:
     @parametrize
     async def test_method_delete(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -543,8 +541,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.delete(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -559,22 +556,19 @@ class TestAsyncMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             await async_client.machines.with_raw_response.delete(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     async def test_method_sleep(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     async def test_raw_response_sleep(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -585,8 +579,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_sleep(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.sleep(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -601,22 +594,19 @@ class TestAsyncMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             await async_client.machines.with_raw_response.sleep(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     async def test_method_wake(self, async_client: AsyncDedalus) -> None:
         machine = await async_client.machines.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
         assert_matches_type(Machine, machine, path=["response"])
 
     @parametrize
     async def test_raw_response_wake(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -627,8 +617,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_wake(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.wake(
-            machine_id="machine_id",
-            if_match="If-Match",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -643,20 +632,19 @@ class TestAsyncMachines:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `machine_id` but received ''"):
             await async_client.machines.with_raw_response.wake(
                 machine_id="",
-                if_match="If-Match",
             )
 
     @parametrize
     async def test_method_watch(self, async_client: AsyncDedalus) -> None:
         machine_stream = await async_client.machines.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         await machine_stream.response.aclose()
 
     @parametrize
     async def test_method_watch_with_all_params(self, async_client: AsyncDedalus) -> None:
         machine_stream = await async_client.machines.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
             last_event_id="Last-Event-ID",
         )
         await machine_stream.response.aclose()
@@ -664,7 +652,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_raw_response_watch(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.with_raw_response.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -674,7 +662,7 @@ class TestAsyncMachines:
     @parametrize
     async def test_streaming_response_watch(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.with_streaming_response.watch(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"

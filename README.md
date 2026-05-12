@@ -128,7 +128,7 @@ from dedalus_sdk import Dedalus
 client = Dedalus()
 
 stream = client.machines.watch(
-    machine_id="machine_id",
+    machine_id="dm-3",
 )
 for machine in stream:
     print(machine.machine_id)
@@ -142,7 +142,7 @@ from dedalus_sdk import AsyncDedalus
 client = AsyncDedalus()
 
 stream = await client.machines.watch(
-    machine_id="machine_id",
+    machine_id="dm-3",
 )
 async for machine in stream:
     print(machine.machine_id)

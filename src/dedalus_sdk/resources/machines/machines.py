@@ -110,6 +110,7 @@ class MachinesResource(SyncAPIResource):
         memory_mib: int,
         storage_gib: int,
         vcpu: float,
+        autosleep: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -128,6 +129,9 @@ class MachinesResource(SyncAPIResource):
 
           vcpu: CPU in vCPUs.
 
+          autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -145,6 +149,7 @@ class MachinesResource(SyncAPIResource):
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
+                    "autosleep": autosleep,
                 },
                 machine_create_params.MachineCreateParams,
             ),
@@ -195,7 +200,7 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
+        autosleep: str | Omit = omit,
         memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
         vcpu: float | Omit = omit,
@@ -207,10 +212,14 @@ class MachinesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """
-        Update machine
+        """Update machine
 
         Args:
+          autosleep: Idle window before autosleep.
+
+        Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           memory_mib: Memory in MiB.
 
           storage_gib: Storage in GiB.
@@ -229,11 +238,11 @@ class MachinesResource(SyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._patch(
             path_template("/v1/machines/{machine_id}", machine_id=machine_id),
             body=maybe_transform(
                 {
+                    "autosleep": autosleep,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
@@ -297,7 +306,6 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -322,7 +330,6 @@ class MachinesResource(SyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._delete(
             path_template("/v1/machines/{machine_id}", machine_id=machine_id),
             options=make_request_options(
@@ -339,7 +346,6 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -364,7 +370,6 @@ class MachinesResource(SyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._post(
             path_template("/v1/machines/{machine_id}/sleep", machine_id=machine_id),
             options=make_request_options(
@@ -381,7 +386,6 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -406,7 +410,6 @@ class MachinesResource(SyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return self._post(
             path_template("/v1/machines/{machine_id}/wake", machine_id=machine_id),
             options=make_request_options(
@@ -507,6 +510,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         memory_mib: int,
         storage_gib: int,
         vcpu: float,
+        autosleep: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -525,6 +529,9 @@ class AsyncMachinesResource(AsyncAPIResource):
 
           vcpu: CPU in vCPUs.
 
+          autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -542,6 +549,7 @@ class AsyncMachinesResource(AsyncAPIResource):
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
+                    "autosleep": autosleep,
                 },
                 machine_create_params.MachineCreateParams,
             ),
@@ -592,7 +600,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
+        autosleep: str | Omit = omit,
         memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
         vcpu: float | Omit = omit,
@@ -604,10 +612,14 @@ class AsyncMachinesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """
-        Update machine
+        """Update machine
 
         Args:
+          autosleep: Idle window before autosleep.
+
+        Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           memory_mib: Memory in MiB.
 
           storage_gib: Storage in GiB.
@@ -626,11 +638,11 @@ class AsyncMachinesResource(AsyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._patch(
             path_template("/v1/machines/{machine_id}", machine_id=machine_id),
             body=await async_maybe_transform(
                 {
+                    "autosleep": autosleep,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
@@ -694,7 +706,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -719,7 +730,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._delete(
             path_template("/v1/machines/{machine_id}", machine_id=machine_id),
             options=make_request_options(
@@ -736,7 +746,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -761,7 +770,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._post(
             path_template("/v1/machines/{machine_id}/sleep", machine_id=machine_id),
             options=make_request_options(
@@ -778,7 +786,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         machine_id: str,
-        if_match: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -803,7 +810,6 @@ class AsyncMachinesResource(AsyncAPIResource):
         """
         if not machine_id:
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"If-Match": if_match, **(extra_headers or {})}
         return await self._post(
             path_template("/v1/machines/{machine_id}/wake", machine_id=machine_id),
             options=make_request_options(

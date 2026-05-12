@@ -1,6 +1,6 @@
 [project]
 name = "dedalus-sdk"
-version = "0.2.0"
+version = "0.3.0"
 description = "The official Python library for the Dedalus API"
 dynamic = ["readme"]
 license = "MIT"
@@ -155,7 +155,7 @@ show_error_codes = true
 #
 # We also exclude our `tests` as mypy doesn't always infer
 # types correctly and Pyright will still catch any type errors.
-exclude = ['src/dedalus_sdk/_files.py', '_dev/.*.py', 'tests/.*']
+exclude = ["src/dedalus_sdk/_files.py", "_dev/.*.py", "tests/.*"]
 
 strict_equality = true
 implicit_reexport = true

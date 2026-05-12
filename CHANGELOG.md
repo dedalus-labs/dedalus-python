@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0 (2026-05-12)
+
+Full Changelog: [v0.2.0...v0.3.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.2.0...v0.3.0)
+
+### Features
+
+* **api:** add orgs usage endpoints, autosleep to machines, remove if_match parameters ([3ecc5f7](https://github.com/dedalus-labs/dedalus-python/commit/3ecc5f71350a236eeb38b6ca1116146378ea7f20))
+* **internal/types:** support eagerly validating pydantic iterators ([d2686f3](https://github.com/dedalus-labs/dedalus-python/commit/d2686f3ea4d92a9b4c1ab211f62483dd2cdfc712))
+* support setting headers via env ([31654ea](https://github.com/dedalus-labs/dedalus-python/commit/31654ea7dba81fd19b0c334846eb4bf988035224))
+
+
+### Bug Fixes
+
+* **client:** add missing f-string prefix in file type error message ([aa1c869](https://github.com/dedalus-labs/dedalus-python/commit/aa1c869547ee96d99910ac50f0962c02812cf844))
+* use correct field name format for multipart file arrays ([09bc433](https://github.com/dedalus-labs/dedalus-python/commit/09bc4338396af1f0a28df189bd026ce052554532))
+
+
+### Chores
+
+* **internal:** reformat pyproject.toml ([6a4934a](https://github.com/dedalus-labs/dedalus-python/commit/6a4934a311b675e0b59dfe5e1d521e2d9405b62f))
+* remove custom code ([e296321](https://github.com/dedalus-labs/dedalus-python/commit/e2963215b941cf1f14c44215f4c5ba8427ea00d4))
+
 ## 0.2.0 (2026-04-22)
 
 Full Changelog: [v0.1.0...v0.2.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.1.0...v0.2.0)

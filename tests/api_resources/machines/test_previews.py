@@ -21,7 +21,7 @@ class TestPreviews:
     @parametrize
     def test_method_create(self, client: Dedalus) -> None:
         preview = client.machines.previews.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -29,7 +29,7 @@ class TestPreviews:
     @parametrize
     def test_method_create_with_all_params(self, client: Dedalus) -> None:
         preview = client.machines.previews.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
             protocol="http",
             visibility="public",
@@ -39,7 +39,7 @@ class TestPreviews:
     @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.machines.previews.with_raw_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         )
 
@@ -51,7 +51,7 @@ class TestPreviews:
     @parametrize
     def test_streaming_response_create(self, client: Dedalus) -> None:
         with client.machines.previews.with_streaming_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         ) as response:
             assert not response.is_closed
@@ -73,7 +73,7 @@ class TestPreviews:
     @parametrize
     def test_method_retrieve(self, client: Dedalus) -> None:
         preview = client.machines.previews.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -81,7 +81,7 @@ class TestPreviews:
     @parametrize
     def test_raw_response_retrieve(self, client: Dedalus) -> None:
         response = client.machines.previews.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
 
@@ -93,7 +93,7 @@ class TestPreviews:
     @parametrize
     def test_streaming_response_retrieve(self, client: Dedalus) -> None:
         with client.machines.previews.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         ) as response:
             assert not response.is_closed
@@ -114,21 +114,21 @@ class TestPreviews:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `preview_id` but received ''"):
             client.machines.previews.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 preview_id="",
             )
 
     @parametrize
     def test_method_list(self, client: Dedalus) -> None:
         preview = client.machines.previews.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(SyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
         preview = client.machines.previews.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -137,7 +137,7 @@ class TestPreviews:
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
         response = client.machines.previews.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -148,7 +148,7 @@ class TestPreviews:
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
         with client.machines.previews.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -168,7 +168,7 @@ class TestPreviews:
     @parametrize
     def test_method_delete(self, client: Dedalus) -> None:
         preview = client.machines.previews.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -176,7 +176,7 @@ class TestPreviews:
     @parametrize
     def test_raw_response_delete(self, client: Dedalus) -> None:
         response = client.machines.previews.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
 
@@ -188,7 +188,7 @@ class TestPreviews:
     @parametrize
     def test_streaming_response_delete(self, client: Dedalus) -> None:
         with client.machines.previews.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         ) as response:
             assert not response.is_closed
@@ -209,7 +209,7 @@ class TestPreviews:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `preview_id` but received ''"):
             client.machines.previews.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 preview_id="",
             )
 
@@ -222,7 +222,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_method_create(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -230,7 +230,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_method_create_with_all_params(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
             protocol="http",
             visibility="public",
@@ -240,7 +240,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_raw_response_create(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.previews.with_raw_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         )
 
@@ -252,7 +252,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_streaming_response_create(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.previews.with_streaming_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             port=0,
         ) as response:
             assert not response.is_closed
@@ -274,7 +274,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_method_retrieve(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -282,7 +282,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_raw_response_retrieve(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.previews.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
 
@@ -294,7 +294,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_streaming_response_retrieve(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.previews.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         ) as response:
             assert not response.is_closed
@@ -315,21 +315,21 @@ class TestAsyncPreviews:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `preview_id` but received ''"):
             await async_client.machines.previews.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 preview_id="",
             )
 
     @parametrize
     async def test_method_list(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(AsyncCursorPage[Preview], preview, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -338,7 +338,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.previews.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -349,7 +349,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.previews.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -369,7 +369,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_method_delete(self, async_client: AsyncDedalus) -> None:
         preview = await async_client.machines.previews.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
         assert_matches_type(Preview, preview, path=["response"])
@@ -377,7 +377,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.previews.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         )
 
@@ -389,7 +389,7 @@ class TestAsyncPreviews:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.previews.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             preview_id="preview_id",
         ) as response:
             assert not response.is_closed
@@ -410,6 +410,6 @@ class TestAsyncPreviews:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `preview_id` but received ''"):
             await async_client.machines.previews.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 preview_id="",
             )
