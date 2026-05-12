@@ -37,8 +37,8 @@ from ._base_client import (
 )
 
 if TYPE_CHECKING:
-    from .resources import orgs, machines
-    from .resources.orgs.orgs import OrgsResource, AsyncOrgsResource
+    from .resources import usage, machines
+    from .resources.usage import UsageResource, AsyncUsageResource
     from .resources.machines.machines import MachinesResource, AsyncMachinesResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Dedalus", "AsyncDedalus", "Client", "AsyncClient"]
@@ -135,10 +135,10 @@ class Dedalus(SyncAPIClient):
         self._default_stream_cls = Stream
 
     @cached_property
-    def orgs(self) -> OrgsResource:
-        from .resources.orgs import OrgsResource
+    def usage(self) -> UsageResource:
+        from .resources.usage import UsageResource
 
-        return OrgsResource(self)
+        return UsageResource(self)
 
     @cached_property
     def machines(self) -> MachinesResource:
@@ -384,10 +384,10 @@ class AsyncDedalus(AsyncAPIClient):
         self._default_stream_cls = AsyncStream
 
     @cached_property
-    def orgs(self) -> AsyncOrgsResource:
-        from .resources.orgs import AsyncOrgsResource
+    def usage(self) -> AsyncUsageResource:
+        from .resources.usage import AsyncUsageResource
 
-        return AsyncOrgsResource(self)
+        return AsyncUsageResource(self)
 
     @cached_property
     def machines(self) -> AsyncMachinesResource:
@@ -549,10 +549,10 @@ class DedalusWithRawResponse:
         self._client = client
 
     @cached_property
-    def orgs(self) -> orgs.OrgsResourceWithRawResponse:
-        from .resources.orgs import OrgsResourceWithRawResponse
+    def usage(self) -> usage.UsageResourceWithRawResponse:
+        from .resources.usage import UsageResourceWithRawResponse
 
-        return OrgsResourceWithRawResponse(self._client.orgs)
+        return UsageResourceWithRawResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.MachinesResourceWithRawResponse:
@@ -568,10 +568,10 @@ class AsyncDedalusWithRawResponse:
         self._client = client
 
     @cached_property
-    def orgs(self) -> orgs.AsyncOrgsResourceWithRawResponse:
-        from .resources.orgs import AsyncOrgsResourceWithRawResponse
+    def usage(self) -> usage.AsyncUsageResourceWithRawResponse:
+        from .resources.usage import AsyncUsageResourceWithRawResponse
 
-        return AsyncOrgsResourceWithRawResponse(self._client.orgs)
+        return AsyncUsageResourceWithRawResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.AsyncMachinesResourceWithRawResponse:
@@ -587,10 +587,10 @@ class DedalusWithStreamedResponse:
         self._client = client
 
     @cached_property
-    def orgs(self) -> orgs.OrgsResourceWithStreamingResponse:
-        from .resources.orgs import OrgsResourceWithStreamingResponse
+    def usage(self) -> usage.UsageResourceWithStreamingResponse:
+        from .resources.usage import UsageResourceWithStreamingResponse
 
-        return OrgsResourceWithStreamingResponse(self._client.orgs)
+        return UsageResourceWithStreamingResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.MachinesResourceWithStreamingResponse:
@@ -606,10 +606,10 @@ class AsyncDedalusWithStreamedResponse:
         self._client = client
 
     @cached_property
-    def orgs(self) -> orgs.AsyncOrgsResourceWithStreamingResponse:
-        from .resources.orgs import AsyncOrgsResourceWithStreamingResponse
+    def usage(self) -> usage.AsyncUsageResourceWithStreamingResponse:
+        from .resources.usage import AsyncUsageResourceWithStreamingResponse
 
-        return AsyncOrgsResourceWithStreamingResponse(self._client.orgs)
+        return AsyncUsageResourceWithStreamingResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.AsyncMachinesResourceWithStreamingResponse:

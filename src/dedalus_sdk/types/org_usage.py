@@ -1,6 +1,6 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from ..._models import BaseModel
+from .._models import BaseModel
 
 __all__ = ["OrgUsage"]
 
@@ -11,8 +11,8 @@ class OrgUsage(BaseModel):
 
     billed_cpu_millicore_seconds: int
     """
-    Closed requested vCPU millicores multiplied by active CPU seconds for the
-    period.
+    Closed requested vCPU millicores multiplied by guest-owned active CPU seconds
+    for the period.
     """
 
     billed_logical_storage_mib_seconds: int
@@ -22,7 +22,10 @@ class OrgUsage(BaseModel):
     """
 
     billed_memory_mib_seconds: int
-    """Closed requested memory MiB multiplied by awake seconds for the period."""
+    """
+    Closed requested memory MiB multiplied by running allocation seconds for the
+    period.
+    """
 
     included_storage_gib: int
     """Plan-included storage in GiB, used as a local guardrail only."""
