@@ -21,7 +21,7 @@ class TestArtifacts:
     @parametrize
     def test_method_retrieve(self, client: Dedalus) -> None:
         artifact = client.machines.artifacts.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
         assert_matches_type(Artifact, artifact, path=["response"])
@@ -29,7 +29,7 @@ class TestArtifacts:
     @parametrize
     def test_raw_response_retrieve(self, client: Dedalus) -> None:
         response = client.machines.artifacts.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
 
@@ -41,7 +41,7 @@ class TestArtifacts:
     @parametrize
     def test_streaming_response_retrieve(self, client: Dedalus) -> None:
         with client.machines.artifacts.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         ) as response:
             assert not response.is_closed
@@ -62,21 +62,21 @@ class TestArtifacts:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `artifact_id` but received ''"):
             client.machines.artifacts.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 artifact_id="",
             )
 
     @parametrize
     def test_method_list(self, client: Dedalus) -> None:
         artifact = client.machines.artifacts.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(SyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
         artifact = client.machines.artifacts.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -85,7 +85,7 @@ class TestArtifacts:
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
         response = client.machines.artifacts.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -96,7 +96,7 @@ class TestArtifacts:
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
         with client.machines.artifacts.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -116,7 +116,7 @@ class TestArtifacts:
     @parametrize
     def test_method_delete(self, client: Dedalus) -> None:
         artifact = client.machines.artifacts.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
         assert_matches_type(Artifact, artifact, path=["response"])
@@ -124,7 +124,7 @@ class TestArtifacts:
     @parametrize
     def test_raw_response_delete(self, client: Dedalus) -> None:
         response = client.machines.artifacts.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
 
@@ -136,7 +136,7 @@ class TestArtifacts:
     @parametrize
     def test_streaming_response_delete(self, client: Dedalus) -> None:
         with client.machines.artifacts.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         ) as response:
             assert not response.is_closed
@@ -157,7 +157,7 @@ class TestArtifacts:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `artifact_id` but received ''"):
             client.machines.artifacts.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 artifact_id="",
             )
 
@@ -170,7 +170,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_method_retrieve(self, async_client: AsyncDedalus) -> None:
         artifact = await async_client.machines.artifacts.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
         assert_matches_type(Artifact, artifact, path=["response"])
@@ -178,7 +178,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_raw_response_retrieve(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.artifacts.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
 
@@ -190,7 +190,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_streaming_response_retrieve(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.artifacts.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         ) as response:
             assert not response.is_closed
@@ -211,21 +211,21 @@ class TestAsyncArtifacts:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `artifact_id` but received ''"):
             await async_client.machines.artifacts.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 artifact_id="",
             )
 
     @parametrize
     async def test_method_list(self, async_client: AsyncDedalus) -> None:
         artifact = await async_client.machines.artifacts.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(AsyncCursorPage[Artifact], artifact, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
         artifact = await async_client.machines.artifacts.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -234,7 +234,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.artifacts.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -245,7 +245,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.artifacts.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -265,7 +265,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_method_delete(self, async_client: AsyncDedalus) -> None:
         artifact = await async_client.machines.artifacts.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
         assert_matches_type(Artifact, artifact, path=["response"])
@@ -273,7 +273,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.artifacts.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         )
 
@@ -285,7 +285,7 @@ class TestAsyncArtifacts:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.artifacts.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             artifact_id="artifact_id",
         ) as response:
             assert not response.is_closed
@@ -306,6 +306,6 @@ class TestAsyncArtifacts:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `artifact_id` but received ''"):
             await async_client.machines.artifacts.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 artifact_id="",
             )

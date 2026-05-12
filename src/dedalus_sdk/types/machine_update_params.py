@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing_extensions import Required, Annotated, TypedDict
-
-from .._utils import PropertyInfo
+from typing_extensions import Required, TypedDict
 
 __all__ = ["MachineUpdateParams"]
 
@@ -12,7 +10,12 @@ __all__ = ["MachineUpdateParams"]
 class MachineUpdateParams(TypedDict, total=False):
     machine_id: Required[str]
 
-    if_match: Required[Annotated[str, PropertyInfo(alias="If-Match")]]
+    autosleep: str
+    """Idle window before autosleep.
+
+    Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds
+    ("1800"), or never to disable.
+    """
 
     memory_mib: int
     """Memory in MiB."""
