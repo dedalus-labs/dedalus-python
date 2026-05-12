@@ -21,7 +21,7 @@ class TestTerminals:
     @parametrize
     def test_method_create(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         )
@@ -30,7 +30,7 @@ class TestTerminals:
     @parametrize
     def test_method_create_with_all_params(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
             cwd="cwd",
@@ -42,7 +42,7 @@ class TestTerminals:
     @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.machines.terminals.with_raw_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         )
@@ -55,7 +55,7 @@ class TestTerminals:
     @parametrize
     def test_streaming_response_create(self, client: Dedalus) -> None:
         with client.machines.terminals.with_streaming_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         ) as response:
@@ -79,7 +79,7 @@ class TestTerminals:
     @parametrize
     def test_method_retrieve(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
         assert_matches_type(Terminal, terminal, path=["response"])
@@ -87,7 +87,7 @@ class TestTerminals:
     @parametrize
     def test_raw_response_retrieve(self, client: Dedalus) -> None:
         response = client.machines.terminals.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
 
@@ -99,7 +99,7 @@ class TestTerminals:
     @parametrize
     def test_streaming_response_retrieve(self, client: Dedalus) -> None:
         with client.machines.terminals.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         ) as response:
             assert not response.is_closed
@@ -120,21 +120,21 @@ class TestTerminals:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `terminal_id` but received ''"):
             client.machines.terminals.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 terminal_id="",
             )
 
     @parametrize
     def test_method_list(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(SyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -143,7 +143,7 @@ class TestTerminals:
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
         response = client.machines.terminals.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -154,7 +154,7 @@ class TestTerminals:
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
         with client.machines.terminals.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -174,7 +174,7 @@ class TestTerminals:
     @parametrize
     def test_method_delete(self, client: Dedalus) -> None:
         terminal = client.machines.terminals.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
         assert_matches_type(Terminal, terminal, path=["response"])
@@ -182,7 +182,7 @@ class TestTerminals:
     @parametrize
     def test_raw_response_delete(self, client: Dedalus) -> None:
         response = client.machines.terminals.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
 
@@ -194,7 +194,7 @@ class TestTerminals:
     @parametrize
     def test_streaming_response_delete(self, client: Dedalus) -> None:
         with client.machines.terminals.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         ) as response:
             assert not response.is_closed
@@ -215,7 +215,7 @@ class TestTerminals:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `terminal_id` but received ''"):
             client.machines.terminals.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 terminal_id="",
             )
 
@@ -228,7 +228,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_method_create(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         )
@@ -237,7 +237,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_method_create_with_all_params(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
             cwd="cwd",
@@ -249,7 +249,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_raw_response_create(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.terminals.with_raw_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         )
@@ -262,7 +262,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_streaming_response_create(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.terminals.with_streaming_response.create(
-            machine_id="machine_id",
+            machine_id="dm-3",
             height=0,
             width=0,
         ) as response:
@@ -286,7 +286,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_method_retrieve(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
         assert_matches_type(Terminal, terminal, path=["response"])
@@ -294,7 +294,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_raw_response_retrieve(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.terminals.with_raw_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
 
@@ -306,7 +306,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_streaming_response_retrieve(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.terminals.with_streaming_response.retrieve(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         ) as response:
             assert not response.is_closed
@@ -327,21 +327,21 @@ class TestAsyncTerminals:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `terminal_id` but received ''"):
             await async_client.machines.terminals.with_raw_response.retrieve(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 terminal_id="",
             )
 
     @parametrize
     async def test_method_list(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
         assert_matches_type(AsyncCursorPage[Terminal], terminal, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
             cursor="cursor",
             limit=0,
         )
@@ -350,7 +350,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.terminals.with_raw_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         )
 
         assert response.is_closed is True
@@ -361,7 +361,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.terminals.with_streaming_response.list(
-            machine_id="machine_id",
+            machine_id="dm-3",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -381,7 +381,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_method_delete(self, async_client: AsyncDedalus) -> None:
         terminal = await async_client.machines.terminals.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
         assert_matches_type(Terminal, terminal, path=["response"])
@@ -389,7 +389,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.terminals.with_raw_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         )
 
@@ -401,7 +401,7 @@ class TestAsyncTerminals:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.terminals.with_streaming_response.delete(
-            machine_id="machine_id",
+            machine_id="dm-3",
             terminal_id="terminal_id",
         ) as response:
             assert not response.is_closed
@@ -422,6 +422,6 @@ class TestAsyncTerminals:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `terminal_id` but received ''"):
             await async_client.machines.terminals.with_raw_response.delete(
-                machine_id="machine_id",
+                machine_id="dm-3",
                 terminal_id="",
             )

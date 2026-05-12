@@ -8,26 +8,26 @@ from .orgs import (
     OrgsResourceWithStreamingResponse,
     AsyncOrgsResourceWithStreamingResponse,
 )
-from .machines import (
-    MachinesResource,
-    AsyncMachinesResource,
-    MachinesResourceWithRawResponse,
-    AsyncMachinesResourceWithRawResponse,
-    MachinesResourceWithStreamingResponse,
-    AsyncMachinesResourceWithStreamingResponse,
+from .usage import (
+    UsageResource,
+    AsyncUsageResource,
+    UsageResourceWithRawResponse,
+    AsyncUsageResourceWithRawResponse,
+    UsageResourceWithStreamingResponse,
+    AsyncUsageResourceWithStreamingResponse,
 )
 
 __all__ = [
+    "UsageResource",
+    "AsyncUsageResource",
+    "UsageResourceWithRawResponse",
+    "AsyncUsageResourceWithRawResponse",
+    "UsageResourceWithStreamingResponse",
+    "AsyncUsageResourceWithStreamingResponse",
     "OrgsResource",
     "AsyncOrgsResource",
     "OrgsResourceWithRawResponse",
     "AsyncOrgsResourceWithRawResponse",
     "OrgsResourceWithStreamingResponse",
     "AsyncOrgsResourceWithStreamingResponse",
-    "MachinesResource",
-    "AsyncMachinesResource",
-    "MachinesResourceWithRawResponse",
-    "AsyncMachinesResourceWithRawResponse",
-    "MachinesResourceWithStreamingResponse",
-    "AsyncMachinesResourceWithStreamingResponse",
 ]
