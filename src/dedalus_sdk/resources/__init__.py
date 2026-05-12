@@ -1,12 +1,12 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from .orgs import (
-    OrgsResource,
-    AsyncOrgsResource,
-    OrgsResourceWithRawResponse,
-    AsyncOrgsResourceWithRawResponse,
-    OrgsResourceWithStreamingResponse,
-    AsyncOrgsResourceWithStreamingResponse,
+from .usage import (
+    UsageResource,
+    AsyncUsageResource,
+    UsageResourceWithRawResponse,
+    AsyncUsageResourceWithRawResponse,
+    UsageResourceWithStreamingResponse,
+    AsyncUsageResourceWithStreamingResponse,
 )
 from .machines import (
     MachinesResource,
@@ -18,12 +18,12 @@ from .machines import (
 )
 
 __all__ = [
-    "OrgsResource",
-    "AsyncOrgsResource",
-    "OrgsResourceWithRawResponse",
-    "AsyncOrgsResourceWithRawResponse",
-    "OrgsResourceWithStreamingResponse",
-    "AsyncOrgsResourceWithStreamingResponse",
+    "UsageResource",
+    "AsyncUsageResource",
+    "UsageResourceWithRawResponse",
+    "AsyncUsageResourceWithRawResponse",
+    "UsageResourceWithStreamingResponse",
+    "AsyncUsageResourceWithStreamingResponse",
     "MachinesResource",
     "AsyncMachinesResource",
     "MachinesResourceWithRawResponse",

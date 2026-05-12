@@ -3,17 +3,17 @@
 from typing import Optional
 from datetime import datetime
 
-from ..._models import BaseModel
+from .._models import BaseModel
 
-__all__ = ["MachineStorageUsageEvidence"]
+__all__ = ["MachineStorageUsageRow"]
 
 
-class MachineStorageUsageEvidence(BaseModel):
+class MachineStorageUsageRow(BaseModel):
     bucket_end: datetime
-    """Exclusive evidence bucket end."""
+    """Exclusive usage bucket end."""
 
     bucket_start: datetime
-    """Inclusive evidence bucket start."""
+    """Inclusive usage bucket start."""
 
     logical_storage_bytes: int
     """Machine logical bytes observed for storage allocation."""
@@ -22,7 +22,7 @@ class MachineStorageUsageEvidence(BaseModel):
     """Machine identifier."""
 
     org_metering_bucket_id: str
-    """Org storage bucket ID this evidence row contributes to."""
+    """Org storage bucket ID this row contributes to."""
 
     storage_mib_seconds: int
     """Allocated logical MiB-seconds for this machine."""
