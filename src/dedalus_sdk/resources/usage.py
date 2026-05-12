@@ -4,21 +4,21 @@ from __future__ import annotations
 
 import httpx
 
-from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
-from ..._compat import cached_property
-from ..._resource import SyncAPIResource, AsyncAPIResource
-from ..._response import (
+from ..types import usage_retrieve_params, usage_machine_compute_params, usage_machine_storage_params
+from .._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
+from .._utils import maybe_transform, async_maybe_transform
+from .._compat import cached_property
+from .._resource import SyncAPIResource, AsyncAPIResource
+from .._response import (
     to_raw_response_wrapper,
     to_streamed_response_wrapper,
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...types.orgs import usage_retrieve_params, usage_get_machine_usage_params, usage_get_machine_storage_usage_params
-from ..._base_client import make_request_options
-from ...types.orgs.org_usage import OrgUsage
-from ...types.orgs.machine_usage import MachineUsage
-from ...types.orgs.machine_storage_usage import MachineStorageUsage
+from .._base_client import make_request_options
+from ..types.org_usage import OrgUsage
+from ..types.machine_compute_usage import MachineComputeUsage
+from ..types.machine_storage_usage import MachineStorageUsage
 
 __all__ = ["UsageResource", "AsyncUsageResource"]
 
@@ -46,7 +46,6 @@ class UsageResource(SyncAPIResource):
     def retrieve(
         self,
         *,
-        org_id: str,
         period_start: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -55,11 +54,12 @@ class UsageResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OrgUsage:
-        """
-        Get org billed machine usage
+        """Get usage summary
 
         Args:
-          period_start: Billing period start (YYYY-MM-DD). Defaults to first of current month.
+          period_start: Billing period start (YYYY-MM-DD).
+
+        Defaults to first of current month.
 
           extra_headers: Send extra headers
 
@@ -69,10 +69,8 @@ class UsageResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
         return self._get(
-            path_template("/v1/orgs/{org_id}/usage", org_id=org_id),
+            "/v1/usage",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -83,63 +81,9 @@ class UsageResource(SyncAPIResource):
             cast_to=OrgUsage,
         )
 
-    def get_machine_storage_usage(
+    def machine_compute(
         self,
         *,
-        org_id: str,
-        machine_id: str | Omit = omit,
-        period_end: str | Omit = omit,
-        period_start: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> MachineStorageUsage:
-        """
-        List machine storage usage evidence
-
-        Args:
-          machine_id: Optional machine ID filter.
-
-          period_end: Last UTC evidence date to include (YYYY-MM-DD). Defaults to current time.
-
-          period_start: Evidence period start (YYYY-MM-DD). Defaults to first of current month.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
-        return self._get(
-            path_template("/v1/orgs/{org_id}/usage/storage/machines", org_id=org_id),
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {
-                        "machine_id": machine_id,
-                        "period_end": period_end,
-                        "period_start": period_start,
-                    },
-                    usage_get_machine_storage_usage_params.UsageGetMachineStorageUsageParams,
-                ),
-            ),
-            cast_to=MachineStorageUsage,
-        )
-
-    def get_machine_usage(
-        self,
-        *,
-        org_id: str,
         granularity: str | Omit = omit,
         machine_id: str | Omit = omit,
         period_end: str | Omit = omit,
@@ -150,18 +94,18 @@ class UsageResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> MachineUsage:
+    ) -> MachineComputeUsage:
         """
-        List machine usage evidence
+        List machine compute usage breakdown
 
         Args:
-          granularity: Evidence granularity: hour or day. Defaults to hour.
+          granularity: Usage breakdown granularity: hour or day. Defaults to hour.
 
           machine_id: Optional machine ID filter.
 
-          period_end: Last UTC evidence date to include (YYYY-MM-DD). Defaults to current time.
+          period_end: Last UTC usage date to include (YYYY-MM-DD). Defaults to current time.
 
-          period_start: Evidence period start (YYYY-MM-DD). Defaults to first of current month.
+          period_start: Usage period start (YYYY-MM-DD). Defaults to first of current month.
 
           extra_headers: Send extra headers
 
@@ -171,10 +115,8 @@ class UsageResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
         return self._get(
-            path_template("/v1/orgs/{org_id}/usage/machines", org_id=org_id),
+            "/v1/usage/machines/compute",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -187,10 +129,60 @@ class UsageResource(SyncAPIResource):
                         "period_end": period_end,
                         "period_start": period_start,
                     },
-                    usage_get_machine_usage_params.UsageGetMachineUsageParams,
+                    usage_machine_compute_params.UsageMachineComputeParams,
                 ),
             ),
-            cast_to=MachineUsage,
+            cast_to=MachineComputeUsage,
+        )
+
+    def machine_storage(
+        self,
+        *,
+        machine_id: str | Omit = omit,
+        period_end: str | Omit = omit,
+        period_start: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> MachineStorageUsage:
+        """
+        List machine storage usage breakdown
+
+        Args:
+          machine_id: Optional machine ID filter.
+
+          period_end: Last UTC usage date to include (YYYY-MM-DD). Defaults to current time.
+
+          period_start: Usage period start (YYYY-MM-DD). Defaults to first of current month.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        return self._get(
+            "/v1/usage/machines/storage",
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform(
+                    {
+                        "machine_id": machine_id,
+                        "period_end": period_end,
+                        "period_start": period_start,
+                    },
+                    usage_machine_storage_params.UsageMachineStorageParams,
+                ),
+            ),
+            cast_to=MachineStorageUsage,
         )
 
 
@@ -217,7 +209,6 @@ class AsyncUsageResource(AsyncAPIResource):
     async def retrieve(
         self,
         *,
-        org_id: str,
         period_start: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -226,11 +217,12 @@ class AsyncUsageResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OrgUsage:
-        """
-        Get org billed machine usage
+        """Get usage summary
 
         Args:
-          period_start: Billing period start (YYYY-MM-DD). Defaults to first of current month.
+          period_start: Billing period start (YYYY-MM-DD).
+
+        Defaults to first of current month.
 
           extra_headers: Send extra headers
 
@@ -240,10 +232,8 @@ class AsyncUsageResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
         return await self._get(
-            path_template("/v1/orgs/{org_id}/usage", org_id=org_id),
+            "/v1/usage",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -256,63 +246,9 @@ class AsyncUsageResource(AsyncAPIResource):
             cast_to=OrgUsage,
         )
 
-    async def get_machine_storage_usage(
+    async def machine_compute(
         self,
         *,
-        org_id: str,
-        machine_id: str | Omit = omit,
-        period_end: str | Omit = omit,
-        period_start: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> MachineStorageUsage:
-        """
-        List machine storage usage evidence
-
-        Args:
-          machine_id: Optional machine ID filter.
-
-          period_end: Last UTC evidence date to include (YYYY-MM-DD). Defaults to current time.
-
-          period_start: Evidence period start (YYYY-MM-DD). Defaults to first of current month.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
-        return await self._get(
-            path_template("/v1/orgs/{org_id}/usage/storage/machines", org_id=org_id),
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=await async_maybe_transform(
-                    {
-                        "machine_id": machine_id,
-                        "period_end": period_end,
-                        "period_start": period_start,
-                    },
-                    usage_get_machine_storage_usage_params.UsageGetMachineStorageUsageParams,
-                ),
-            ),
-            cast_to=MachineStorageUsage,
-        )
-
-    async def get_machine_usage(
-        self,
-        *,
-        org_id: str,
         granularity: str | Omit = omit,
         machine_id: str | Omit = omit,
         period_end: str | Omit = omit,
@@ -323,18 +259,18 @@ class AsyncUsageResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> MachineUsage:
+    ) -> MachineComputeUsage:
         """
-        List machine usage evidence
+        List machine compute usage breakdown
 
         Args:
-          granularity: Evidence granularity: hour or day. Defaults to hour.
+          granularity: Usage breakdown granularity: hour or day. Defaults to hour.
 
           machine_id: Optional machine ID filter.
 
-          period_end: Last UTC evidence date to include (YYYY-MM-DD). Defaults to current time.
+          period_end: Last UTC usage date to include (YYYY-MM-DD). Defaults to current time.
 
-          period_start: Evidence period start (YYYY-MM-DD). Defaults to first of current month.
+          period_start: Usage period start (YYYY-MM-DD). Defaults to first of current month.
 
           extra_headers: Send extra headers
 
@@ -344,10 +280,8 @@ class AsyncUsageResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not org_id:
-            raise ValueError(f"Expected a non-empty value for `org_id` but received {org_id!r}")
         return await self._get(
-            path_template("/v1/orgs/{org_id}/usage/machines", org_id=org_id),
+            "/v1/usage/machines/compute",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -360,10 +294,60 @@ class AsyncUsageResource(AsyncAPIResource):
                         "period_end": period_end,
                         "period_start": period_start,
                     },
-                    usage_get_machine_usage_params.UsageGetMachineUsageParams,
+                    usage_machine_compute_params.UsageMachineComputeParams,
                 ),
             ),
-            cast_to=MachineUsage,
+            cast_to=MachineComputeUsage,
+        )
+
+    async def machine_storage(
+        self,
+        *,
+        machine_id: str | Omit = omit,
+        period_end: str | Omit = omit,
+        period_start: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> MachineStorageUsage:
+        """
+        List machine storage usage breakdown
+
+        Args:
+          machine_id: Optional machine ID filter.
+
+          period_end: Last UTC usage date to include (YYYY-MM-DD). Defaults to current time.
+
+          period_start: Usage period start (YYYY-MM-DD). Defaults to first of current month.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        return await self._get(
+            "/v1/usage/machines/storage",
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=await async_maybe_transform(
+                    {
+                        "machine_id": machine_id,
+                        "period_end": period_end,
+                        "period_start": period_start,
+                    },
+                    usage_machine_storage_params.UsageMachineStorageParams,
+                ),
+            ),
+            cast_to=MachineStorageUsage,
         )
 
 
@@ -374,11 +358,11 @@ class UsageResourceWithRawResponse:
         self.retrieve = to_raw_response_wrapper(
             usage.retrieve,
         )
-        self.get_machine_storage_usage = to_raw_response_wrapper(
-            usage.get_machine_storage_usage,
+        self.machine_compute = to_raw_response_wrapper(
+            usage.machine_compute,
         )
-        self.get_machine_usage = to_raw_response_wrapper(
-            usage.get_machine_usage,
+        self.machine_storage = to_raw_response_wrapper(
+            usage.machine_storage,
         )
 
 
@@ -389,11 +373,11 @@ class AsyncUsageResourceWithRawResponse:
         self.retrieve = async_to_raw_response_wrapper(
             usage.retrieve,
         )
-        self.get_machine_storage_usage = async_to_raw_response_wrapper(
-            usage.get_machine_storage_usage,
+        self.machine_compute = async_to_raw_response_wrapper(
+            usage.machine_compute,
         )
-        self.get_machine_usage = async_to_raw_response_wrapper(
-            usage.get_machine_usage,
+        self.machine_storage = async_to_raw_response_wrapper(
+            usage.machine_storage,
         )
 
 
@@ -404,11 +388,11 @@ class UsageResourceWithStreamingResponse:
         self.retrieve = to_streamed_response_wrapper(
             usage.retrieve,
         )
-        self.get_machine_storage_usage = to_streamed_response_wrapper(
-            usage.get_machine_storage_usage,
+        self.machine_compute = to_streamed_response_wrapper(
+            usage.machine_compute,
         )
-        self.get_machine_usage = to_streamed_response_wrapper(
-            usage.get_machine_usage,
+        self.machine_storage = to_streamed_response_wrapper(
+            usage.machine_storage,
         )
 
 
@@ -419,9 +403,9 @@ class AsyncUsageResourceWithStreamingResponse:
         self.retrieve = async_to_streamed_response_wrapper(
             usage.retrieve,
         )
-        self.get_machine_storage_usage = async_to_streamed_response_wrapper(
-            usage.get_machine_storage_usage,
+        self.machine_compute = async_to_streamed_response_wrapper(
+            usage.machine_compute,
         )
-        self.get_machine_usage = async_to_streamed_response_wrapper(
-            usage.get_machine_usage,
+        self.machine_storage = async_to_streamed_response_wrapper(
+            usage.machine_storage,
         )

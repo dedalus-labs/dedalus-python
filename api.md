@@ -1,24 +1,22 @@
-# Orgs
-
-## Usage
+# Usage
 
 Types:
 
 ```python
-from dedalus_sdk.types.orgs import (
+from dedalus_sdk.types import (
+    MachineComputeUsage,
+    MachineComputeUsageRow,
     MachineStorageUsage,
-    MachineStorageUsageEvidence,
-    MachineUsage,
-    MachineUsageEvidence,
+    MachineStorageUsageRow,
     OrgUsage,
 )
 ```
 
 Methods:
 
-- <code title="get /v1/orgs/{org_id}/usage">client.orgs.usage.<a href="./src/dedalus_sdk/resources/orgs/usage.py">retrieve</a>(\*, org_id, \*\*<a href="src/dedalus_sdk/types/orgs/usage_retrieve_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/orgs/org_usage.py">OrgUsage</a></code>
-- <code title="get /v1/orgs/{org_id}/usage/storage/machines">client.orgs.usage.<a href="./src/dedalus_sdk/resources/orgs/usage.py">get_machine_storage_usage</a>(\*, org_id, \*\*<a href="src/dedalus_sdk/types/orgs/usage_get_machine_storage_usage_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/orgs/machine_storage_usage.py">MachineStorageUsage</a></code>
-- <code title="get /v1/orgs/{org_id}/usage/machines">client.orgs.usage.<a href="./src/dedalus_sdk/resources/orgs/usage.py">get_machine_usage</a>(\*, org_id, \*\*<a href="src/dedalus_sdk/types/orgs/usage_get_machine_usage_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/orgs/machine_usage.py">MachineUsage</a></code>
+- <code title="get /v1/usage">client.usage.<a href="./src/dedalus_sdk/resources/usage.py">retrieve</a>(\*\*<a href="src/dedalus_sdk/types/usage_retrieve_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/org_usage.py">OrgUsage</a></code>
+- <code title="get /v1/usage/machines/compute">client.usage.<a href="./src/dedalus_sdk/resources/usage.py">machine_compute</a>(\*\*<a href="src/dedalus_sdk/types/usage_machine_compute_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/machine_compute_usage.py">MachineComputeUsage</a></code>
+- <code title="get /v1/usage/machines/storage">client.usage.<a href="./src/dedalus_sdk/resources/usage.py">machine_storage</a>(\*\*<a href="src/dedalus_sdk/types/usage_machine_storage_params.py">params</a>) -> <a href="./src/dedalus_sdk/types/machine_storage_usage.py">MachineStorageUsage</a></code>
 
 # Machines
 

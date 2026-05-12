@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2026-05-12)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** add usage endpoints/autosleep ([3ebb476](https://github.com/dedalus-labs/dedalus-python/commit/3ebb476fd66187dce852e6efc8c5ea80d095e0dd))
+
 ## 0.3.0 (2026-05-12)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.2.0...v0.3.0)

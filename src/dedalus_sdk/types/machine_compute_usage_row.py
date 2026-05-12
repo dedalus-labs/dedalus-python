@@ -3,23 +3,23 @@
 from typing import List, Optional
 from datetime import datetime
 
-from ..._models import BaseModel
+from .._models import BaseModel
 
-__all__ = ["MachineUsageEvidence"]
+__all__ = ["MachineComputeUsageRow"]
 
 
-class MachineUsageEvidence(BaseModel):
+class MachineComputeUsageRow(BaseModel):
     awake_seconds: int
     """Machine-awake seconds in this bucket."""
 
     bucket_end: datetime
-    """Exclusive evidence bucket end."""
+    """Exclusive usage bucket end."""
 
     bucket_start: datetime
-    """Inclusive evidence bucket start."""
+    """Inclusive usage bucket start."""
 
     cpu_millicore_seconds: int
-    """Requested vCPU millicores multiplied by active CPU seconds."""
+    """Requested vCPU millicores multiplied by guest-owned active CPU seconds."""
 
     last_window_end: datetime
     """Latest raw window_end represented by this row."""
@@ -28,10 +28,10 @@ class MachineUsageEvidence(BaseModel):
     """Machine identifier."""
 
     memory_mib_seconds: int
-    """Requested memory MiB multiplied by awake seconds."""
+    """Requested memory MiB multiplied by running allocation seconds."""
 
     org_metering_bucket_ids: Optional[List[str]] = None
-    """Org compute bucket IDs this evidence row contributes to."""
+    """Org compute bucket IDs this row contributes to."""
 
     requested_memory_mib: int
     """Requested memory for this shape, in MiB."""
@@ -52,7 +52,7 @@ class MachineUsageEvidence(BaseModel):
     """Stripe memory meter event identifiers linked to those org buckets."""
 
     window_count: int
-    """Raw usage windows compacted into this evidence row."""
+    """Raw usage windows compacted into this row."""
 
     latest_stripe_emitted_at: Optional[datetime] = None
     """Latest Stripe emission timestamp for linked org buckets, when emitted."""
