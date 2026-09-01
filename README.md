@@ -118,36 +118,6 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-## Streaming responses
-
-We provide support for streaming responses using Server Side Events (SSE).
-
-```python
-from dedalus_sdk import Dedalus
-
-client = Dedalus()
-
-stream = client.machines.watch(
-    machine_id="dm-3",
-)
-for machine in stream:
-    print(machine.machine_id)
-```
-
-The async client uses the exact same interface.
-
-```python
-from dedalus_sdk import AsyncDedalus
-
-client = AsyncDedalus()
-
-stream = await client.machines.watch(
-    machine_id="dm-3",
-)
-async for machine in stream:
-    print(machine.machine_id)
-```
-
 ## Using types
 
 Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typing.html#typing.TypedDict). Responses are [Pydantic models](https://docs.pydantic.dev) which also provide helper methods for things like:

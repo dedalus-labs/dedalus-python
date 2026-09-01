@@ -23,7 +23,6 @@ from dedalus_sdk import Dedalus, AsyncDedalus, APIResponseValidationError
 from dedalus_sdk._types import Omit
 from dedalus_sdk._utils import asyncify
 from dedalus_sdk._models import BaseModel, FinalRequestOptions
-from dedalus_sdk._streaming import Stream, AsyncStream
 from dedalus_sdk._exceptions import APIStatusError, APITimeoutError, APIResponseValidationError
 from dedalus_sdk._base_client import (
     DEFAULT_TIMEOUT,
@@ -862,17 +861,6 @@ class TestDedalus:
             Dedalus(base_url=base_url, api_key=api_key, _strict_response_validation=True, max_retries=cast(Any, None))
 
     @pytest.mark.respx(base_url=base_url)
-    def test_default_stream_cls(self, respx_mock: MockRouter, client: Dedalus) -> None:
-        class Model(BaseModel):
-            name: str
-
-        respx_mock.post("/foo").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
-
-        stream = client.post("/foo", cast_to=Model, stream=True, stream_cls=Stream[Model])
-        assert isinstance(stream, Stream)
-        stream.response.close()
-
-    @pytest.mark.respx(base_url=base_url)
     def test_received_text_for_expected_json(self, respx_mock: MockRouter) -> None:
         class Model(BaseModel):
             name: str
@@ -928,7 +916,7 @@ class TestDedalus:
         respx_mock.post("/v1/machines").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            client.machines.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__enter__()
+            client.machines.with_streaming_response.create().__enter__()
 
         assert _get_open_connections(client) == 0
 
@@ -938,7 +926,7 @@ class TestDedalus:
         respx_mock.post("/v1/machines").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            client.machines.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__enter__()
+            client.machines.with_streaming_response.create().__enter__()
         assert _get_open_connections(client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -967,7 +955,7 @@ class TestDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = client.machines.with_raw_response.create(memory_mib=0, storage_gib=0, vcpu=0)
+        response = client.machines.with_raw_response.create()
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -991,9 +979,7 @@ class TestDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = client.machines.with_raw_response.create(
-            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": Omit()}
-        )
+        response = client.machines.with_raw_response.create(extra_headers={"x-stainless-retry-count": Omit()})
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
@@ -1016,9 +1002,7 @@ class TestDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = client.machines.with_raw_response.create(
-            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": "42"}
-        )
+        response = client.machines.with_raw_response.create(extra_headers={"x-stainless-retry-count": "42"})
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 
@@ -1847,17 +1831,6 @@ class TestAsyncDedalus:
             )
 
     @pytest.mark.respx(base_url=base_url)
-    async def test_default_stream_cls(self, respx_mock: MockRouter, async_client: AsyncDedalus) -> None:
-        class Model(BaseModel):
-            name: str
-
-        respx_mock.post("/foo").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
-
-        stream = await async_client.post("/foo", cast_to=Model, stream=True, stream_cls=AsyncStream[Model])
-        assert isinstance(stream, AsyncStream)
-        await stream.response.aclose()
-
-    @pytest.mark.respx(base_url=base_url)
     async def test_received_text_for_expected_json(self, respx_mock: MockRouter) -> None:
         class Model(BaseModel):
             name: str
@@ -1915,7 +1888,7 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/machines").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            await async_client.machines.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__aenter__()
+            await async_client.machines.with_streaming_response.create().__aenter__()
 
         assert _get_open_connections(async_client) == 0
 
@@ -1925,7 +1898,7 @@ class TestAsyncDedalus:
         respx_mock.post("/v1/machines").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            await async_client.machines.with_streaming_response.create(memory_mib=0, storage_gib=0, vcpu=0).__aenter__()
+            await async_client.machines.with_streaming_response.create().__aenter__()
         assert _get_open_connections(async_client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -1954,7 +1927,7 @@ class TestAsyncDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = await client.machines.with_raw_response.create(memory_mib=0, storage_gib=0, vcpu=0)
+        response = await client.machines.with_raw_response.create()
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -1978,9 +1951,7 @@ class TestAsyncDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = await client.machines.with_raw_response.create(
-            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": Omit()}
-        )
+        response = await client.machines.with_raw_response.create(extra_headers={"x-stainless-retry-count": Omit()})
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
@@ -2003,9 +1974,7 @@ class TestAsyncDedalus:
 
         respx_mock.post("/v1/machines").mock(side_effect=retry_handler)
 
-        response = await client.machines.with_raw_response.create(
-            memory_mib=0, storage_gib=0, vcpu=0, extra_headers={"x-stainless-retry-count": "42"}
-        )
+        response = await client.machines.with_raw_response.create(extra_headers={"x-stainless-retry-count": "42"})
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 

@@ -37,8 +37,7 @@ from ._base_client import (
 )
 
 if TYPE_CHECKING:
-    from .resources import usage, machines
-    from .resources.usage import UsageResource, AsyncUsageResource
+    from .resources import machines
     from .resources.machines.machines import MachinesResource, AsyncMachinesResource
 
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Dedalus", "AsyncDedalus", "Client", "AsyncClient"]
@@ -50,14 +49,6 @@ class Dedalus(SyncAPIClient):
     x_api_key: str | None
     dedalus_org_id: str | None
 
-    websocket_base_url: str | httpx.URL | None
-    """Base URL for WebSocket connections.
-
-    If not specified, the default base URL will be used, with 'wss://' replacing the
-    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
-    'wss://example.com'
-    """
-
     def __init__(
         self,
         *,
@@ -65,7 +56,6 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
         base_url: str | httpx.URL | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -103,8 +93,6 @@ class Dedalus(SyncAPIClient):
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
 
-        self.websocket_base_url = websocket_base_url
-
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -132,14 +120,6 @@ class Dedalus(SyncAPIClient):
 
         self._idempotency_header = "Idempotency-Key"
 
-        self._default_stream_cls = Stream
-
-    @cached_property
-    def usage(self) -> UsageResource:
-        from .resources.usage import UsageResource
-
-        return UsageResource(self)
-
     @cached_property
     def machines(self) -> MachinesResource:
         from .resources.machines import MachinesResource
@@ -161,10 +141,14 @@ class Dedalus(SyncAPIClient):
 
     @override
     def _auth_headers(self, security: SecurityOptions) -> dict[str, str]:
-        return {
-            **(self._api_key_auth if security.get("api_key_auth", False) else {}),
-            **(self._bearer_auth if security.get("bearer_auth", False) else {}),
-        }
+        headers: dict[str, str] = {}
+        if security.get("api_key_auth", False):
+            for key, value in self._api_key_auth.items():
+                headers.setdefault(key, value)
+        if security.get("bearer_auth", False):
+            for key, value in self._bearer_auth.items():
+                headers.setdefault(key, value)
+        return headers
 
     @property
     def _api_key_auth(self) -> dict[str, str]:
@@ -208,7 +192,6 @@ class Dedalus(SyncAPIClient):
         api_key: str | None = None,
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -245,7 +228,6 @@ class Dedalus(SyncAPIClient):
             api_key=api_key or self.api_key,
             x_api_key=x_api_key or self.x_api_key,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
-            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -299,14 +281,6 @@ class AsyncDedalus(AsyncAPIClient):
     x_api_key: str | None
     dedalus_org_id: str | None
 
-    websocket_base_url: str | httpx.URL | None
-    """Base URL for WebSocket connections.
-
-    If not specified, the default base URL will be used, with 'wss://' replacing the
-    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
-    'wss://example.com'
-    """
-
     def __init__(
         self,
         *,
@@ -314,7 +288,6 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
         base_url: str | httpx.URL | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -352,8 +325,6 @@ class AsyncDedalus(AsyncAPIClient):
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
 
-        self.websocket_base_url = websocket_base_url
-
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -381,14 +352,6 @@ class AsyncDedalus(AsyncAPIClient):
 
         self._idempotency_header = "Idempotency-Key"
 
-        self._default_stream_cls = AsyncStream
-
-    @cached_property
-    def usage(self) -> AsyncUsageResource:
-        from .resources.usage import AsyncUsageResource
-
-        return AsyncUsageResource(self)
-
     @cached_property
     def machines(self) -> AsyncMachinesResource:
         from .resources.machines import AsyncMachinesResource
@@ -410,10 +373,14 @@ class AsyncDedalus(AsyncAPIClient):
 
     @override
     def _auth_headers(self, security: SecurityOptions) -> dict[str, str]:
-        return {
-            **(self._api_key_auth if security.get("api_key_auth", False) else {}),
-            **(self._bearer_auth if security.get("bearer_auth", False) else {}),
-        }
+        headers: dict[str, str] = {}
+        if security.get("api_key_auth", False):
+            for key, value in self._api_key_auth.items():
+                headers.setdefault(key, value)
+        if security.get("bearer_auth", False):
+            for key, value in self._bearer_auth.items():
+                headers.setdefault(key, value)
+        return headers
 
     @property
     def _api_key_auth(self) -> dict[str, str]:
@@ -457,7 +424,6 @@ class AsyncDedalus(AsyncAPIClient):
         api_key: str | None = None,
         x_api_key: str | None = None,
         dedalus_org_id: str | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -494,7 +460,6 @@ class AsyncDedalus(AsyncAPIClient):
             api_key=api_key or self.api_key,
             x_api_key=x_api_key or self.x_api_key,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
-            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -549,12 +514,6 @@ class DedalusWithRawResponse:
         self._client = client
 
     @cached_property
-    def usage(self) -> usage.UsageResourceWithRawResponse:
-        from .resources.usage import UsageResourceWithRawResponse
-
-        return UsageResourceWithRawResponse(self._client.usage)
-
-    @cached_property
     def machines(self) -> machines.MachinesResourceWithRawResponse:
         from .resources.machines import MachinesResourceWithRawResponse
 
@@ -566,12 +525,6 @@ class AsyncDedalusWithRawResponse:
 
     def __init__(self, client: AsyncDedalus) -> None:
         self._client = client
-
-    @cached_property
-    def usage(self) -> usage.AsyncUsageResourceWithRawResponse:
-        from .resources.usage import AsyncUsageResourceWithRawResponse
-
-        return AsyncUsageResourceWithRawResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.AsyncMachinesResourceWithRawResponse:
@@ -587,12 +540,6 @@ class DedalusWithStreamedResponse:
         self._client = client
 
     @cached_property
-    def usage(self) -> usage.UsageResourceWithStreamingResponse:
-        from .resources.usage import UsageResourceWithStreamingResponse
-
-        return UsageResourceWithStreamingResponse(self._client.usage)
-
-    @cached_property
     def machines(self) -> machines.MachinesResourceWithStreamingResponse:
         from .resources.machines import MachinesResourceWithStreamingResponse
 
@@ -604,12 +551,6 @@ class AsyncDedalusWithStreamedResponse:
 
     def __init__(self, client: AsyncDedalus) -> None:
         self._client = client
-
-    @cached_property
-    def usage(self) -> usage.AsyncUsageResourceWithStreamingResponse:
-        from .resources.usage import AsyncUsageResourceWithStreamingResponse
-
-        return AsyncUsageResourceWithStreamingResponse(self._client.usage)
 
     @cached_property
     def machines(self) -> machines.AsyncMachinesResourceWithStreamingResponse:
