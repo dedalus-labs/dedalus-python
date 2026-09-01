@@ -3,7 +3,6 @@
 from typing_extensions import Literal
 
 from .._models import BaseModel
-from .lifecycle_status import LifecycleStatus
 
 __all__ = ["Machine"]
 
@@ -19,7 +18,17 @@ class Machine(BaseModel):
     memory_mib: int
     """Memory in MiB."""
 
-    status: LifecycleStatus
+    phase: Literal[
+        "accepted",
+        "placement_pending",
+        "starting",
+        "running",
+        "stopping",
+        "sleeping",
+        "destroying",
+        "destroyed",
+        "failed",
+    ]
 
     storage_gib: int
 

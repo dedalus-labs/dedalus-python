@@ -16,30 +16,6 @@ from .machines import (
     MachinesResourceWithStreamingResponse,
     AsyncMachinesResourceWithStreamingResponse,
 )
-from .previews import (
-    PreviewsResource,
-    AsyncPreviewsResource,
-    PreviewsResourceWithRawResponse,
-    AsyncPreviewsResourceWithRawResponse,
-    PreviewsResourceWithStreamingResponse,
-    AsyncPreviewsResourceWithStreamingResponse,
-)
-from .artifacts import (
-    ArtifactsResource,
-    AsyncArtifactsResource,
-    ArtifactsResourceWithRawResponse,
-    AsyncArtifactsResourceWithRawResponse,
-    ArtifactsResourceWithStreamingResponse,
-    AsyncArtifactsResourceWithStreamingResponse,
-)
-from .terminals import (
-    TerminalsResource,
-    AsyncTerminalsResource,
-    TerminalsResourceWithRawResponse,
-    AsyncTerminalsResourceWithRawResponse,
-    TerminalsResourceWithStreamingResponse,
-    AsyncTerminalsResourceWithStreamingResponse,
-)
 from .executions import (
     ExecutionsResource,
     AsyncExecutionsResource,
@@ -50,18 +26,6 @@ from .executions import (
 )
 
 __all__ = [
-    "ArtifactsResource",
-    "AsyncArtifactsResource",
-    "ArtifactsResourceWithRawResponse",
-    "AsyncArtifactsResourceWithRawResponse",
-    "ArtifactsResourceWithStreamingResponse",
-    "AsyncArtifactsResourceWithStreamingResponse",
-    "PreviewsResource",
-    "AsyncPreviewsResource",
-    "PreviewsResourceWithRawResponse",
-    "AsyncPreviewsResourceWithRawResponse",
-    "PreviewsResourceWithStreamingResponse",
-    "AsyncPreviewsResourceWithStreamingResponse",
     "SSHResource",
     "AsyncSSHResource",
     "SSHResourceWithRawResponse",
@@ -74,12 +38,6 @@ __all__ = [
     "AsyncExecutionsResourceWithRawResponse",
     "ExecutionsResourceWithStreamingResponse",
     "AsyncExecutionsResourceWithStreamingResponse",
-    "TerminalsResource",
-    "AsyncTerminalsResource",
-    "TerminalsResourceWithRawResponse",
-    "AsyncTerminalsResourceWithRawResponse",
-    "TerminalsResourceWithStreamingResponse",
-    "AsyncTerminalsResourceWithStreamingResponse",
     "MachinesResource",
     "AsyncMachinesResource",
     "MachinesResourceWithRawResponse",
