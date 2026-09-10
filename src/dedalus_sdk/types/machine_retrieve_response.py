@@ -1,18 +1,16 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from datetime import datetime
 from typing_extensions import Literal
 
 from .._models import BaseModel
+from .lifecycle_status import LifecycleStatus
 
-__all__ = ["MachineListItem"]
+__all__ = ["MachineRetrieveResponse"]
 
 
-class MachineListItem(BaseModel):
+class MachineRetrieveResponse(BaseModel):
     autosleep_seconds: int
     """Seconds of inactivity before autosleep. 0 disables autosleep."""
-
-    created_at: datetime
 
     desired_state: Literal["running", "sleeping", "destroyed"]
 
@@ -21,17 +19,7 @@ class MachineListItem(BaseModel):
     memory_mib: int
     """Memory in MiB."""
 
-    phase: Literal[
-        "accepted",
-        "placement_pending",
-        "starting",
-        "running",
-        "stopping",
-        "sleeping",
-        "destroying",
-        "destroyed",
-        "failed",
-    ]
+    status: LifecycleStatus
 
     storage_gib: int
 

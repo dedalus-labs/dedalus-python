@@ -14,32 +14,8 @@ from .ssh import (
 )
 from ...types import machine_list_params, machine_create_params, machine_update_params
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, strip_not_given, async_maybe_transform
-from .previews import (
-    PreviewsResource,
-    AsyncPreviewsResource,
-    PreviewsResourceWithRawResponse,
-    AsyncPreviewsResourceWithRawResponse,
-    PreviewsResourceWithStreamingResponse,
-    AsyncPreviewsResourceWithStreamingResponse,
-)
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
-from .artifacts import (
-    ArtifactsResource,
-    AsyncArtifactsResource,
-    ArtifactsResourceWithRawResponse,
-    AsyncArtifactsResourceWithRawResponse,
-    ArtifactsResourceWithStreamingResponse,
-    AsyncArtifactsResourceWithStreamingResponse,
-)
-from .terminals import (
-    TerminalsResource,
-    AsyncTerminalsResource,
-    TerminalsResourceWithRawResponse,
-    AsyncTerminalsResourceWithRawResponse,
-    TerminalsResourceWithStreamingResponse,
-    AsyncTerminalsResourceWithStreamingResponse,
-)
 from .executions import (
     ExecutionsResource,
     AsyncExecutionsResource,
@@ -55,24 +31,16 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ..._streaming import Stream, AsyncStream
 from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
 from ...types.machine import Machine
 from ...types.machine_list_item import MachineListItem
+from ...types.machine_retrieve_response import MachineRetrieveResponse
 
 __all__ = ["MachinesResource", "AsyncMachinesResource"]
 
 
 class MachinesResource(SyncAPIResource):
-    @cached_property
-    def artifacts(self) -> ArtifactsResource:
-        return ArtifactsResource(self._client)
-
-    @cached_property
-    def previews(self) -> PreviewsResource:
-        return PreviewsResource(self._client)
-
     @cached_property
     def ssh(self) -> SSHResource:
         return SSHResource(self._client)
@@ -80,10 +48,6 @@ class MachinesResource(SyncAPIResource):
     @cached_property
     def executions(self) -> ExecutionsResource:
         return ExecutionsResource(self._client)
-
-    @cached_property
-    def terminals(self) -> TerminalsResource:
-        return TerminalsResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> MachinesResourceWithRawResponse:
@@ -107,10 +71,10 @@ class MachinesResource(SyncAPIResource):
     def create(
         self,
         *,
-        memory_mib: int,
-        storage_gib: int,
-        vcpu: float,
         autosleep: str | Omit = omit,
+        memory_mib: int | Omit = omit,
+        storage_gib: int | Omit = omit,
+        vcpu: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -119,18 +83,19 @@ class MachinesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """
-        Create machine
+        """Create machine
 
         Args:
+          autosleep: Idle window before autosleep.
+
+        Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           memory_mib: Memory in MiB.
 
           storage_gib: Storage in GiB.
 
           vcpu: CPU in vCPUs.
-
-          autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
 
           extra_headers: Send extra headers
 
@@ -146,10 +111,10 @@ class MachinesResource(SyncAPIResource):
             "/v1/machines",
             body=maybe_transform(
                 {
+                    "autosleep": autosleep,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
-                    "autosleep": autosleep,
                 },
                 machine_create_params.MachineCreateParams,
             ),
@@ -173,7 +138,7 @@ class MachinesResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Machine:
+    ) -> MachineRetrieveResponse:
         """
         Get machine
 
@@ -193,7 +158,7 @@ class MachinesResource(SyncAPIResource):
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Machine,
+            cast_to=MachineRetrieveResponse,
         )
 
     def update(
@@ -422,57 +387,8 @@ class MachinesResource(SyncAPIResource):
             cast_to=Machine,
         )
 
-    def watch(
-        self,
-        *,
-        machine_id: str,
-        last_event_id: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Stream[Machine]:
-        """Streams machine lifecycle updates over Server-Sent Events.
-
-        Each `status` event
-        contains a full `LifecycleResponse` payload. The stream closes after the machine
-        reaches its current desired state.
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not machine_id:
-            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"Accept": "text/event-stream", **(extra_headers or {})}
-        extra_headers = {**strip_not_given({"Last-Event-ID": last_event_id}), **(extra_headers or {})}
-        return self._get(
-            path_template("/v1/machines/{machine_id}/status/stream", machine_id=machine_id),
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
-            ),
-            cast_to=Machine,
-            stream=True,
-            stream_cls=Stream[Machine],
-        )
-
 
 class AsyncMachinesResource(AsyncAPIResource):
-    @cached_property
-    def artifacts(self) -> AsyncArtifactsResource:
-        return AsyncArtifactsResource(self._client)
-
-    @cached_property
-    def previews(self) -> AsyncPreviewsResource:
-        return AsyncPreviewsResource(self._client)
-
     @cached_property
     def ssh(self) -> AsyncSSHResource:
         return AsyncSSHResource(self._client)
@@ -480,10 +396,6 @@ class AsyncMachinesResource(AsyncAPIResource):
     @cached_property
     def executions(self) -> AsyncExecutionsResource:
         return AsyncExecutionsResource(self._client)
-
-    @cached_property
-    def terminals(self) -> AsyncTerminalsResource:
-        return AsyncTerminalsResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> AsyncMachinesResourceWithRawResponse:
@@ -507,10 +419,10 @@ class AsyncMachinesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        memory_mib: int,
-        storage_gib: int,
-        vcpu: float,
         autosleep: str | Omit = omit,
+        memory_mib: int | Omit = omit,
+        storage_gib: int | Omit = omit,
+        vcpu: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -519,18 +431,19 @@ class AsyncMachinesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """
-        Create machine
+        """Create machine
 
         Args:
+          autosleep: Idle window before autosleep.
+
+        Accepts fixed duration units like 30s, 30m, 2h,
+              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+
           memory_mib: Memory in MiB.
 
           storage_gib: Storage in GiB.
 
           vcpu: CPU in vCPUs.
-
-          autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
 
           extra_headers: Send extra headers
 
@@ -546,10 +459,10 @@ class AsyncMachinesResource(AsyncAPIResource):
             "/v1/machines",
             body=await async_maybe_transform(
                 {
+                    "autosleep": autosleep,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
-                    "autosleep": autosleep,
                 },
                 machine_create_params.MachineCreateParams,
             ),
@@ -573,7 +486,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Machine:
+    ) -> MachineRetrieveResponse:
         """
         Get machine
 
@@ -593,7 +506,7 @@ class AsyncMachinesResource(AsyncAPIResource):
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Machine,
+            cast_to=MachineRetrieveResponse,
         )
 
     async def update(
@@ -822,47 +735,6 @@ class AsyncMachinesResource(AsyncAPIResource):
             cast_to=Machine,
         )
 
-    async def watch(
-        self,
-        *,
-        machine_id: str,
-        last_event_id: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncStream[Machine]:
-        """Streams machine lifecycle updates over Server-Sent Events.
-
-        Each `status` event
-        contains a full `LifecycleResponse` payload. The stream closes after the machine
-        reaches its current desired state.
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not machine_id:
-            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {"Accept": "text/event-stream", **(extra_headers or {})}
-        extra_headers = {**strip_not_given({"Last-Event-ID": last_event_id}), **(extra_headers or {})}
-        return await self._get(
-            path_template("/v1/machines/{machine_id}/status/stream", machine_id=machine_id),
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
-            ),
-            cast_to=Machine,
-            stream=True,
-            stream_cls=AsyncStream[Machine],
-        )
-
 
 class MachinesResourceWithRawResponse:
     def __init__(self, machines: MachinesResource) -> None:
@@ -889,17 +761,6 @@ class MachinesResourceWithRawResponse:
         self.wake = to_raw_response_wrapper(
             machines.wake,
         )
-        self.watch = to_raw_response_wrapper(
-            machines.watch,
-        )
-
-    @cached_property
-    def artifacts(self) -> ArtifactsResourceWithRawResponse:
-        return ArtifactsResourceWithRawResponse(self._machines.artifacts)
-
-    @cached_property
-    def previews(self) -> PreviewsResourceWithRawResponse:
-        return PreviewsResourceWithRawResponse(self._machines.previews)
 
     @cached_property
     def ssh(self) -> SSHResourceWithRawResponse:
@@ -908,10 +769,6 @@ class MachinesResourceWithRawResponse:
     @cached_property
     def executions(self) -> ExecutionsResourceWithRawResponse:
         return ExecutionsResourceWithRawResponse(self._machines.executions)
-
-    @cached_property
-    def terminals(self) -> TerminalsResourceWithRawResponse:
-        return TerminalsResourceWithRawResponse(self._machines.terminals)
 
 
 class AsyncMachinesResourceWithRawResponse:
@@ -939,17 +796,6 @@ class AsyncMachinesResourceWithRawResponse:
         self.wake = async_to_raw_response_wrapper(
             machines.wake,
         )
-        self.watch = async_to_raw_response_wrapper(
-            machines.watch,
-        )
-
-    @cached_property
-    def artifacts(self) -> AsyncArtifactsResourceWithRawResponse:
-        return AsyncArtifactsResourceWithRawResponse(self._machines.artifacts)
-
-    @cached_property
-    def previews(self) -> AsyncPreviewsResourceWithRawResponse:
-        return AsyncPreviewsResourceWithRawResponse(self._machines.previews)
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithRawResponse:
@@ -958,10 +804,6 @@ class AsyncMachinesResourceWithRawResponse:
     @cached_property
     def executions(self) -> AsyncExecutionsResourceWithRawResponse:
         return AsyncExecutionsResourceWithRawResponse(self._machines.executions)
-
-    @cached_property
-    def terminals(self) -> AsyncTerminalsResourceWithRawResponse:
-        return AsyncTerminalsResourceWithRawResponse(self._machines.terminals)
 
 
 class MachinesResourceWithStreamingResponse:
@@ -989,17 +831,6 @@ class MachinesResourceWithStreamingResponse:
         self.wake = to_streamed_response_wrapper(
             machines.wake,
         )
-        self.watch = to_streamed_response_wrapper(
-            machines.watch,
-        )
-
-    @cached_property
-    def artifacts(self) -> ArtifactsResourceWithStreamingResponse:
-        return ArtifactsResourceWithStreamingResponse(self._machines.artifacts)
-
-    @cached_property
-    def previews(self) -> PreviewsResourceWithStreamingResponse:
-        return PreviewsResourceWithStreamingResponse(self._machines.previews)
 
     @cached_property
     def ssh(self) -> SSHResourceWithStreamingResponse:
@@ -1008,10 +839,6 @@ class MachinesResourceWithStreamingResponse:
     @cached_property
     def executions(self) -> ExecutionsResourceWithStreamingResponse:
         return ExecutionsResourceWithStreamingResponse(self._machines.executions)
-
-    @cached_property
-    def terminals(self) -> TerminalsResourceWithStreamingResponse:
-        return TerminalsResourceWithStreamingResponse(self._machines.terminals)
 
 
 class AsyncMachinesResourceWithStreamingResponse:
@@ -1039,17 +866,6 @@ class AsyncMachinesResourceWithStreamingResponse:
         self.wake = async_to_streamed_response_wrapper(
             machines.wake,
         )
-        self.watch = async_to_streamed_response_wrapper(
-            machines.watch,
-        )
-
-    @cached_property
-    def artifacts(self) -> AsyncArtifactsResourceWithStreamingResponse:
-        return AsyncArtifactsResourceWithStreamingResponse(self._machines.artifacts)
-
-    @cached_property
-    def previews(self) -> AsyncPreviewsResourceWithStreamingResponse:
-        return AsyncPreviewsResourceWithStreamingResponse(self._machines.previews)
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithStreamingResponse:
@@ -1058,7 +874,3 @@ class AsyncMachinesResourceWithStreamingResponse:
     @cached_property
     def executions(self) -> AsyncExecutionsResourceWithStreamingResponse:
         return AsyncExecutionsResourceWithStreamingResponse(self._machines.executions)
-
-    @cached_property
-    def terminals(self) -> AsyncTerminalsResourceWithStreamingResponse:
-        return AsyncTerminalsResourceWithStreamingResponse(self._machines.terminals)

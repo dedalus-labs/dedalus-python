@@ -25,7 +25,7 @@ class TestExecutions:
     @parametrize
     def test_method_create(self, client: Dedalus) -> None:
         execution = client.machines.executions.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -33,7 +33,7 @@ class TestExecutions:
     @parametrize
     def test_method_create_with_all_params(self, client: Dedalus) -> None:
         execution = client.machines.executions.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
             cwd="cwd",
             env={"foo": "string"},
@@ -45,7 +45,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_create(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         )
 
@@ -57,7 +57,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_create(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         ) as response:
             assert not response.is_closed
@@ -79,7 +79,7 @@ class TestExecutions:
     @parametrize
     def test_method_retrieve(self, client: Dedalus) -> None:
         execution = client.machines.executions.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -87,7 +87,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_retrieve(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -99,7 +99,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_retrieve(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -120,21 +120,21 @@ class TestExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             client.machines.executions.with_raw_response.retrieve(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     def test_method_list(self, client: Dedalus) -> None:
         execution = client.machines.executions.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         )
         assert_matches_type(SyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     def test_method_list_with_all_params(self, client: Dedalus) -> None:
         execution = client.machines.executions.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             cursor="cursor",
             limit=0,
         )
@@ -143,7 +143,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_list(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         )
 
         assert response.is_closed is True
@@ -154,7 +154,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_list(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -174,7 +174,7 @@ class TestExecutions:
     @parametrize
     def test_method_delete(self, client: Dedalus) -> None:
         execution = client.machines.executions.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -182,7 +182,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_delete(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -194,7 +194,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_delete(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -215,14 +215,14 @@ class TestExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             client.machines.executions.with_raw_response.delete(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     def test_method_events(self, client: Dedalus) -> None:
         execution = client.machines.executions.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(SyncCursorPage[ExecutionEvent], execution, path=["response"])
@@ -230,7 +230,7 @@ class TestExecutions:
     @parametrize
     def test_method_events_with_all_params(self, client: Dedalus) -> None:
         execution = client.machines.executions.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
             cursor="cursor",
             limit=0,
@@ -240,7 +240,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_events(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -252,7 +252,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_events(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -273,14 +273,14 @@ class TestExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             client.machines.executions.with_raw_response.events(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     def test_method_output(self, client: Dedalus) -> None:
         execution = client.machines.executions.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(ExecutionOutput, execution, path=["response"])
@@ -288,7 +288,7 @@ class TestExecutions:
     @parametrize
     def test_raw_response_output(self, client: Dedalus) -> None:
         response = client.machines.executions.with_raw_response.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -300,7 +300,7 @@ class TestExecutions:
     @parametrize
     def test_streaming_response_output(self, client: Dedalus) -> None:
         with client.machines.executions.with_streaming_response.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -321,7 +321,7 @@ class TestExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             client.machines.executions.with_raw_response.output(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
@@ -334,7 +334,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_method_create(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -342,7 +342,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_method_create_with_all_params(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
             cwd="cwd",
             env={"foo": "string"},
@@ -354,7 +354,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_create(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         )
 
@@ -366,7 +366,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_create(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.create(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             command=["string"],
         ) as response:
             assert not response.is_closed
@@ -388,7 +388,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_method_retrieve(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -396,7 +396,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_retrieve(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -408,7 +408,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_retrieve(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.retrieve(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -429,21 +429,21 @@ class TestAsyncExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             await async_client.machines.executions.with_raw_response.retrieve(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     async def test_method_list(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         )
         assert_matches_type(AsyncCursorPage[Execution], execution, path=["response"])
 
     @parametrize
     async def test_method_list_with_all_params(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             cursor="cursor",
             limit=0,
         )
@@ -452,7 +452,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_list(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         )
 
         assert response.is_closed is True
@@ -463,7 +463,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_list(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.list(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -483,7 +483,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_method_delete(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(Execution, execution, path=["response"])
@@ -491,7 +491,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_delete(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -503,7 +503,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_delete(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.delete(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -524,14 +524,14 @@ class TestAsyncExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             await async_client.machines.executions.with_raw_response.delete(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     async def test_method_events(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(AsyncCursorPage[ExecutionEvent], execution, path=["response"])
@@ -539,7 +539,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_method_events_with_all_params(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
             cursor="cursor",
             limit=0,
@@ -549,7 +549,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_events(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -561,7 +561,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_events(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.events(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -582,14 +582,14 @@ class TestAsyncExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             await async_client.machines.executions.with_raw_response.events(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
 
     @parametrize
     async def test_method_output(self, async_client: AsyncDedalus) -> None:
         execution = await async_client.machines.executions.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
         assert_matches_type(ExecutionOutput, execution, path=["response"])
@@ -597,7 +597,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_raw_response_output(self, async_client: AsyncDedalus) -> None:
         response = await async_client.machines.executions.with_raw_response.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         )
 
@@ -609,7 +609,7 @@ class TestAsyncExecutions:
     @parametrize
     async def test_streaming_response_output(self, async_client: AsyncDedalus) -> None:
         async with async_client.machines.executions.with_streaming_response.output(
-            machine_id="dm-3",
+            machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
             execution_id="execution_id",
         ) as response:
             assert not response.is_closed
@@ -630,6 +630,6 @@ class TestAsyncExecutions:
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `execution_id` but received ''"):
             await async_client.machines.executions.with_raw_response.output(
-                machine_id="dm-3",
+                machine_id="dm-ecc2efdd-ddfa-31a9-c6f1-b833d337aa7c",
                 execution_id="",
             )
