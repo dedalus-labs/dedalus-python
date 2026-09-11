@@ -825,7 +825,8 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         return False
 
     def _idempotency_key(self) -> str:
-        return f"stainless-python-retry-{uuid.uuid4()}"
+        # Use the API's UUIDv7 format. Automatic retries reuse this value.
+        return f"{time.time_ns() // 1_000_000:012x}7{uuid.uuid4().hex[13:]}"
 
 
 class _DefaultHttpxClient(httpx.Client):
