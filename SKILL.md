@@ -21,15 +21,14 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    api_key=os.environ.get("DEDALUS_API_KEY"),
+    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
 )
 ```
 
 Provide credentials using the options below. Environment variables are read automatically when the target runtime supports them:
 
-- `x_api_key` (env: `DEDALUS_X_API_KEY`) — API key authentication using X-API-Key header
-- `bearer_auth` (env: `DEDALUS_BEARER_AUTH`) — Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>.
-- `api_key` (env: `DEDALUS_API_KEY`) — API key authentication using Bearer token
+- `x_api_key` (env: `DEDALUS_X_API_KEY`) — Dedalus API key. Alternative to Bearer token.
+- `api_key` (env: `DEDALUS_API_KEY`) — Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>.
 
 ## Calling operations
 
@@ -39,7 +38,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    api_key=os.environ.get("DEDALUS_API_KEY"),
+    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
 )
 
 machine = client.machines.create(
@@ -61,16 +60,6 @@ List endpoints return paginated results you can iterate directly; the SDK fetche
 
 ```python
 page = client.machines.list()
-```
-
-## WebSockets
-
-WebSocket endpoints open a persistent connection you can send messages to and receive messages from.
-
-```python
-with client.machines.terminals.connect(machine_id="machineID", terminal_id="terminalID") as connection:
-    message = connection.recv()
-    print(message)
 ```
 
 ## Error handling

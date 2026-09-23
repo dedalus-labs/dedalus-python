@@ -1,13 +1,5 @@
 # File generated from our OpenAPI spec by Scalar. See README.md for details.
 
-from .machines import (
-    MachinesResource,
-    AsyncMachinesResource,
-    MachinesResourceWithRawResponse,
-    AsyncMachinesResourceWithRawResponse,
-    MachinesResourceWithStreamingResponse,
-    AsyncMachinesResourceWithStreamingResponse,
-)
 from .organization import (
     OrganizationResource,
     AsyncOrganizationResource,
@@ -16,18 +8,26 @@ from .organization import (
     OrganizationResourceWithStreamingResponse,
     AsyncOrganizationResourceWithStreamingResponse,
 )
+from .autoresizing import (
+    AutoresizingResource,
+    AsyncAutoresizingResource,
+    AutoresizingResourceWithRawResponse,
+    AsyncAutoresizingResourceWithRawResponse,
+    AutoresizingResourceWithStreamingResponse,
+    AsyncAutoresizingResourceWithStreamingResponse,
+)
 
 __all__ = [
-    "MachinesResource",
-    "AsyncMachinesResource",
-    "MachinesResourceWithRawResponse",
-    "AsyncMachinesResourceWithRawResponse",
-    "MachinesResourceWithStreamingResponse",
-    "AsyncMachinesResourceWithStreamingResponse",
     "OrganizationResource",
     "AsyncOrganizationResource",
     "OrganizationResourceWithRawResponse",
     "AsyncOrganizationResourceWithRawResponse",
     "OrganizationResourceWithStreamingResponse",
     "AsyncOrganizationResourceWithStreamingResponse",
+    "AutoresizingResource",
+    "AsyncAutoresizingResource",
+    "AutoresizingResourceWithRawResponse",
+    "AsyncAutoresizingResourceWithRawResponse",
+    "AutoresizingResourceWithStreamingResponse",
+    "AsyncAutoresizingResourceWithStreamingResponse",
 ]

@@ -24,13 +24,13 @@ from .executions import (
     ExecutionsResourceWithStreamingResponse,
     AsyncExecutionsResourceWithStreamingResponse,
 )
-from .terminals import (
-    TerminalsResource,
-    AsyncTerminalsResource,
-    TerminalsResourceWithRawResponse,
-    AsyncTerminalsResourceWithRawResponse,
-    TerminalsResourceWithStreamingResponse,
-    AsyncTerminalsResourceWithStreamingResponse,
+from .autoresizing import (
+    AutoresizingResource,
+    AsyncAutoresizingResource,
+    AutoresizingResourceWithRawResponse,
+    AsyncAutoresizingResourceWithRawResponse,
+    AutoresizingResourceWithStreamingResponse,
+    AsyncAutoresizingResourceWithStreamingResponse,
 )
 
 __all__ = [
@@ -52,10 +52,10 @@ __all__ = [
     "AsyncExecutionsResourceWithRawResponse",
     "ExecutionsResourceWithStreamingResponse",
     "AsyncExecutionsResourceWithStreamingResponse",
-    "TerminalsResource",
-    "AsyncTerminalsResource",
-    "TerminalsResourceWithRawResponse",
-    "AsyncTerminalsResourceWithRawResponse",
-    "TerminalsResourceWithStreamingResponse",
-    "AsyncTerminalsResourceWithStreamingResponse",
+    "AutoresizingResource",
+    "AsyncAutoresizingResource",
+    "AutoresizingResourceWithRawResponse",
+    "AsyncAutoresizingResourceWithRawResponse",
+    "AutoresizingResourceWithStreamingResponse",
+    "AsyncAutoresizingResourceWithStreamingResponse",
 ]

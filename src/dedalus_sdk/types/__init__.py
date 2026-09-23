@@ -10,8 +10,4 @@ from .machine_list_params import MachineListParams as MachineListParams
 from .machine_create_params import MachineCreateParams as MachineCreateParams
 from .machine_retrieve_response import MachineRetrieveResponse as MachineRetrieveResponse
 from .machine_update_params import MachineUpdateParams as MachineUpdateParams
-from .websocket_connection_options import WebSocketConnectionOptions as WebSocketConnectionOptions
-from .websocket_reconnection import (
-    ReconnectingEvent as ReconnectingEvent,
-    ReconnectingOverrides as ReconnectingOverrides,
-)
+from .machine_reboot_params import MachineRebootParams as MachineRebootParams

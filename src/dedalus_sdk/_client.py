@@ -33,8 +33,9 @@ from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._version import __version__
 
 if TYPE_CHECKING:
-    from .resources import machines
+    from .resources import machines, organization
     from .resources.machines import MachinesResource, AsyncMachinesResource
+    from .resources.organization import OrganizationResource, AsyncOrganizationResource
 
 # Serializes lazy resource imports so concurrent cold access from multiple
 # threads cannot deadlock on CPython import locks (see CPython 3.14).
@@ -49,18 +50,6 @@ class Dedalus(SyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
-    provider: str | None
-    provider_key: str | None
-    provider_model: str | None
-    bearer_auth: str | None
-
-    websocket_base_url: str | httpx.URL | None
-    """Base URL for WebSocket connections.
-
-    If not specified, the default base URL will be used, with 'wss://' replacing the
-    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
-    'wss://example.com'
-    """
 
     def __init__(
         self,
@@ -69,12 +58,7 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
-        provider: str | None = None,
-        provider_key: str | None = None,
-        provider_model: str | None = None,
-        bearer_auth: str | None = None,
         base_url: str | httpx.URL | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -100,9 +84,6 @@ class Dedalus(SyncAPIClient):
         - `x_api_key` from `DEDALUS_X_API_KEY`
         - `as_base_url` from `DEDALUS_AS_URL`
         - `dedalus_org_id` from `DEDALUS_ORG_ID`
-        - `provider` from `DEDALUS_PROVIDER`
-        - `provider_key` from `DEDALUS_PROVIDER_KEY`
-        - `provider_model` from `DEDALUS_PROVIDER_MODEL`
         """
         if api_key is None:
             api_key = os.environ.get("DEDALUS_API_KEY")
@@ -118,19 +99,6 @@ class Dedalus(SyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
-        if provider is None:
-            provider = os.environ.get("DEDALUS_PROVIDER")
-        self.provider = provider
-        if provider_key is None:
-            provider_key = os.environ.get("DEDALUS_PROVIDER_KEY")
-        self.provider_key = provider_key
-        if provider_model is None:
-            provider_model = os.environ.get("DEDALUS_PROVIDER_MODEL")
-        self.provider_model = provider_model
-        if bearer_auth is None:
-            bearer_auth = os.environ.get("DEDALUS_BEARER_AUTH")
-        self.bearer_auth = bearer_auth
-        self.websocket_base_url = websocket_base_url
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -163,6 +131,12 @@ class Dedalus(SyncAPIClient):
         return MachinesResource(self)
 
     @cached_property
+    def organization(self) -> "OrganizationResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import OrganizationResource
+        return OrganizationResource(self)
+
+    @cached_property
     def with_raw_response(self) -> DedalusWithRawResponse:
         return DedalusWithRawResponse(self)
 
@@ -181,7 +155,6 @@ class Dedalus(SyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
-            **self._bearer_auth_header_auth,
         }
 
     @override
@@ -209,13 +182,6 @@ class Dedalus(SyncAPIClient):
         return {"x-api-key": value}
 
     @property
-    def _bearer_auth_header_auth(self) -> dict[str, str]:
-        value = self.bearer_auth
-        if value is None:
-            return {}
-        return {"Authorization": f"Bearer {value}"}
-
-    @property
     @override
     def default_headers(self) -> dict[str, str | Omit]:
         return {
@@ -223,9 +189,6 @@ class Dedalus(SyncAPIClient):
             "X-Scalar-Async": "false",
             "User-Agent": "Dedalus-SDK",
             "X-SDK-Version": "1.0.0",
-            "X-Provider": self.provider if self.provider is not None else Omit(),
-            "X-Provider-Key": self.provider_key if self.provider_key is not None else Omit(),
-            "X-Provider-Model": self.provider_model if self.provider_model is not None else Omit(),
             **self._custom_headers,
         }
 
@@ -246,7 +209,7 @@ class Dedalus(SyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key, bearer_auth or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -256,11 +219,6 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
-        provider: str | None = None,
-        provider_key: str | None = None,
-        provider_model: str | None = None,
-        bearer_auth: str | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -292,11 +250,6 @@ class Dedalus(SyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
-            provider=provider or self.provider,
-            provider_key=provider_key or self.provider_key,
-            provider_model=provider_model or self.provider_model,
-            bearer_auth=bearer_auth or self.bearer_auth,
-            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -336,18 +289,6 @@ class AsyncDedalus(AsyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
-    provider: str | None
-    provider_key: str | None
-    provider_model: str | None
-    bearer_auth: str | None
-
-    websocket_base_url: str | httpx.URL | None
-    """Base URL for WebSocket connections.
-
-    If not specified, the default base URL will be used, with 'wss://' replacing the
-    'http://' or 'https://' scheme. For example: 'http://example.com' becomes
-    'wss://example.com'
-    """
 
     def __init__(
         self,
@@ -356,12 +297,7 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
-        provider: str | None = None,
-        provider_key: str | None = None,
-        provider_model: str | None = None,
-        bearer_auth: str | None = None,
         base_url: str | httpx.URL | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -387,9 +323,6 @@ class AsyncDedalus(AsyncAPIClient):
         - `x_api_key` from `DEDALUS_X_API_KEY`
         - `as_base_url` from `DEDALUS_AS_URL`
         - `dedalus_org_id` from `DEDALUS_ORG_ID`
-        - `provider` from `DEDALUS_PROVIDER`
-        - `provider_key` from `DEDALUS_PROVIDER_KEY`
-        - `provider_model` from `DEDALUS_PROVIDER_MODEL`
         """
         if api_key is None:
             api_key = os.environ.get("DEDALUS_API_KEY")
@@ -405,19 +338,6 @@ class AsyncDedalus(AsyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
-        if provider is None:
-            provider = os.environ.get("DEDALUS_PROVIDER")
-        self.provider = provider
-        if provider_key is None:
-            provider_key = os.environ.get("DEDALUS_PROVIDER_KEY")
-        self.provider_key = provider_key
-        if provider_model is None:
-            provider_model = os.environ.get("DEDALUS_PROVIDER_MODEL")
-        self.provider_model = provider_model
-        if bearer_auth is None:
-            bearer_auth = os.environ.get("DEDALUS_BEARER_AUTH")
-        self.bearer_auth = bearer_auth
-        self.websocket_base_url = websocket_base_url
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -450,6 +370,12 @@ class AsyncDedalus(AsyncAPIClient):
         return AsyncMachinesResource(self)
 
     @cached_property
+    def organization(self) -> "AsyncOrganizationResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import AsyncOrganizationResource
+        return AsyncOrganizationResource(self)
+
+    @cached_property
     def with_raw_response(self) -> AsyncDedalusWithRawResponse:
         return AsyncDedalusWithRawResponse(self)
 
@@ -468,7 +394,6 @@ class AsyncDedalus(AsyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
-            **self._bearer_auth_header_auth,
         }
 
     @override
@@ -496,13 +421,6 @@ class AsyncDedalus(AsyncAPIClient):
         return {"x-api-key": value}
 
     @property
-    def _bearer_auth_header_auth(self) -> dict[str, str]:
-        value = self.bearer_auth
-        if value is None:
-            return {}
-        return {"Authorization": f"Bearer {value}"}
-
-    @property
     @override
     def default_headers(self) -> dict[str, str | Omit]:
         return {
@@ -510,9 +428,6 @@ class AsyncDedalus(AsyncAPIClient):
             "X-Scalar-Async": f"async:{get_async_library()}",
             "User-Agent": "Dedalus-SDK",
             "X-SDK-Version": "1.0.0",
-            "X-Provider": self.provider if self.provider is not None else Omit(),
-            "X-Provider-Key": self.provider_key if self.provider_key is not None else Omit(),
-            "X-Provider-Model": self.provider_model if self.provider_model is not None else Omit(),
             **self._custom_headers,
         }
 
@@ -533,7 +448,7 @@ class AsyncDedalus(AsyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key, bearer_auth or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -543,11 +458,6 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
-        provider: str | None = None,
-        provider_key: str | None = None,
-        provider_model: str | None = None,
-        bearer_auth: str | None = None,
-        websocket_base_url: str | httpx.URL | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -579,11 +489,6 @@ class AsyncDedalus(AsyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
-            provider=provider or self.provider,
-            provider_key=provider_key or self.provider_key,
-            provider_model=provider_model or self.provider_model,
-            bearer_auth=bearer_auth or self.bearer_auth,
-            websocket_base_url=websocket_base_url or self.websocket_base_url,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -629,6 +534,12 @@ class DedalusWithRawResponse:
             from .resources.machines import MachinesResourceWithRawResponse
         return MachinesResourceWithRawResponse(self._client.machines)
 
+    @cached_property
+    def organization(self) -> organization.OrganizationResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import OrganizationResourceWithRawResponse
+        return OrganizationResourceWithRawResponse(self._client.organization)
+
 
 class AsyncDedalusWithRawResponse:
     _client: AsyncDedalus
@@ -641,6 +552,12 @@ class AsyncDedalusWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.machines import AsyncMachinesResourceWithRawResponse
         return AsyncMachinesResourceWithRawResponse(self._client.machines)
+
+    @cached_property
+    def organization(self) -> organization.AsyncOrganizationResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import AsyncOrganizationResourceWithRawResponse
+        return AsyncOrganizationResourceWithRawResponse(self._client.organization)
 
 
 class DedalusWithStreamedResponse:
@@ -655,6 +572,12 @@ class DedalusWithStreamedResponse:
             from .resources.machines import MachinesResourceWithStreamingResponse
         return MachinesResourceWithStreamingResponse(self._client.machines)
 
+    @cached_property
+    def organization(self) -> organization.OrganizationResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import OrganizationResourceWithStreamingResponse
+        return OrganizationResourceWithStreamingResponse(self._client.organization)
+
 
 class AsyncDedalusWithStreamedResponse:
     _client: AsyncDedalus
@@ -667,6 +590,12 @@ class AsyncDedalusWithStreamedResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.machines import AsyncMachinesResourceWithStreamingResponse
         return AsyncMachinesResourceWithStreamingResponse(self._client.machines)
+
+    @cached_property
+    def organization(self) -> organization.AsyncOrganizationResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.organization import AsyncOrganizationResourceWithStreamingResponse
+        return AsyncOrganizationResourceWithStreamingResponse(self._client.organization)
 
 
 # Alias names for the documented `Client` / `AsyncClient` symbols.

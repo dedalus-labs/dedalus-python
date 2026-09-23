@@ -105,12 +105,27 @@ def _smoke_case_7() -> None:
 
 
 def _smoke_case_8() -> None:
+    machine = client.machines.reboot(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        idempotency_key="",
+    )
+
+
+def _smoke_case_9() -> None:
+    machine = client.machines.reboot(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        force=True,
+        idempotency_key="",
+    )
+
+
+def _smoke_case_10() -> None:
     page = client.machines.ssh.list(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     )
 
 
-def _smoke_case_9() -> None:
+def _smoke_case_11() -> None:
     ssh = client.machines.ssh.create(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         public_key="",
@@ -118,14 +133,14 @@ def _smoke_case_9() -> None:
     )
 
 
-def _smoke_case_10() -> None:
+def _smoke_case_12() -> None:
     ssh = client.machines.ssh.retrieve(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         session_id="sessionID",
     )
 
 
-def _smoke_case_11() -> None:
+def _smoke_case_13() -> None:
     ssh = client.machines.ssh.delete(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         session_id="sessionID",
@@ -133,13 +148,13 @@ def _smoke_case_11() -> None:
     )
 
 
-def _smoke_case_12() -> None:
+def _smoke_case_14() -> None:
     page = client.machines.executions.list(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     )
 
 
-def _smoke_case_13() -> None:
+def _smoke_case_15() -> None:
     execution = client.machines.executions.create(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         command=[""],
@@ -147,7 +162,7 @@ def _smoke_case_13() -> None:
     )
 
 
-def _smoke_case_14() -> None:
+def _smoke_case_16() -> None:
     execution = client.machines.executions.create(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         command=[""],
@@ -159,14 +174,14 @@ def _smoke_case_14() -> None:
     )
 
 
-def _smoke_case_15() -> None:
+def _smoke_case_17() -> None:
     execution = client.machines.executions.retrieve(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         execution_id="executionID",
     )
 
 
-def _smoke_case_16() -> None:
+def _smoke_case_18() -> None:
     execution = client.machines.executions.delete(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         execution_id="executionID",
@@ -174,32 +189,66 @@ def _smoke_case_16() -> None:
     )
 
 
-def _smoke_case_17() -> None:
+def _smoke_case_19() -> None:
     execution = client.machines.executions.output(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         execution_id="executionID",
     )
 
 
-def _smoke_case_18() -> None:
+def _smoke_case_20() -> None:
     page = client.machines.executions.events(
         machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
         execution_id="executionID",
     )
 
 
-def _smoke_case_19() -> None:
-    def _probe() -> None:
-        with client.machines.terminals.connect(
-            machine_id="machineID",
-            terminal_id="terminalID",
-        ) as socket:
-            try:
-                socket.recv()
-            finally:
-                socket.close(code=1000, reason="smoke-test")
+def _smoke_case_21() -> None:
+    log = client.machines.executions.logs.retrieve(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        execution_id="executionID",
+    )
 
-    _probe()
+
+def _smoke_case_22() -> None:
+    log = client.machines.executions.logs.reauthorize(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        execution_id="executionID",
+        idempotency_key="",
+    )
+
+
+def _smoke_case_23() -> None:
+    log = client.machines.executions.logs.create_token(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        execution_id="executionID",
+        idempotency_key="",
+    )
+
+
+def _smoke_case_24() -> None:
+    autoresizing = client.machines.autoresizing.retrieve(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    )
+
+
+def _smoke_case_25() -> None:
+    autoresizing = client.machines.autoresizing.update(
+        machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+        enabled=False,
+        idempotency_key="",
+    )
+
+
+def _smoke_case_26() -> None:
+    autoresizing = client.organization.autoresizing.retrieve()
+
+
+def _smoke_case_27() -> None:
+    autoresizing = client.organization.autoresizing.update(
+        enabled=False,
+        idempotency_key="",
+    )
 
 
 cases: list[SmokeCase] = [
@@ -254,78 +303,128 @@ cases: list[SmokeCase] = [
         "run": _smoke_case_7,
     },
     {
+        "operation": "reboot",
+        "method": "POST",
+        "path": "/v1/machines/{machine_id}/reboot",
+        "label": "required params",
+        "run": _smoke_case_8,
+    },
+    {
+        "operation": "reboot",
+        "method": "POST",
+        "path": "/v1/machines/{machine_id}/reboot",
+        "label": "all params",
+        "run": _smoke_case_9,
+    },
+    {
         "operation": "list",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/ssh",
-        "run": _smoke_case_8,
+        "run": _smoke_case_10,
     },
     {
         "operation": "create",
         "method": "POST",
         "path": "/v1/machines/{machine_id}/ssh",
-        "run": _smoke_case_9,
+        "run": _smoke_case_11,
     },
     {
         "operation": "retrieve",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/ssh/{session_id}",
-        "run": _smoke_case_10,
+        "run": _smoke_case_12,
     },
     {
         "operation": "delete",
         "method": "DELETE",
         "path": "/v1/machines/{machine_id}/ssh/{session_id}",
-        "run": _smoke_case_11,
+        "run": _smoke_case_13,
     },
     {
         "operation": "list",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/executions",
-        "run": _smoke_case_12,
+        "run": _smoke_case_14,
     },
     {
         "operation": "create",
         "method": "POST",
         "path": "/v1/machines/{machine_id}/executions",
         "label": "required params",
-        "run": _smoke_case_13,
+        "run": _smoke_case_15,
     },
     {
         "operation": "create",
         "method": "POST",
         "path": "/v1/machines/{machine_id}/executions",
         "label": "all params",
-        "run": _smoke_case_14,
+        "run": _smoke_case_16,
     },
     {
         "operation": "retrieve",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/executions/{execution_id}",
-        "run": _smoke_case_15,
+        "run": _smoke_case_17,
     },
     {
         "operation": "delete",
         "method": "DELETE",
         "path": "/v1/machines/{machine_id}/executions/{execution_id}",
-        "run": _smoke_case_16,
+        "run": _smoke_case_18,
     },
     {
         "operation": "output",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/executions/{execution_id}/output",
-        "run": _smoke_case_17,
+        "run": _smoke_case_19,
     },
     {
         "operation": "events",
         "method": "GET",
         "path": "/v1/machines/{machine_id}/executions/{execution_id}/events",
-        "run": _smoke_case_18,
+        "run": _smoke_case_20,
     },
     {
-        "operation": "connect",
+        "operation": "retrieve",
         "method": "GET",
-        "path": "/v1/machines/{machine_id}/terminals/{terminal_id}/stream",
-        "run": _smoke_case_19,
+        "path": "/v1/machines/{machine_id}/executions/{execution_id}/logs",
+        "run": _smoke_case_21,
+    },
+    {
+        "operation": "reauthorize",
+        "method": "POST",
+        "path": "/v1/machines/{machine_id}/executions/{execution_id}/logs/reauthorize",
+        "run": _smoke_case_22,
+    },
+    {
+        "operation": "createToken",
+        "method": "POST",
+        "path": "/v1/machines/{machine_id}/executions/{execution_id}/logs/token",
+        "run": _smoke_case_23,
+    },
+    {
+        "operation": "retrieve",
+        "method": "GET",
+        "path": "/v1/machines/{machine_id}/autoresizing",
+        "run": _smoke_case_24,
+    },
+    {
+        "operation": "update",
+        "method": "PUT",
+        "path": "/v1/machines/{machine_id}/autoresizing",
+        "run": _smoke_case_25,
+    },
+    {
+        "operation": "retrieve",
+        "method": "GET",
+        "path": "/v1/organization/autoresizing",
+        "run": _smoke_case_26,
+    },
+    {
+        "operation": "update",
+        "method": "PUT",
+        "path": "/v1/organization/autoresizing",
+        "run": _smoke_case_27,
     },
 ]
 

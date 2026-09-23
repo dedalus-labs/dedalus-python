@@ -32,15 +32,15 @@ from .executions import (
     ExecutionsResourceWithStreamingResponse,
     AsyncExecutionsResourceWithStreamingResponse,
 )
-from .terminals import (
-    TerminalsResource,
-    AsyncTerminalsResource,
-    TerminalsResourceWithRawResponse,
-    AsyncTerminalsResourceWithRawResponse,
-    TerminalsResourceWithStreamingResponse,
-    AsyncTerminalsResourceWithStreamingResponse,
+from .autoresizing import (
+    AutoresizingResource,
+    AsyncAutoresizingResource,
+    AutoresizingResourceWithRawResponse,
+    AsyncAutoresizingResourceWithRawResponse,
+    AutoresizingResourceWithStreamingResponse,
+    AsyncAutoresizingResourceWithStreamingResponse,
 )
-from ...types import machine_list_params, machine_create_params, machine_update_params
+from ...types import machine_list_params, machine_create_params, machine_update_params, machine_reboot_params
 from ...types.machine_list_item import MachineListItem
 from ...types.machine import Machine
 from ...types.machine_retrieve_response import MachineRetrieveResponse
@@ -58,8 +58,8 @@ class MachinesResource(SyncAPIResource):
         return ExecutionsResource(self._client)
 
     @cached_property
-    def terminals(self) -> TerminalsResource:
-        return TerminalsResource(self._client)
+    def autoresizing(self) -> AutoresizingResource:
+        return AutoresizingResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> MachinesResourceWithRawResponse:
@@ -428,6 +428,57 @@ class MachinesResource(SyncAPIResource):
             cast_to=Machine,
         )
 
+    def reboot(
+        self,
+        *,
+        machine_id: str,
+        force: bool | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> Machine:
+        """
+        Checkpoints files and replaces the runtime. The machine ID and filesystem are preserved. RAM, processes, and temporary mounts are cleared. Poll the machine until its phase is running. Retry the same Idempotency-Key after a lost response.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Recover from the last committed filesystem checkpoint without guest cooperation. Unpublished file writes are lost. The default checkpoints files before rebooting.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            Machine: OK
+
+        Example:
+            ```python
+            machine = client.machines.reboot(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return self._post(
+            path_template("/v1/machines/{machine_id}/reboot", **{"machine_id": machine_id}),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+                query=maybe_transform({"force": force}, machine_reboot_params.MachineRebootParams),
+            ),
+            cast_to=Machine,
+        )
+
 
 class AsyncMachinesResource(AsyncAPIResource):
     @cached_property
@@ -439,8 +490,8 @@ class AsyncMachinesResource(AsyncAPIResource):
         return AsyncExecutionsResource(self._client)
 
     @cached_property
-    def terminals(self) -> AsyncTerminalsResource:
-        return AsyncTerminalsResource(self._client)
+    def autoresizing(self) -> AsyncAutoresizingResource:
+        return AsyncAutoresizingResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> AsyncMachinesResourceWithRawResponse:
@@ -809,6 +860,57 @@ class AsyncMachinesResource(AsyncAPIResource):
             cast_to=Machine,
         )
 
+    async def reboot(
+        self,
+        *,
+        machine_id: str,
+        force: bool | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> Machine:
+        """
+        Checkpoints files and replaces the runtime. The machine ID and filesystem are preserved. RAM, processes, and temporary mounts are cleared. Poll the machine until its phase is running. Retry the same Idempotency-Key after a lost response.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Recover from the last committed filesystem checkpoint without guest cooperation. Unpublished file writes are lost. The default checkpoints files before rebooting.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            Machine: OK
+
+        Example:
+            ```python
+            machine = await client.machines.reboot(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return await self._post(
+            path_template("/v1/machines/{machine_id}/reboot", **{"machine_id": machine_id}),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+                query=await async_maybe_transform({"force": force}, machine_reboot_params.MachineRebootParams),
+            ),
+            cast_to=Machine,
+        )
+
 
 class MachinesResourceWithRawResponse:
     def __init__(self, machines: MachinesResource) -> None:
@@ -835,6 +937,9 @@ class MachinesResourceWithRawResponse:
         self.wake = to_raw_response_wrapper(
             machines.wake,
         )
+        self.reboot = to_raw_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> SSHResourceWithRawResponse:
@@ -845,8 +950,8 @@ class MachinesResourceWithRawResponse:
         return ExecutionsResourceWithRawResponse(self._machines.executions)
 
     @cached_property
-    def terminals(self) -> TerminalsResourceWithRawResponse:
-        return TerminalsResourceWithRawResponse(self._machines.terminals)
+    def autoresizing(self) -> AutoresizingResourceWithRawResponse:
+        return AutoresizingResourceWithRawResponse(self._machines.autoresizing)
 
 
 class AsyncMachinesResourceWithRawResponse:
@@ -874,6 +979,9 @@ class AsyncMachinesResourceWithRawResponse:
         self.wake = async_to_raw_response_wrapper(
             machines.wake,
         )
+        self.reboot = async_to_raw_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithRawResponse:
@@ -884,8 +992,8 @@ class AsyncMachinesResourceWithRawResponse:
         return AsyncExecutionsResourceWithRawResponse(self._machines.executions)
 
     @cached_property
-    def terminals(self) -> AsyncTerminalsResourceWithRawResponse:
-        return AsyncTerminalsResourceWithRawResponse(self._machines.terminals)
+    def autoresizing(self) -> AsyncAutoresizingResourceWithRawResponse:
+        return AsyncAutoresizingResourceWithRawResponse(self._machines.autoresizing)
 
 
 class MachinesResourceWithStreamingResponse:
@@ -913,6 +1021,9 @@ class MachinesResourceWithStreamingResponse:
         self.wake = to_streamed_response_wrapper(
             machines.wake,
         )
+        self.reboot = to_streamed_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> SSHResourceWithStreamingResponse:
@@ -923,8 +1034,8 @@ class MachinesResourceWithStreamingResponse:
         return ExecutionsResourceWithStreamingResponse(self._machines.executions)
 
     @cached_property
-    def terminals(self) -> TerminalsResourceWithStreamingResponse:
-        return TerminalsResourceWithStreamingResponse(self._machines.terminals)
+    def autoresizing(self) -> AutoresizingResourceWithStreamingResponse:
+        return AutoresizingResourceWithStreamingResponse(self._machines.autoresizing)
 
 
 class AsyncMachinesResourceWithStreamingResponse:
@@ -952,6 +1063,9 @@ class AsyncMachinesResourceWithStreamingResponse:
         self.wake = async_to_streamed_response_wrapper(
             machines.wake,
         )
+        self.reboot = async_to_streamed_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithStreamingResponse:
@@ -962,5 +1076,5 @@ class AsyncMachinesResourceWithStreamingResponse:
         return AsyncExecutionsResourceWithStreamingResponse(self._machines.executions)
 
     @cached_property
-    def terminals(self) -> AsyncTerminalsResourceWithStreamingResponse:
-        return AsyncTerminalsResourceWithStreamingResponse(self._machines.terminals)
+    def autoresizing(self) -> AsyncAutoresizingResourceWithStreamingResponse:
+        return AsyncAutoresizingResourceWithStreamingResponse(self._machines.autoresizing)

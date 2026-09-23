@@ -5,29 +5,41 @@ from __future__ import annotations
 import httpx
 
 from typing import Dict, Optional
-from ..._types import SequenceNotStr
+from ...._types import SequenceNotStr
 
-from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
-from ..._compat import cached_property
-from ..._resource import SyncAPIResource, AsyncAPIResource
-from ..._response import (
+from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
+from ...._utils import path_template, maybe_transform, async_maybe_transform
+from ...._compat import cached_property
+from ...._resource import SyncAPIResource, AsyncAPIResource
+from ...._response import (
     to_raw_response_wrapper,
     to_streamed_response_wrapper,
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncCursorPage, AsyncCursorPage
-from ..._base_client import AsyncPaginator, make_request_options
-from ...types.machines import execution_list_params, execution_create_params, execution_events_params
-from ...types.machines.execution import Execution
-from ...types.machines.execution_output import ExecutionOutput
-from ...types.machines.execution_event import ExecutionEvent
+from ....pagination import SyncCursorPage, AsyncCursorPage
+from ...._base_client import AsyncPaginator, make_request_options
+from .logs import (
+    LogsResource,
+    AsyncLogsResource,
+    LogsResourceWithRawResponse,
+    AsyncLogsResourceWithRawResponse,
+    LogsResourceWithStreamingResponse,
+    AsyncLogsResourceWithStreamingResponse,
+)
+from ....types.machines import execution_list_params, execution_create_params, execution_events_params
+from ....types.machines.execution import Execution
+from ....types.machines.execution_output import ExecutionOutput
+from ....types.machines.execution_event import ExecutionEvent
 
 __all__ = ["ExecutionsResource", "AsyncExecutionsResource"]
 
 
 class ExecutionsResource(SyncAPIResource):
+    @cached_property
+    def logs(self) -> LogsResource:
+        return LogsResource(self._client)
+
     @cached_property
     def with_raw_response(self) -> ExecutionsResourceWithRawResponse:
         return ExecutionsResourceWithRawResponse(self)
@@ -373,6 +385,10 @@ class ExecutionsResource(SyncAPIResource):
 
 
 class AsyncExecutionsResource(AsyncAPIResource):
+    @cached_property
+    def logs(self) -> AsyncLogsResource:
+        return AsyncLogsResource(self._client)
+
     @cached_property
     def with_raw_response(self) -> AsyncExecutionsResourceWithRawResponse:
         return AsyncExecutionsResourceWithRawResponse(self)
@@ -740,6 +756,10 @@ class ExecutionsResourceWithRawResponse:
             executions.events,
         )
 
+    @cached_property
+    def logs(self) -> LogsResourceWithRawResponse:
+        return LogsResourceWithRawResponse(self._executions.logs)
+
 
 class AsyncExecutionsResourceWithRawResponse:
     def __init__(self, executions: AsyncExecutionsResource) -> None:
@@ -763,6 +783,10 @@ class AsyncExecutionsResourceWithRawResponse:
         self.events = async_to_raw_response_wrapper(
             executions.events,
         )
+
+    @cached_property
+    def logs(self) -> AsyncLogsResourceWithRawResponse:
+        return AsyncLogsResourceWithRawResponse(self._executions.logs)
 
 
 class ExecutionsResourceWithStreamingResponse:
@@ -788,6 +812,10 @@ class ExecutionsResourceWithStreamingResponse:
             executions.events,
         )
 
+    @cached_property
+    def logs(self) -> LogsResourceWithStreamingResponse:
+        return LogsResourceWithStreamingResponse(self._executions.logs)
+
 
 class AsyncExecutionsResourceWithStreamingResponse:
     def __init__(self, executions: AsyncExecutionsResource) -> None:
@@ -811,3 +839,7 @@ class AsyncExecutionsResourceWithStreamingResponse:
         self.events = async_to_streamed_response_wrapper(
             executions.events,
         )
+
+    @cached_property
+    def logs(self) -> AsyncLogsResourceWithStreamingResponse:
+        return AsyncLogsResourceWithStreamingResponse(self._executions.logs)

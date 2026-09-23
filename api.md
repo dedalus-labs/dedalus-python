@@ -12,6 +12,7 @@ Complete reference of every operation, grouped by resource. See [the README](./R
   - [Destroy machine](#destroy-machine)
   - [Sleep a running machine](#sleep-a-running-machine)
   - [Wake a sleeping machine](#wake-a-sleeping-machine)
+  - [Reboot a machine with fresh memory](#reboot-a-machine-with-fresh-memory)
   - [`Machines Ssh`](#machines-ssh)
     - [List SSH sessions](#list-ssh-sessions)
     - [Create SSH session](#create-ssh-session)
@@ -24,8 +25,17 @@ Complete reference of every operation, grouped by resource. See [the README](./R
     - [Delete execution](#delete-execution)
     - [Get execution output](#get-execution-output)
     - [List execution events](#list-execution-events)
-  - [`Machines Terminals`](#machines-terminals)
-    - [`connect`](#connect)
+    - [`Machines Executions Logs`](#machines-executions-logs)
+      - [Get execution log status](#get-execution-log-status)
+      - [Reauthorize execution log publication](#reauthorize-execution-log-publication)
+      - [Create execution log read token](#create-execution-log-read-token)
+  - [`Machines Autoresizing`](#machines-autoresizing)
+    - [Read this machine's RAM autoresizing settings](#read-this-machines-ram-autoresizing-settings)
+    - [Set this machine's RAM autoresizing settings](#set-this-machines-ram-autoresizing-settings)
+- [`Organization`](#organization)
+  - [`Organization Autoresizing`](#organization-autoresizing)
+    - [Read organization RAM autoresizing policy](#read-organization-ram-autoresizing-policy)
+    - [Set organization RAM autoresizing policy](#set-organization-ram-autoresizing-policy)
 
 ## Setup
 
@@ -35,7 +45,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    api_key=os.environ.get("DEDALUS_API_KEY"),
+    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
 )
 ```
 
@@ -128,6 +138,22 @@ machine = client.machines.sleep(
 
 ```python
 machine = client.machines.wake(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    idempotency_key="",
+)
+```
+
+### Reboot a machine with fresh memory
+
+Checkpoints files and replaces the runtime. The machine ID and filesystem are preserved. RAM, processes, and temporary mounts are cleared. Poll the machine until its phase is running. Retry the same Idempotency-Key after a lost response.
+
+| Direction | Type |
+| --- | --- |
+| Request | [`MachineRebootParams`](./src/dedalus_sdk/types/machine_reboot_params.py) |
+| Response | [`Machine`](./src/dedalus_sdk/types/machine.py) |
+
+```python
+machine = client.machines.reboot(
     machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
@@ -271,12 +297,102 @@ page = client.machines.executions.events(
 )
 ```
 
-### `Machines Terminals`
+#### `Machines Executions Logs`
 
-#### `connect`
+##### Get execution log status
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Status`](./src/dedalus_sdk/types/machines/executions/status.py) |
 
 ```python
-with client.machines.terminals.connect(machine_id="machineID", terminal_id="terminalID") as connection:
-    message = connection.recv()
-    print(message)
+log = client.machines.executions.logs.retrieve(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    execution_id="executionID",
+)
+```
+
+##### Reauthorize execution log publication
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Status`](./src/dedalus_sdk/types/machines/executions/status.py) |
+
+```python
+log = client.machines.executions.logs.reauthorize(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    execution_id="executionID",
+    idempotency_key="",
+)
+```
+
+##### Create execution log read token
+
+| Direction | Type |
+| --- | --- |
+| Response | [`ReadToken`](./src/dedalus_sdk/types/machines/executions/read_token.py) |
+
+```python
+log = client.machines.executions.logs.create_token(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    execution_id="executionID",
+    idempotency_key="",
+)
+```
+
+### `Machines Autoresizing`
+
+#### Read this machine's RAM autoresizing settings
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Settings`](./src/dedalus_sdk/types/machines/settings.py) |
+
+```python
+autoresizing = client.machines.autoresizing.retrieve(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+)
+```
+
+#### Set this machine's RAM autoresizing settings
+
+| Direction | Type |
+| --- | --- |
+| Request | [`AutoresizingUpdateParams`](./src/dedalus_sdk/types/machines/autoresizing_update_params.py) |
+| Response | [`Settings`](./src/dedalus_sdk/types/machines/settings.py) |
+
+```python
+autoresizing = client.machines.autoresizing.update(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    enabled=False,
+    idempotency_key="",
+)
+```
+
+## `Organization`
+
+### `Organization Autoresizing`
+
+#### Read organization RAM autoresizing policy
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Policy`](./src/dedalus_sdk/types/organization/policy.py) |
+
+```python
+autoresizing = client.organization.autoresizing.retrieve()
+```
+
+#### Set organization RAM autoresizing policy
+
+| Direction | Type |
+| --- | --- |
+| Request | [`AutoresizingUpdateParams`](./src/dedalus_sdk/types/organization/autoresizing_update_params.py) |
+| Response | [`Policy`](./src/dedalus_sdk/types/organization/policy.py) |
+
+```python
+autoresizing = client.organization.autoresizing.update(
+    enabled=False,
+    idempotency_key="",
+)
 ```
