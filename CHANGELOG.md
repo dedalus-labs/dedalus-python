@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0 (2026-09-01)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.4.0...v0.5.0)
+
+### ⚠ BREAKING CHANGES
+
+* **api:** regenerate SDKs from the current public DCS contract
+
+### Features
+
+* **api:** regenerate SDKs from the current public DCS contract ([04208ef](https://github.com/dedalus-labs/dedalus-python/commit/04208ef05cb07426d68717abb57835e089b76205))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([6acb1d3](https://github.com/dedalus-labs/dedalus-python/commit/6acb1d303d2a07cf6c01f63005a4f98541c47f40))
+
+
+### Bug Fixes
+
+* **auth:** prioritize first auth header ([81f3c28](https://github.com/dedalus-labs/dedalus-python/commit/81f3c288b2ae2e97046344177500714e1e4ce6be))
+* **internal:** resolve build failures ([c10ce00](https://github.com/dedalus-labs/dedalus-python/commit/c10ce00180c146772ec9f390e3d058a1d9462082))
+
+
+### Chores
+
+* **internal:** allow the mock server port to be set with STAINLESS_MOCK_PORT ([aa8a0ee](https://github.com/dedalus-labs/dedalus-python/commit/aa8a0ee9f29ad6fa93a917baba1ab0ffaebb6959))
+
 ## 0.4.0 (2026-05-12)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.3.0...v0.4.0)
