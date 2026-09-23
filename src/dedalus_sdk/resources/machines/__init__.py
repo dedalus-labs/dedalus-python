@@ -1,13 +1,5 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
-from .ssh import (
-    SSHResource,
-    AsyncSSHResource,
-    SSHResourceWithRawResponse,
-    AsyncSSHResourceWithRawResponse,
-    SSHResourceWithStreamingResponse,
-    AsyncSSHResourceWithStreamingResponse,
-)
 from .machines import (
     MachinesResource,
     AsyncMachinesResource,
@@ -15,6 +7,38 @@ from .machines import (
     AsyncMachinesResourceWithRawResponse,
     MachinesResourceWithStreamingResponse,
     AsyncMachinesResourceWithStreamingResponse,
+)
+from .network import (
+    NetworkResource,
+    AsyncNetworkResource,
+    NetworkResourceWithRawResponse,
+    AsyncNetworkResourceWithRawResponse,
+    NetworkResourceWithStreamingResponse,
+    AsyncNetworkResourceWithStreamingResponse,
+)
+from .artifacts import (
+    ArtifactsResource,
+    AsyncArtifactsResource,
+    ArtifactsResourceWithRawResponse,
+    AsyncArtifactsResourceWithRawResponse,
+    ArtifactsResourceWithStreamingResponse,
+    AsyncArtifactsResourceWithStreamingResponse,
+)
+from .ports import (
+    PortsResource,
+    AsyncPortsResource,
+    PortsResourceWithRawResponse,
+    AsyncPortsResourceWithRawResponse,
+    PortsResourceWithStreamingResponse,
+    AsyncPortsResourceWithStreamingResponse,
+)
+from .ssh import (
+    SSHResource,
+    AsyncSSHResource,
+    SSHResourceWithRawResponse,
+    AsyncSSHResourceWithRawResponse,
+    SSHResourceWithStreamingResponse,
+    AsyncSSHResourceWithStreamingResponse,
 )
 from .executions import (
     ExecutionsResource,
@@ -24,8 +48,40 @@ from .executions import (
     ExecutionsResourceWithStreamingResponse,
     AsyncExecutionsResourceWithStreamingResponse,
 )
+from .terminals import (
+    TerminalsResource,
+    AsyncTerminalsResource,
+    TerminalsResourceWithRawResponse,
+    AsyncTerminalsResourceWithRawResponse,
+    TerminalsResourceWithStreamingResponse,
+    AsyncTerminalsResourceWithStreamingResponse,
+)
 
 __all__ = [
+    "MachinesResource",
+    "AsyncMachinesResource",
+    "MachinesResourceWithRawResponse",
+    "AsyncMachinesResourceWithRawResponse",
+    "MachinesResourceWithStreamingResponse",
+    "AsyncMachinesResourceWithStreamingResponse",
+    "NetworkResource",
+    "AsyncNetworkResource",
+    "NetworkResourceWithRawResponse",
+    "AsyncNetworkResourceWithRawResponse",
+    "NetworkResourceWithStreamingResponse",
+    "AsyncNetworkResourceWithStreamingResponse",
+    "ArtifactsResource",
+    "AsyncArtifactsResource",
+    "ArtifactsResourceWithRawResponse",
+    "AsyncArtifactsResourceWithRawResponse",
+    "ArtifactsResourceWithStreamingResponse",
+    "AsyncArtifactsResourceWithStreamingResponse",
+    "PortsResource",
+    "AsyncPortsResource",
+    "PortsResourceWithRawResponse",
+    "AsyncPortsResourceWithRawResponse",
+    "PortsResourceWithStreamingResponse",
+    "AsyncPortsResourceWithStreamingResponse",
     "SSHResource",
     "AsyncSSHResource",
     "SSHResourceWithRawResponse",
@@ -38,10 +94,10 @@ __all__ = [
     "AsyncExecutionsResourceWithRawResponse",
     "ExecutionsResourceWithStreamingResponse",
     "AsyncExecutionsResourceWithStreamingResponse",
-    "MachinesResource",
-    "AsyncMachinesResource",
-    "MachinesResourceWithRawResponse",
-    "AsyncMachinesResourceWithRawResponse",
-    "MachinesResourceWithStreamingResponse",
-    "AsyncMachinesResourceWithStreamingResponse",
+    "TerminalsResource",
+    "AsyncTerminalsResource",
+    "TerminalsResourceWithRawResponse",
+    "AsyncTerminalsResourceWithRawResponse",
+    "TerminalsResourceWithStreamingResponse",
+    "AsyncTerminalsResourceWithStreamingResponse",
 ]

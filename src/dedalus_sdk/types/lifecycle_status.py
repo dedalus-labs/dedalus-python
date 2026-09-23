@@ -1,4 +1,4 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
 from typing import Optional
 from datetime import datetime
@@ -10,6 +10,8 @@ __all__ = ["LifecycleStatus"]
 
 
 class LifecycleStatus(BaseModel):
+    last_error: Optional[str] = None
+
     last_progress_at: datetime
 
     last_transition_at: datetime
@@ -31,5 +33,3 @@ class LifecycleStatus(BaseModel):
     retryable: bool
 
     revision: str
-
-    last_error: Optional[str] = None
