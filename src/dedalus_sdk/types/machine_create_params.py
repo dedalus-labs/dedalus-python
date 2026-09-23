@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing_extensions import Annotated, TypedDict
-
-from .._utils import PropertyInfo
+from typing_extensions import TypedDict
 
 __all__ = ["MachineCreateParams"]
 
@@ -21,5 +19,3 @@ class MachineCreateParams(TypedDict, total=False):
 
     vcpu: float
     """CPU in vCPUs."""
-
-    x_dedalus_org_id: Annotated[str, PropertyInfo(alias="X-Dedalus-Org-Id")]

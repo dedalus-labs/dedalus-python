@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from typing_extensions import Annotated, Required, TypedDict
-
-from .._utils import PropertyInfo
+from typing_extensions import Required, TypedDict
 
 __all__ = ["MachineUpdateParams"]
 
 
 class MachineUpdateParams(TypedDict, total=False):
     machine_id: Required[str]
+    """Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged."""
 
     autosleep: str
     """Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable."""
@@ -23,5 +22,3 @@ class MachineUpdateParams(TypedDict, total=False):
 
     vcpu: float
     """CPU in vCPUs."""
-
-    x_dedalus_org_id: Annotated[str, PropertyInfo(alias="X-Dedalus-Org-Id")]

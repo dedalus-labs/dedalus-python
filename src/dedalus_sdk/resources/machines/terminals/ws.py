@@ -21,9 +21,9 @@ from ...._event_handler import EventHandlerRegistry
 from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ....types.websocket_connection_options import WebSocketConnectionOptions
 from ....types.websocket_reconnection import ReconnectingEvent, ReconnectingOverrides, is_recoverable_close
-from ....types.machines.terminal_client_event import TerminalClientEvent
-from ....types.machines.terminal_client_event_param import TerminalClientEventParam
-from ....types.machines.terminal_server_event import TerminalServerEvent
+from ....types.machines.connect_client_event import ConnectClientEvent
+from ....types.machines.connect_client_event_param import ConnectClientEventParam
+from ....types.machines.connect_server_event import ConnectServerEvent
 
 if TYPE_CHECKING:
     from websockets.sync.client import ClientConnection as WebSocketConnection
@@ -77,7 +77,7 @@ class TerminalsResourceConnection:
         self._send_queue = send_queue or SendQueue()
         self._event_handler_registry = EventHandlerRegistry(use_lock=True)
 
-    def __iter__(self) -> Iterator[TerminalServerEvent]:
+    def __iter__(self) -> Iterator[ConnectServerEvent]:
         """Yield events until the connection closes."""
         from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
@@ -96,7 +96,7 @@ class TerminalsResourceConnection:
                         ) from exc
                     raise
 
-    def recv(self) -> TerminalServerEvent:
+    def recv(self) -> ConnectServerEvent:
         """Receive and parse the next websocket message."""
         return self.parse_event(self.recv_bytes())
 
@@ -106,11 +106,11 @@ class TerminalsResourceConnection:
         log.debug("Received WebSocket message: %s", message)
         return message
 
-    def send(self, event: TerminalClientEvent | TerminalClientEventParam) -> None:
+    def send(self, event: ConnectClientEvent | ConnectClientEventParam) -> None:
         data = (
             event.to_json(use_api_names=True, exclude_defaults=True, exclude_unset=True)
             if isinstance(event, BaseModel)
-            else json.dumps(maybe_transform(event, TerminalClientEventParam))
+            else json.dumps(maybe_transform(event, ConnectClientEventParam))
         )
         if self._is_reconnecting:
             self._send_queue.enqueue(data)
@@ -132,10 +132,10 @@ class TerminalsResourceConnection:
         self._intentionally_closed = True
         self._connection.close(code=code, reason=reason)
 
-    def parse_event(self, data: str | bytes) -> TerminalServerEvent:
+    def parse_event(self, data: str | bytes) -> ConnectServerEvent:
         """Convert a raw websocket message into the generated server event type."""
         return cast(
-            TerminalServerEvent, construct_type_unchecked(value=json.loads(data), type_=cast(Any, TerminalServerEvent))
+            ConnectServerEvent, construct_type_unchecked(value=json.loads(data), type_=cast(Any, ConnectServerEvent))
         )
 
     def _reconnect(self, exc: Exception) -> bool:
@@ -280,7 +280,7 @@ class AsyncTerminalsResourceConnection:
         self._send_queue = send_queue or SendQueue()
         self._event_handler_registry = EventHandlerRegistry(use_lock=False)
 
-    async def __aiter__(self) -> AsyncIterator[TerminalServerEvent]:
+    async def __aiter__(self) -> AsyncIterator[ConnectServerEvent]:
         """Yield events until the connection closes."""
         from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
@@ -299,7 +299,7 @@ class AsyncTerminalsResourceConnection:
                         ) from exc
                     raise
 
-    async def recv(self) -> TerminalServerEvent:
+    async def recv(self) -> ConnectServerEvent:
         """Receive and parse the next websocket message."""
         return self.parse_event(await self.recv_bytes())
 
@@ -309,11 +309,11 @@ class AsyncTerminalsResourceConnection:
         log.debug("Received WebSocket message: %s", message)
         return message
 
-    async def send(self, event: TerminalClientEvent | TerminalClientEventParam) -> None:
+    async def send(self, event: ConnectClientEvent | ConnectClientEventParam) -> None:
         data = (
             event.to_json(use_api_names=True, exclude_defaults=True, exclude_unset=True)
             if isinstance(event, BaseModel)
-            else json.dumps(await async_maybe_transform(event, TerminalClientEventParam))
+            else json.dumps(await async_maybe_transform(event, ConnectClientEventParam))
         )
         if self._is_reconnecting:
             self._send_queue.enqueue(data)
@@ -335,10 +335,10 @@ class AsyncTerminalsResourceConnection:
         self._intentionally_closed = True
         await self._connection.close(code=code, reason=reason)
 
-    def parse_event(self, data: str | bytes) -> TerminalServerEvent:
+    def parse_event(self, data: str | bytes) -> ConnectServerEvent:
         """Convert a raw websocket message into the generated server event type."""
         return cast(
-            TerminalServerEvent, construct_type_unchecked(value=json.loads(data), type_=cast(Any, TerminalServerEvent))
+            ConnectServerEvent, construct_type_unchecked(value=json.loads(data), type_=cast(Any, ConnectServerEvent))
         )
 
     async def _reconnect(self, exc: Exception) -> bool:
@@ -498,12 +498,12 @@ class TerminalsResourceConnectionManager:
         self.__send_queue = SendQueue(max_bytes=max_queue_size)
         self.__event_handler_registry = EventHandlerRegistry(use_lock=True)
 
-    def send(self, event: TerminalClientEvent | TerminalClientEventParam) -> None:
+    def send(self, event: ConnectClientEvent | ConnectClientEventParam) -> None:
         """Queue a message to send as soon as the websocket opens."""
         data = (
             event.to_json(use_api_names=True, exclude_defaults=True, exclude_unset=True)
             if isinstance(event, BaseModel)
-            else json.dumps(maybe_transform(event, TerminalClientEventParam))
+            else json.dumps(maybe_transform(event, ConnectClientEventParam))
         )
         self.__send_queue.enqueue(data)
 
@@ -656,12 +656,12 @@ class AsyncTerminalsResourceConnectionManager:
         self.__send_queue = SendQueue(max_bytes=max_queue_size)
         self.__event_handler_registry = EventHandlerRegistry(use_lock=False)
 
-    def send(self, event: TerminalClientEvent | TerminalClientEventParam) -> None:
+    def send(self, event: ConnectClientEvent | ConnectClientEventParam) -> None:
         """Queue a message to send as soon as the websocket opens."""
         data = (
             event.to_json(use_api_names=True, exclude_defaults=True, exclude_unset=True)
             if isinstance(event, BaseModel)
-            else json.dumps(maybe_transform(event, TerminalClientEventParam))
+            else json.dumps(maybe_transform(event, ConnectClientEventParam))
         )
         self.__send_queue.enqueue(data)
 

@@ -8,7 +8,17 @@ from ..._models import BaseModel
 
 from .artifact_ref import ArtifactRef
 
-__all__ = ["Execution"]
+__all__ = ["Execution", "LogCapture"]
+
+
+class LogCapture(BaseModel):
+    code: Optional[str] = None
+
+    lost_bytes: Optional[str] = None
+
+    state: Optional[Literal["pending", "incomplete", "unavailable"]] = None
+
+    unconfirmed_bytes: Optional[str] = None
 
 
 class Execution(BaseModel):
@@ -19,6 +29,10 @@ class Execution(BaseModel):
     completed_at: Optional[datetime] = None
 
     created_at: datetime
+
+    creation_request_id: Optional[str] = None
+
+    creation_trace_id: Optional[str] = None
 
     cwd: Optional[str] = None
 
@@ -33,6 +47,8 @@ class Execution(BaseModel):
     exit_code: Optional[int] = None
 
     expires_at: Optional[datetime] = None
+
+    log_capture: LogCapture
 
     machine_id: str
 

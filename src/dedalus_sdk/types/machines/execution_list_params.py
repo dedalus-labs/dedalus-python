@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
-from typing_extensions import Annotated, Required, TypedDict
-
-from ..._utils import PropertyInfo
+from typing_extensions import Required, TypedDict
 
 __all__ = ["ExecutionListParams"]
 
 
 class ExecutionListParams(TypedDict, total=False):
     machine_id: Required[str]
+    """Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged."""
 
     limit: int
 
     cursor: str
-
-    x_dedalus_org_id: Annotated[str, PropertyInfo(alias="X-Dedalus-Org-Id")]

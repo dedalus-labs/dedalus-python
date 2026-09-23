@@ -33,10 +33,8 @@ from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._version import __version__
 
 if TYPE_CHECKING:
-    from .resources import machines, networks, usage
+    from .resources import machines
     from .resources.machines import MachinesResource, AsyncMachinesResource
-    from .resources.networks import NetworksResource, AsyncNetworksResource
-    from .resources.usage import UsageResource, AsyncUsageResource
 
 # Serializes lazy resource imports so concurrent cold access from multiple
 # threads cannot deadlock on CPython import locks (see CPython 3.14).
@@ -163,18 +161,6 @@ class Dedalus(SyncAPIClient):
         with _RESOURCE_IMPORT_LOCK:
             from .resources.machines import MachinesResource
         return MachinesResource(self)
-
-    @cached_property
-    def networks(self) -> "NetworksResource":
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import NetworksResource
-        return NetworksResource(self)
-
-    @cached_property
-    def usage(self) -> "UsageResource":
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import UsageResource
-        return UsageResource(self)
 
     @cached_property
     def with_raw_response(self) -> DedalusWithRawResponse:
@@ -464,18 +450,6 @@ class AsyncDedalus(AsyncAPIClient):
         return AsyncMachinesResource(self)
 
     @cached_property
-    def networks(self) -> "AsyncNetworksResource":
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import AsyncNetworksResource
-        return AsyncNetworksResource(self)
-
-    @cached_property
-    def usage(self) -> "AsyncUsageResource":
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import AsyncUsageResource
-        return AsyncUsageResource(self)
-
-    @cached_property
     def with_raw_response(self) -> AsyncDedalusWithRawResponse:
         return AsyncDedalusWithRawResponse(self)
 
@@ -655,18 +629,6 @@ class DedalusWithRawResponse:
             from .resources.machines import MachinesResourceWithRawResponse
         return MachinesResourceWithRawResponse(self._client.machines)
 
-    @cached_property
-    def networks(self) -> networks.NetworksResourceWithRawResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import NetworksResourceWithRawResponse
-        return NetworksResourceWithRawResponse(self._client.networks)
-
-    @cached_property
-    def usage(self) -> usage.UsageResourceWithRawResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import UsageResourceWithRawResponse
-        return UsageResourceWithRawResponse(self._client.usage)
-
 
 class AsyncDedalusWithRawResponse:
     _client: AsyncDedalus
@@ -679,18 +641,6 @@ class AsyncDedalusWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.machines import AsyncMachinesResourceWithRawResponse
         return AsyncMachinesResourceWithRawResponse(self._client.machines)
-
-    @cached_property
-    def networks(self) -> networks.AsyncNetworksResourceWithRawResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import AsyncNetworksResourceWithRawResponse
-        return AsyncNetworksResourceWithRawResponse(self._client.networks)
-
-    @cached_property
-    def usage(self) -> usage.AsyncUsageResourceWithRawResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import AsyncUsageResourceWithRawResponse
-        return AsyncUsageResourceWithRawResponse(self._client.usage)
 
 
 class DedalusWithStreamedResponse:
@@ -705,18 +655,6 @@ class DedalusWithStreamedResponse:
             from .resources.machines import MachinesResourceWithStreamingResponse
         return MachinesResourceWithStreamingResponse(self._client.machines)
 
-    @cached_property
-    def networks(self) -> networks.NetworksResourceWithStreamingResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import NetworksResourceWithStreamingResponse
-        return NetworksResourceWithStreamingResponse(self._client.networks)
-
-    @cached_property
-    def usage(self) -> usage.UsageResourceWithStreamingResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import UsageResourceWithStreamingResponse
-        return UsageResourceWithStreamingResponse(self._client.usage)
-
 
 class AsyncDedalusWithStreamedResponse:
     _client: AsyncDedalus
@@ -729,18 +667,6 @@ class AsyncDedalusWithStreamedResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.machines import AsyncMachinesResourceWithStreamingResponse
         return AsyncMachinesResourceWithStreamingResponse(self._client.machines)
-
-    @cached_property
-    def networks(self) -> networks.AsyncNetworksResourceWithStreamingResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.networks import AsyncNetworksResourceWithStreamingResponse
-        return AsyncNetworksResourceWithStreamingResponse(self._client.networks)
-
-    @cached_property
-    def usage(self) -> usage.AsyncUsageResourceWithStreamingResponse:
-        with _RESOURCE_IMPORT_LOCK:
-            from .resources.usage import AsyncUsageResourceWithStreamingResponse
-        return AsyncUsageResourceWithStreamingResponse(self._client.usage)
 
 
 # Alias names for the documented `Client` / `AsyncClient` symbols.

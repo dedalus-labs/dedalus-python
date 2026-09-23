@@ -30,4 +30,4 @@ class SSHSession(BaseModel):
 
     session_id: str
 
-    status: Literal["wake_in_progress", "ready", "closed", "expired", "failed"]
+    status: Literal["wake_in_progress", "ssh_in_progress", "ready", "closed", "expired", "failed"]

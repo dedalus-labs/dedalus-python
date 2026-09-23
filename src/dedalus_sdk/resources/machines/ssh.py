@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform, strip_not_given
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -37,7 +37,6 @@ class SSHResource(SyncAPIResource):
         machine_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -49,10 +48,9 @@ class SSHResource(SyncAPIResource):
         List SSH sessions
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -64,13 +62,12 @@ class SSHResource(SyncAPIResource):
         Example:
             ```python
             page = client.machines.ssh.list(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
             page=SyncCursorPage[SSHSession],
@@ -90,7 +87,6 @@ class SSHResource(SyncAPIResource):
         *,
         machine_id: str,
         public_key: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -103,9 +99,8 @@ class SSHResource(SyncAPIResource):
         Create SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             public_key: Body parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -118,7 +113,7 @@ class SSHResource(SyncAPIResource):
         Example:
             ```python
             ssh = client.machines.ssh.create(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 public_key="",
                 idempotency_key="",
             )
@@ -126,7 +121,6 @@ class SSHResource(SyncAPIResource):
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._post(
             path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
             body=maybe_transform(
@@ -148,7 +142,6 @@ class SSHResource(SyncAPIResource):
         *,
         machine_id: str,
         session_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -160,9 +153,8 @@ class SSHResource(SyncAPIResource):
         Get SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             session_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -174,7 +166,7 @@ class SSHResource(SyncAPIResource):
         Example:
             ```python
             ssh = client.machines.ssh.retrieve(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 session_id="sessionID",
             )
             ```
@@ -183,7 +175,6 @@ class SSHResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get(
             path_template(
                 "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
@@ -199,7 +190,6 @@ class SSHResource(SyncAPIResource):
         *,
         machine_id: str,
         session_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -212,9 +202,8 @@ class SSHResource(SyncAPIResource):
         Delete SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             session_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -227,7 +216,7 @@ class SSHResource(SyncAPIResource):
         Example:
             ```python
             ssh = client.machines.ssh.delete(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 session_id="sessionID",
                 idempotency_key="",
             )
@@ -237,7 +226,6 @@ class SSHResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._delete(
             path_template(
                 "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
@@ -268,7 +256,6 @@ class AsyncSSHResource(AsyncAPIResource):
         machine_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -280,10 +267,9 @@ class AsyncSSHResource(AsyncAPIResource):
         List SSH sessions
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -295,13 +281,12 @@ class AsyncSSHResource(AsyncAPIResource):
         Example:
             ```python
             page = client.machines.ssh.list(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
             page=AsyncCursorPage[SSHSession],
@@ -321,7 +306,6 @@ class AsyncSSHResource(AsyncAPIResource):
         *,
         machine_id: str,
         public_key: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -334,9 +318,8 @@ class AsyncSSHResource(AsyncAPIResource):
         Create SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             public_key: Body parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -349,7 +332,7 @@ class AsyncSSHResource(AsyncAPIResource):
         Example:
             ```python
             ssh = await client.machines.ssh.create(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 public_key="",
                 idempotency_key="",
             )
@@ -357,7 +340,6 @@ class AsyncSSHResource(AsyncAPIResource):
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._post(
             path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
             body=await async_maybe_transform(
@@ -379,7 +361,6 @@ class AsyncSSHResource(AsyncAPIResource):
         *,
         machine_id: str,
         session_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -391,9 +372,8 @@ class AsyncSSHResource(AsyncAPIResource):
         Get SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             session_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -405,7 +385,7 @@ class AsyncSSHResource(AsyncAPIResource):
         Example:
             ```python
             ssh = await client.machines.ssh.retrieve(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 session_id="sessionID",
             )
             ```
@@ -414,7 +394,6 @@ class AsyncSSHResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._get(
             path_template(
                 "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
@@ -430,7 +409,6 @@ class AsyncSSHResource(AsyncAPIResource):
         *,
         machine_id: str,
         session_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -443,9 +421,8 @@ class AsyncSSHResource(AsyncAPIResource):
         Delete SSH session
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             session_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -458,7 +435,7 @@ class AsyncSSHResource(AsyncAPIResource):
         Example:
             ```python
             ssh = await client.machines.ssh.delete(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 session_id="sessionID",
                 idempotency_key="",
             )
@@ -468,7 +445,6 @@ class AsyncSSHResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._delete(
             path_template(
                 "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}

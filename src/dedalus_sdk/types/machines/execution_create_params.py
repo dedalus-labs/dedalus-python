@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 from typing import Dict, Optional
-from typing_extensions import Annotated, Required, TypedDict
+from typing_extensions import Required, TypedDict
 from ..._types import SequenceNotStr
-
-from ..._utils import PropertyInfo
 
 __all__ = ["ExecutionCreateParams"]
 
 
 class ExecutionCreateParams(TypedDict, total=False):
     machine_id: Required[str]
+    """Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged."""
 
     command: Required[Optional[SequenceNotStr[str]]]
 
@@ -23,5 +22,3 @@ class ExecutionCreateParams(TypedDict, total=False):
     stdin: str
 
     timeout_ms: int
-
-    x_dedalus_org_id: Annotated[str, PropertyInfo(alias="X-Dedalus-Org-Id")]

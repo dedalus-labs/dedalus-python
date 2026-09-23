@@ -28,7 +28,7 @@ client = Dedalus(
 Provide credentials using the options below. Environment variables are read automatically when the target runtime supports them:
 
 - `x_api_key` (env: `DEDALUS_X_API_KEY`) — API key authentication using X-API-Key header
-- `bearer_auth` (env: `DEDALUS_BEARER_AUTH`) — Dedalus API key in Authorization: Bearer <key>.
+- `bearer_auth` (env: `DEDALUS_BEARER_AUTH`) — Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>.
 - `api_key` (env: `DEDALUS_API_KEY`) — API key authentication using Bearer token
 
 ## Calling operations
@@ -61,19 +61,6 @@ List endpoints return paginated results you can iterate directly; the SDK fetche
 
 ```python
 page = client.machines.list()
-```
-
-## Streaming
-
-Streaming endpoints return an iterator that yields results as the server emits them.
-
-```python
-stream = client.machines.watch(
-    machine_id="machineID",
-)
-
-for machine in stream:
-    print(machine)
 ```
 
 ## WebSockets

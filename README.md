@@ -12,7 +12,6 @@ The full API of this library can be found in [api.md](./api.md).
 - [Usage](#usage)
 - [API Reference](./api.md)
 - [Async](#async)
-- [Streaming](#streaming)
 - [WebSockets](#websockets)
 - [Authentication](#authentication)
 - [Errors](#errors)
@@ -87,21 +86,6 @@ asyncio.run(main())
 
 <br />
 
-## Streaming
-
-Streaming endpoints return an async iterator that yields results as the server emits them.
-
-```python
-stream = client.machines.watch(
-    machine_id="machineID",
-)
-
-for machine in stream:
-    print(machine)
-```
-
-<br />
-
 ## WebSockets
 
 WebSocket endpoints open a persistent connection you can send messages to and receive messages from.
@@ -121,7 +105,7 @@ Pass credentials to the generated client constructor. Environment variables are 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `x_api_key` | `string \| provider` | - | API key authentication using X-API-Key header Defaults to DEDALUS_X_API_KEY. |
-| `bearer_auth` | `string \| provider` | - | Dedalus API key in Authorization: Bearer <key>. Defaults to DEDALUS_BEARER_AUTH. |
+| `bearer_auth` | `string \| provider` | - | Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>. Defaults to DEDALUS_BEARER_AUTH. |
 | `api_key` | `string \| provider` | - | API key authentication using Bearer token Defaults to DEDALUS_API_KEY. |
 
 Declared schemes:
@@ -152,7 +136,7 @@ except APIStatusError as err:
     raise
 ```
 
-Documented error statuses: `400`, `401`, `403`, `409`, `429`, `500`, `502`, `503`, `default`.
+Documented error statuses: `401`, `403`, `409`, `429`, `503`, `default`.
 
 <br />
 
@@ -172,7 +156,7 @@ client = Dedalus(
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `x_api_key` | `str \| None` | `os.environ.get("DEDALUS_X_API_KEY")` | API key authentication using X-API-Key header |
-| `bearer_auth` | `str \| None` | `os.environ.get("DEDALUS_BEARER_AUTH")` | Dedalus API key in Authorization: Bearer <key>. |
+| `bearer_auth` | `str \| None` | `os.environ.get("DEDALUS_BEARER_AUTH")` | Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>. |
 | `api_key` | `str \| None` | `os.environ.get("DEDALUS_API_KEY")` | API key authentication using Bearer token |
 | `base_url` | `str \| httpx.URL \| None` | - | Override the default API base URL. |
 | `timeout` | `float \| Timeout \| None` | `60.0` | Maximum time in seconds to wait for a response before aborting a request. |

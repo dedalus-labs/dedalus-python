@@ -8,7 +8,7 @@ from typing import Dict, Optional
 from ..._types import SequenceNotStr
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform, strip_not_given
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -42,7 +42,6 @@ class ExecutionsResource(SyncAPIResource):
         machine_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -54,10 +53,9 @@ class ExecutionsResource(SyncAPIResource):
         List executions
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -69,13 +67,12 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             page = client.machines.executions.list(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template("/v1/machines/{machine_id}/executions", **{"machine_id": machine_id}),
             page=SyncCursorPage[Execution],
@@ -99,7 +96,6 @@ class ExecutionsResource(SyncAPIResource):
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
         timeout_ms: int | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -112,13 +108,12 @@ class ExecutionsResource(SyncAPIResource):
         Create execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             command: Body parameter.
             cwd: Body parameter.
             env: Body parameter.
             stdin: Body parameter.
             timeout_ms: Body parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -131,7 +126,7 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             execution = client.machines.executions.create(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 command=[""],
                 idempotency_key="",
             )
@@ -139,7 +134,6 @@ class ExecutionsResource(SyncAPIResource):
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._post(
             path_template("/v1/machines/{machine_id}/executions", **{"machine_id": machine_id}),
             body=maybe_transform(
@@ -167,7 +161,6 @@ class ExecutionsResource(SyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -179,9 +172,8 @@ class ExecutionsResource(SyncAPIResource):
         Get execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -193,7 +185,7 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             execution = client.machines.executions.retrieve(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -202,7 +194,6 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}",
@@ -219,7 +210,6 @@ class ExecutionsResource(SyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -232,9 +222,8 @@ class ExecutionsResource(SyncAPIResource):
         Delete execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -247,7 +236,7 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             execution = client.machines.executions.delete(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
                 idempotency_key="",
             )
@@ -257,7 +246,6 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._delete(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}",
@@ -278,7 +266,6 @@ class ExecutionsResource(SyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -290,9 +277,8 @@ class ExecutionsResource(SyncAPIResource):
         Get execution output
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -304,7 +290,7 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             execution = client.machines.executions.output(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -313,7 +299,6 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}/output",
@@ -332,7 +317,6 @@ class ExecutionsResource(SyncAPIResource):
         execution_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -344,11 +328,10 @@ class ExecutionsResource(SyncAPIResource):
         List execution events
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -360,7 +343,7 @@ class ExecutionsResource(SyncAPIResource):
         Example:
             ```python
             page = client.machines.executions.events(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -369,7 +352,6 @@ class ExecutionsResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}/events",
@@ -405,7 +387,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         machine_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -417,10 +398,9 @@ class AsyncExecutionsResource(AsyncAPIResource):
         List executions
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -432,13 +412,12 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             page = client.machines.executions.list(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template("/v1/machines/{machine_id}/executions", **{"machine_id": machine_id}),
             page=AsyncCursorPage[Execution],
@@ -462,7 +441,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         env: Dict[str, str] | Omit = omit,
         stdin: str | Omit = omit,
         timeout_ms: int | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -475,13 +453,12 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Create execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             command: Body parameter.
             cwd: Body parameter.
             env: Body parameter.
             stdin: Body parameter.
             timeout_ms: Body parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -494,7 +471,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             execution = await client.machines.executions.create(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 command=[""],
                 idempotency_key="",
             )
@@ -502,7 +479,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._post(
             path_template("/v1/machines/{machine_id}/executions", **{"machine_id": machine_id}),
             body=await async_maybe_transform(
@@ -530,7 +506,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -542,9 +517,8 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Get execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -556,7 +530,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             execution = await client.machines.executions.retrieve(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -565,7 +539,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._get(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}",
@@ -582,7 +555,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -595,9 +567,8 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Delete execution
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -610,7 +581,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             execution = await client.machines.executions.delete(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
                 idempotency_key="",
             )
@@ -620,7 +591,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._delete(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}",
@@ -641,7 +611,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         *,
         machine_id: str,
         execution_id: str,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -653,9 +622,8 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Get execution output
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -667,7 +635,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             execution = await client.machines.executions.output(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -676,7 +644,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return await self._get(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}/output",
@@ -695,7 +662,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
         execution_id: str,
         limit: int | Omit = omit,
         cursor: str | Omit = omit,
-        x_dedalus_org_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -707,11 +673,10 @@ class AsyncExecutionsResource(AsyncAPIResource):
         List execution events
 
         Args:
-            machine_id: Path parameter.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
             execution_id: Path parameter.
             limit: Query parameter.
             cursor: Query parameter.
-            x_dedalus_org_id: Header parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -723,7 +688,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
         Example:
             ```python
             page = client.machines.executions.events(
-                machine_id="machineID",
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
                 execution_id="executionID",
             )
             ```
@@ -732,7 +697,6 @@ class AsyncExecutionsResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         if execution_id is None or (isinstance(execution_id, str) and not execution_id):
             raise ValueError(f"Expected a non-empty value for `execution_id` but received {execution_id!r}")
-        extra_headers = {**strip_not_given({"X-Dedalus-Org-Id": x_dedalus_org_id}), **(extra_headers or {})}
         return self._get_api_list(
             path_template(
                 "/v1/machines/{machine_id}/executions/{execution_id}/events",

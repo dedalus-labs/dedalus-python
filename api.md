@@ -10,20 +10,8 @@ Complete reference of every operation, grouped by resource. See [the README](./R
   - [Get machine](#get-machine)
   - [Update machine](#update-machine)
   - [Destroy machine](#destroy-machine)
-  - [Watch machine lifecycle status](#watch-machine-lifecycle-status)
   - [Sleep a running machine](#sleep-a-running-machine)
   - [Wake a sleeping machine](#wake-a-sleeping-machine)
-  - [`Machines Network`](#machines-network)
-    - [Get machine network identity](#get-machine-network-identity)
-  - [`Machines Artifacts`](#machines-artifacts)
-    - [List artifacts](#list-artifacts)
-    - [Get artifact](#get-artifact)
-    - [Delete artifact](#delete-artifact)
-  - [`Machines Ports`](#machines-ports)
-    - [List ports](#list-ports)
-    - [Create port](#create-port)
-    - [Get port](#get-port)
-    - [Delete port](#delete-port)
   - [`Machines Ssh`](#machines-ssh)
     - [List SSH sessions](#list-ssh-sessions)
     - [Create SSH session](#create-ssh-session)
@@ -37,17 +25,7 @@ Complete reference of every operation, grouped by resource. See [the README](./R
     - [Get execution output](#get-execution-output)
     - [List execution events](#list-execution-events)
   - [`Machines Terminals`](#machines-terminals)
-    - [List terminals](#list-terminals)
-    - [Create terminal](#create-terminal)
-    - [Get terminal](#get-terminal)
-    - [Delete terminal](#delete-terminal)
-    - [Connect to terminal WebSocket stream](#connect-to-terminal-websocket-stream)
-- [`Networks`](#networks)
-  - [Get network details](#get-network-details)
-- [`Usage`](#usage)
-  - [Get usage summary](#get-usage-summary)
-  - [List machine compute usage breakdown](#list-machine-compute-usage-breakdown)
-  - [List machine storage usage breakdown](#list-machine-storage-usage-breakdown)
+    - [`connect`](#connect)
 
 ## Setup
 
@@ -98,7 +76,7 @@ machine = client.machines.create(
 
 ```python
 machine = client.machines.retrieve(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
 )
 ```
 
@@ -111,7 +89,7 @@ machine = client.machines.retrieve(
 
 ```python
 machine = client.machines.update(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
 ```
@@ -124,26 +102,9 @@ machine = client.machines.update(
 
 ```python
 machine = client.machines.delete(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
-```
-
-### Watch machine lifecycle status
-
-Streams machine lifecycle updates over Server-Sent Events. Each `status` event contains a full `LifecycleResponse` payload. The stream closes after the machine reaches its current desired state.
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Machine`](./src/dedalus_sdk/types/machine.py) |
-
-```python
-stream = client.machines.watch(
-    machine_id="machineID",
-)
-
-for machine in stream:
-    print(machine)
 ```
 
 ### Sleep a running machine
@@ -154,7 +115,7 @@ for machine in stream:
 
 ```python
 machine = client.machines.sleep(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
 ```
@@ -167,118 +128,7 @@ machine = client.machines.sleep(
 
 ```python
 machine = client.machines.wake(
-    machine_id="machineID",
-    idempotency_key="",
-)
-```
-
-### `Machines Network`
-
-#### Get machine network identity
-
-| Direction | Type |
-| --- | --- |
-| Response | [`MachineNetwork`](./src/dedalus_sdk/types/machines/machine_network.py) |
-
-```python
-network = client.machines.network.retrieve(
-    machine_id="machineID",
-)
-```
-
-### `Machines Artifacts`
-
-#### List artifacts
-
-| Direction | Type |
-| --- | --- |
-| Request | [`ArtifactListParams`](./src/dedalus_sdk/types/machines/artifact_list_params.py) |
-
-```python
-page = client.machines.artifacts.list(
-    machine_id="machineID",
-)
-```
-
-#### Get artifact
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Artifact`](./src/dedalus_sdk/types/machines/artifact.py) |
-
-```python
-artifact = client.machines.artifacts.retrieve(
-    machine_id="machineID",
-    artifact_id="artifactID",
-)
-```
-
-#### Delete artifact
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Artifact`](./src/dedalus_sdk/types/machines/artifact.py) |
-
-```python
-artifact = client.machines.artifacts.delete(
-    machine_id="machineID",
-    artifact_id="artifactID",
-    idempotency_key="",
-)
-```
-
-### `Machines Ports`
-
-#### List ports
-
-| Direction | Type |
-| --- | --- |
-| Request | [`PortListParams`](./src/dedalus_sdk/types/machines/port_list_params.py) |
-
-```python
-page = client.machines.ports.list(
-    machine_id="machineID",
-)
-```
-
-#### Create port
-
-| Direction | Type |
-| --- | --- |
-| Request | [`PortCreateParams`](./src/dedalus_sdk/types/machines/port_create_params.py) |
-| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
-
-```python
-port = client.machines.ports.create(
-    machine_id="machineID",
-    port=0,
-    idempotency_key="",
-)
-```
-
-#### Get port
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
-
-```python
-port = client.machines.ports.retrieve(
-    machine_id="machineID",
-    port_id="portID",
-)
-```
-
-#### Delete port
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
-
-```python
-port = client.machines.ports.delete(
-    machine_id="machineID",
-    port_id="portID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
 ```
@@ -293,7 +143,7 @@ port = client.machines.ports.delete(
 
 ```python
 page = client.machines.ssh.list(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
 )
 ```
 
@@ -306,7 +156,7 @@ page = client.machines.ssh.list(
 
 ```python
 ssh = client.machines.ssh.create(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     public_key="",
     idempotency_key="",
 )
@@ -320,7 +170,7 @@ ssh = client.machines.ssh.create(
 
 ```python
 ssh = client.machines.ssh.retrieve(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     session_id="sessionID",
 )
 ```
@@ -333,7 +183,7 @@ ssh = client.machines.ssh.retrieve(
 
 ```python
 ssh = client.machines.ssh.delete(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     session_id="sessionID",
     idempotency_key="",
 )
@@ -349,7 +199,7 @@ ssh = client.machines.ssh.delete(
 
 ```python
 page = client.machines.executions.list(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
 )
 ```
 
@@ -362,7 +212,7 @@ page = client.machines.executions.list(
 
 ```python
 execution = client.machines.executions.create(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     command=[""],
     idempotency_key="",
 )
@@ -376,7 +226,7 @@ execution = client.machines.executions.create(
 
 ```python
 execution = client.machines.executions.retrieve(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     execution_id="executionID",
 )
 ```
@@ -389,7 +239,7 @@ execution = client.machines.executions.retrieve(
 
 ```python
 execution = client.machines.executions.delete(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     execution_id="executionID",
     idempotency_key="",
 )
@@ -403,7 +253,7 @@ execution = client.machines.executions.delete(
 
 ```python
 execution = client.machines.executions.output(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     execution_id="executionID",
 )
 ```
@@ -416,123 +266,17 @@ execution = client.machines.executions.output(
 
 ```python
 page = client.machines.executions.events(
-    machine_id="machineID",
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     execution_id="executionID",
 )
 ```
 
 ### `Machines Terminals`
 
-#### List terminals
-
-| Direction | Type |
-| --- | --- |
-| Request | [`TerminalListParams`](./src/dedalus_sdk/types/machines/terminal_list_params.py) |
-
-```python
-page = client.machines.terminals.list(
-    machine_id="machineID",
-)
-```
-
-#### Create terminal
-
-| Direction | Type |
-| --- | --- |
-| Request | [`TerminalCreateParams`](./src/dedalus_sdk/types/machines/terminal_create_params.py) |
-| Response | [`Terminal`](./src/dedalus_sdk/types/machines/terminal.py) |
-
-```python
-terminal = client.machines.terminals.create(
-    machine_id="machineID",
-    height=0,
-    width=0,
-    idempotency_key="",
-)
-```
-
-#### Get terminal
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Terminal`](./src/dedalus_sdk/types/machines/terminal.py) |
-
-```python
-terminal = client.machines.terminals.retrieve(
-    machine_id="machineID",
-    terminal_id="terminalID",
-)
-```
-
-#### Delete terminal
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Terminal`](./src/dedalus_sdk/types/machines/terminal.py) |
-
-```python
-terminal = client.machines.terminals.delete(
-    machine_id="machineID",
-    terminal_id="terminalID",
-    idempotency_key="",
-)
-```
-
-#### Connect to terminal WebSocket stream
-
-Upgrades to a WebSocket connection for interactive terminal I/O. Clients send JSON `TerminalClientEvent` messages and receive JSON `TerminalServerEvent` messages. Terminal byte streams are base64-encoded inside `input` and `output` events; `resize` events use integer `width` and `height` fields.
+#### `connect`
 
 ```python
 with client.machines.terminals.connect(machine_id="machineID", terminal_id="terminalID") as connection:
     message = connection.recv()
     print(message)
-```
-
-## `Networks`
-
-### Get network details
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Network`](./src/dedalus_sdk/types/network.py) |
-
-```python
-network = client.networks.retrieve(
-    network_id="networkID",
-)
-```
-
-## `Usage`
-
-### Get usage summary
-
-| Direction | Type |
-| --- | --- |
-| Request | [`UsageRetrieveParams`](./src/dedalus_sdk/types/usage_retrieve_params.py) |
-| Response | [`OrgUsage`](./src/dedalus_sdk/types/org_usage.py) |
-
-```python
-usage = client.usage.retrieve()
-```
-
-### List machine compute usage breakdown
-
-| Direction | Type |
-| --- | --- |
-| Request | [`UsageMachineComputeParams`](./src/dedalus_sdk/types/usage_machine_compute_params.py) |
-| Response | [`MachineComputeUsage`](./src/dedalus_sdk/types/machine_compute_usage.py) |
-
-```python
-usage = client.usage.machine_compute()
-```
-
-### List machine storage usage breakdown
-
-| Direction | Type |
-| --- | --- |
-| Request | [`UsageMachineStorageParams`](./src/dedalus_sdk/types/usage_machine_storage_params.py) |
-| Response | [`MachineStorageUsage`](./src/dedalus_sdk/types/machine_storage_usage.py) |
-
-```python
-usage = client.usage.machine_storage()
 ```
