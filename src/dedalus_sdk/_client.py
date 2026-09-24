@@ -189,6 +189,7 @@ class Dedalus(SyncAPIClient):
             "X-Scalar-Async": "false",
             "User-Agent": "Dedalus-SDK",
             "X-SDK-Version": "1.0.0",
+            "X-Dedalus-Org-Id": self.dedalus_org_id if self.dedalus_org_id is not None else Omit(),
             **self._custom_headers,
         }
 
@@ -428,6 +429,7 @@ class AsyncDedalus(AsyncAPIClient):
             "X-Scalar-Async": f"async:{get_async_library()}",
             "User-Agent": "Dedalus-SDK",
             "X-SDK-Version": "1.0.0",
+            "X-Dedalus-Org-Id": self.dedalus_org_id if self.dedalus_org_id is not None else Omit(),
             **self._custom_headers,
         }
 
