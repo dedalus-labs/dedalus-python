@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import gc
 import os
+import re
 import sys
 import json
 import asyncio
@@ -715,7 +716,7 @@ class TestDedalus:
 
         header = response.request.headers.get("Idempotency-Key")
         assert header is not None
-        assert header.startswith("stainless-python-retry")
+        assert re.fullmatch(r"[0-9a-f]{12}7[0-9a-f]{3}[89ab][0-9a-f]{15}", header)
 
         # explicit header
         response = client.post(
@@ -1674,7 +1675,7 @@ class TestAsyncDedalus:
 
         header = response.request.headers.get("Idempotency-Key")
         assert header is not None
-        assert header.startswith("stainless-python-retry")
+        assert re.fullmatch(r"[0-9a-f]{12}7[0-9a-f]{3}[89ab][0-9a-f]{15}", header)
 
         # explicit header
         response = await async_client.post(
