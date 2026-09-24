@@ -890,7 +890,10 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         return False
 
     def _idempotency_key(self) -> str:
-        return f"scalar-python-retry-{uuid.uuid4()}"
+        # @custom start
+        # The API requires a compact UUIDv7; retries reuse this generated key.
+        return f"{time.time_ns() // 1_000_000:012x}7{uuid.uuid4().hex[13:]}"
+        # @custom end
 
 
 class _DefaultHttpxClient(httpx.Client):
