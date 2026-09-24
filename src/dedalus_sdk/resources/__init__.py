@@ -1,4 +1,4 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
 from .machines import (
     MachinesResource,
@@ -8,6 +8,14 @@ from .machines import (
     MachinesResourceWithStreamingResponse,
     AsyncMachinesResourceWithStreamingResponse,
 )
+from .organization import (
+    OrganizationResource,
+    AsyncOrganizationResource,
+    OrganizationResourceWithRawResponse,
+    AsyncOrganizationResourceWithRawResponse,
+    OrganizationResourceWithStreamingResponse,
+    AsyncOrganizationResourceWithStreamingResponse,
+)
 
 __all__ = [
     "MachinesResource",
@@ -16,4 +24,10 @@ __all__ = [
     "AsyncMachinesResourceWithRawResponse",
     "MachinesResourceWithStreamingResponse",
     "AsyncMachinesResourceWithStreamingResponse",
+    "OrganizationResource",
+    "AsyncOrganizationResource",
+    "OrganizationResourceWithRawResponse",
+    "AsyncOrganizationResourceWithRawResponse",
+    "OrganizationResourceWithStreamingResponse",
+    "AsyncOrganizationResourceWithStreamingResponse",
 ]

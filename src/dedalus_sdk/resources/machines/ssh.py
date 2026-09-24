@@ -1,4 +1,4 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
 from __future__ import annotations
 
@@ -25,22 +25,62 @@ __all__ = ["SSHResource", "AsyncSSHResource"]
 class SSHResource(SyncAPIResource):
     @cached_property
     def with_raw_response(self) -> SSHResourceWithRawResponse:
-        """
-        This property can be used as a prefix for any HTTP method call to return
-        the raw response object instead of the parsed content.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
-        """
         return SSHResourceWithRawResponse(self)
 
     @cached_property
     def with_streaming_response(self) -> SSHResourceWithStreamingResponse:
-        """
-        An alternative to `.with_raw_response` that doesn't eagerly read the response body.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
-        """
         return SSHResourceWithStreamingResponse(self)
+
+    def list(
+        self,
+        *,
+        machine_id: str,
+        limit: int | Omit = omit,
+        cursor: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> SyncCursorPage[SSHSession]:
+        """
+        List SSH sessions
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            limit: Query parameter.
+            cursor: Query parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+
+        Returns:
+            SyncCursorPage[SSHSession]: OK
+
+        Example:
+            ```python
+            page = client.machines.ssh.list(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return self._get_api_list(
+            path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
+            page=SyncCursorPage[SSHSession],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform({"limit": limit, "cursor": cursor}, ssh_list_params.SSHListParams),
+            ),
+            model=SSHSession,
+            method="get",
+        )
 
     def create(
         self,
@@ -59,21 +99,34 @@ class SSHResource(SyncAPIResource):
         Create SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            public_key: Body parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            ssh = client.machines.ssh.create(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                public_key="",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._post(
-            path_template("/v1/machines/{machine_id}/ssh", machine_id=machine_id),
-            body=maybe_transform({"public_key": public_key}, ssh_create_params.SSHCreateParams),
+            path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
+            body=maybe_transform(
+                {"public_key": public_key},
+                ssh_create_params.SSHCreateParams,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -100,70 +153,36 @@ class SSHResource(SyncAPIResource):
         Get SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            session_id: Path parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
+        Example:
+            ```python
+            ssh = client.machines.ssh.retrieve(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                session_id="sessionID",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        if not session_id:
+        if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
         return self._get(
-            path_template("/v1/machines/{machine_id}/ssh/{session_id}", machine_id=machine_id, session_id=session_id),
+            path_template(
+                "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=SSHSession,
-        )
-
-    def list(
-        self,
-        *,
-        machine_id: str,
-        cursor: str | Omit = omit,
-        limit: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncCursorPage[SSHSession]:
-        """
-        List SSH sessions
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not machine_id:
-            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        return self._get_api_list(
-            path_template("/v1/machines/{machine_id}/ssh", machine_id=machine_id),
-            page=SyncCursorPage[SSHSession],
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {
-                        "cursor": cursor,
-                        "limit": limit,
-                    },
-                    ssh_list_params.SSHListParams,
-                ),
-            ),
-            model=SSHSession,
         )
 
     def delete(
@@ -183,22 +202,34 @@ class SSHResource(SyncAPIResource):
         Delete SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            session_id: Path parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            ssh = client.machines.ssh.delete(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                session_id="sessionID",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        if not session_id:
+        if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
         return self._delete(
-            path_template("/v1/machines/{machine_id}/ssh/{session_id}", machine_id=machine_id, session_id=session_id),
+            path_template(
+                "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -213,22 +244,62 @@ class SSHResource(SyncAPIResource):
 class AsyncSSHResource(AsyncAPIResource):
     @cached_property
     def with_raw_response(self) -> AsyncSSHResourceWithRawResponse:
-        """
-        This property can be used as a prefix for any HTTP method call to return
-        the raw response object instead of the parsed content.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
-        """
         return AsyncSSHResourceWithRawResponse(self)
 
     @cached_property
     def with_streaming_response(self) -> AsyncSSHResourceWithStreamingResponse:
-        """
-        An alternative to `.with_raw_response` that doesn't eagerly read the response body.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
-        """
         return AsyncSSHResourceWithStreamingResponse(self)
+
+    def list(
+        self,
+        *,
+        machine_id: str,
+        limit: int | Omit = omit,
+        cursor: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> AsyncPaginator[SSHSession, AsyncCursorPage[SSHSession]]:
+        """
+        List SSH sessions
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            limit: Query parameter.
+            cursor: Query parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+
+        Returns:
+            AsyncPaginator[SSHSession, AsyncCursorPage[SSHSession]]: OK
+
+        Example:
+            ```python
+            page = client.machines.ssh.list(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return self._get_api_list(
+            path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
+            page=AsyncCursorPage[SSHSession],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform({"limit": limit, "cursor": cursor}, ssh_list_params.SSHListParams),
+            ),
+            model=SSHSession,
+            method="get",
+        )
 
     async def create(
         self,
@@ -247,21 +318,34 @@ class AsyncSSHResource(AsyncAPIResource):
         Create SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            public_key: Body parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            ssh = await client.machines.ssh.create(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                public_key="",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._post(
-            path_template("/v1/machines/{machine_id}/ssh", machine_id=machine_id),
-            body=await async_maybe_transform({"public_key": public_key}, ssh_create_params.SSHCreateParams),
+            path_template("/v1/machines/{machine_id}/ssh", **{"machine_id": machine_id}),
+            body=await async_maybe_transform(
+                {"public_key": public_key},
+                ssh_create_params.SSHCreateParams,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -288,70 +372,36 @@ class AsyncSSHResource(AsyncAPIResource):
         Get SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            session_id: Path parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
+        Example:
+            ```python
+            ssh = await client.machines.ssh.retrieve(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                session_id="sessionID",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        if not session_id:
+        if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
         return await self._get(
-            path_template("/v1/machines/{machine_id}/ssh/{session_id}", machine_id=machine_id, session_id=session_id),
+            path_template(
+                "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=SSHSession,
-        )
-
-    def list(
-        self,
-        *,
-        machine_id: str,
-        cursor: str | Omit = omit,
-        limit: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[SSHSession, AsyncCursorPage[SSHSession]]:
-        """
-        List SSH sessions
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        if not machine_id:
-            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        return self._get_api_list(
-            path_template("/v1/machines/{machine_id}/ssh", machine_id=machine_id),
-            page=AsyncCursorPage[SSHSession],
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {
-                        "cursor": cursor,
-                        "limit": limit,
-                    },
-                    ssh_list_params.SSHListParams,
-                ),
-            ),
-            model=SSHSession,
         )
 
     async def delete(
@@ -371,22 +421,34 @@ class AsyncSSHResource(AsyncAPIResource):
         Delete SSH session
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            session_id: Path parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            SSHSession: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            ssh = await client.machines.ssh.delete(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                session_id="sessionID",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        if not session_id:
+        if session_id is None or (isinstance(session_id, str) and not session_id):
             raise ValueError(f"Expected a non-empty value for `session_id` but received {session_id!r}")
         return await self._delete(
-            path_template("/v1/machines/{machine_id}/ssh/{session_id}", machine_id=machine_id, session_id=session_id),
+            path_template(
+                "/v1/machines/{machine_id}/ssh/{session_id}", **{"machine_id": machine_id, "session_id": session_id}
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -402,14 +464,14 @@ class SSHResourceWithRawResponse:
     def __init__(self, ssh: SSHResource) -> None:
         self._ssh = ssh
 
+        self.list = to_raw_response_wrapper(
+            ssh.list,
+        )
         self.create = to_raw_response_wrapper(
             ssh.create,
         )
         self.retrieve = to_raw_response_wrapper(
             ssh.retrieve,
-        )
-        self.list = to_raw_response_wrapper(
-            ssh.list,
         )
         self.delete = to_raw_response_wrapper(
             ssh.delete,
@@ -420,14 +482,14 @@ class AsyncSSHResourceWithRawResponse:
     def __init__(self, ssh: AsyncSSHResource) -> None:
         self._ssh = ssh
 
+        self.list = async_to_raw_response_wrapper(
+            ssh.list,
+        )
         self.create = async_to_raw_response_wrapper(
             ssh.create,
         )
         self.retrieve = async_to_raw_response_wrapper(
             ssh.retrieve,
-        )
-        self.list = async_to_raw_response_wrapper(
-            ssh.list,
         )
         self.delete = async_to_raw_response_wrapper(
             ssh.delete,
@@ -438,14 +500,14 @@ class SSHResourceWithStreamingResponse:
     def __init__(self, ssh: SSHResource) -> None:
         self._ssh = ssh
 
+        self.list = to_streamed_response_wrapper(
+            ssh.list,
+        )
         self.create = to_streamed_response_wrapper(
             ssh.create,
         )
         self.retrieve = to_streamed_response_wrapper(
             ssh.retrieve,
-        )
-        self.list = to_streamed_response_wrapper(
-            ssh.list,
         )
         self.delete = to_streamed_response_wrapper(
             ssh.delete,
@@ -456,14 +518,14 @@ class AsyncSSHResourceWithStreamingResponse:
     def __init__(self, ssh: AsyncSSHResource) -> None:
         self._ssh = ssh
 
+        self.list = async_to_streamed_response_wrapper(
+            ssh.list,
+        )
         self.create = async_to_streamed_response_wrapper(
             ssh.create,
         )
         self.retrieve = async_to_streamed_response_wrapper(
             ssh.retrieve,
-        )
-        self.list = async_to_streamed_response_wrapper(
-            ssh.list,
         )
         self.delete = async_to_streamed_response_wrapper(
             ssh.delete,

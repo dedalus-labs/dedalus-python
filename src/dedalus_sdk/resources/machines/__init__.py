@@ -1,13 +1,5 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
-from .ssh import (
-    SSHResource,
-    AsyncSSHResource,
-    SSHResourceWithRawResponse,
-    AsyncSSHResourceWithRawResponse,
-    SSHResourceWithStreamingResponse,
-    AsyncSSHResourceWithStreamingResponse,
-)
 from .machines import (
     MachinesResource,
     AsyncMachinesResource,
@@ -15,6 +7,14 @@ from .machines import (
     AsyncMachinesResourceWithRawResponse,
     MachinesResourceWithStreamingResponse,
     AsyncMachinesResourceWithStreamingResponse,
+)
+from .ssh import (
+    SSHResource,
+    AsyncSSHResource,
+    SSHResourceWithRawResponse,
+    AsyncSSHResourceWithRawResponse,
+    SSHResourceWithStreamingResponse,
+    AsyncSSHResourceWithStreamingResponse,
 )
 from .executions import (
     ExecutionsResource,
@@ -24,8 +24,22 @@ from .executions import (
     ExecutionsResourceWithStreamingResponse,
     AsyncExecutionsResourceWithStreamingResponse,
 )
+from .autoresizing import (
+    AutoresizingResource,
+    AsyncAutoresizingResource,
+    AutoresizingResourceWithRawResponse,
+    AsyncAutoresizingResourceWithRawResponse,
+    AutoresizingResourceWithStreamingResponse,
+    AsyncAutoresizingResourceWithStreamingResponse,
+)
 
 __all__ = [
+    "MachinesResource",
+    "AsyncMachinesResource",
+    "MachinesResourceWithRawResponse",
+    "AsyncMachinesResourceWithRawResponse",
+    "MachinesResourceWithStreamingResponse",
+    "AsyncMachinesResourceWithStreamingResponse",
     "SSHResource",
     "AsyncSSHResource",
     "SSHResourceWithRawResponse",
@@ -38,10 +52,10 @@ __all__ = [
     "AsyncExecutionsResourceWithRawResponse",
     "ExecutionsResourceWithStreamingResponse",
     "AsyncExecutionsResourceWithStreamingResponse",
-    "MachinesResource",
-    "AsyncMachinesResource",
-    "MachinesResourceWithRawResponse",
-    "AsyncMachinesResourceWithRawResponse",
-    "MachinesResourceWithStreamingResponse",
-    "AsyncMachinesResourceWithStreamingResponse",
+    "AutoresizingResource",
+    "AsyncAutoresizingResource",
+    "AutoresizingResourceWithRawResponse",
+    "AsyncAutoresizingResourceWithRawResponse",
+    "AutoresizingResourceWithStreamingResponse",
+    "AsyncAutoresizingResourceWithStreamingResponse",
 ]

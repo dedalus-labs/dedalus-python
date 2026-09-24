@@ -1,29 +1,12 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
 from __future__ import annotations
 
 import httpx
 
-from .ssh import (
-    SSHResource,
-    AsyncSSHResource,
-    SSHResourceWithRawResponse,
-    AsyncSSHResourceWithRawResponse,
-    SSHResourceWithStreamingResponse,
-    AsyncSSHResourceWithStreamingResponse,
-)
-from ...types import machine_list_params, machine_create_params, machine_update_params
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
 from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
-from .executions import (
-    ExecutionsResource,
-    AsyncExecutionsResource,
-    ExecutionsResourceWithRawResponse,
-    AsyncExecutionsResourceWithRawResponse,
-    ExecutionsResourceWithStreamingResponse,
-    AsyncExecutionsResourceWithStreamingResponse,
-)
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
     to_raw_response_wrapper,
@@ -33,8 +16,33 @@ from ..._response import (
 )
 from ...pagination import SyncCursorPage, AsyncCursorPage
 from ..._base_client import AsyncPaginator, make_request_options
-from ...types.machine import Machine
+from .ssh import (
+    SSHResource,
+    AsyncSSHResource,
+    SSHResourceWithRawResponse,
+    AsyncSSHResourceWithRawResponse,
+    SSHResourceWithStreamingResponse,
+    AsyncSSHResourceWithStreamingResponse,
+)
+from .executions import (
+    ExecutionsResource,
+    AsyncExecutionsResource,
+    ExecutionsResourceWithRawResponse,
+    AsyncExecutionsResourceWithRawResponse,
+    ExecutionsResourceWithStreamingResponse,
+    AsyncExecutionsResourceWithStreamingResponse,
+)
+from .autoresizing import (
+    AutoresizingResource,
+    AsyncAutoresizingResource,
+    AutoresizingResourceWithRawResponse,
+    AsyncAutoresizingResourceWithRawResponse,
+    AutoresizingResourceWithStreamingResponse,
+    AsyncAutoresizingResourceWithStreamingResponse,
+)
+from ...types import machine_list_params, machine_create_params, machine_update_params, machine_reboot_params
 from ...types.machine_list_item import MachineListItem
+from ...types.machine import Machine
 from ...types.machine_retrieve_response import MachineRetrieveResponse
 
 __all__ = ["MachinesResource", "AsyncMachinesResource"]
@@ -50,23 +58,61 @@ class MachinesResource(SyncAPIResource):
         return ExecutionsResource(self._client)
 
     @cached_property
-    def with_raw_response(self) -> MachinesResourceWithRawResponse:
-        """
-        This property can be used as a prefix for any HTTP method call to return
-        the raw response object instead of the parsed content.
+    def autoresizing(self) -> AutoresizingResource:
+        return AutoresizingResource(self._client)
 
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
-        """
+    @cached_property
+    def with_raw_response(self) -> MachinesResourceWithRawResponse:
         return MachinesResourceWithRawResponse(self)
 
     @cached_property
     def with_streaming_response(self) -> MachinesResourceWithStreamingResponse:
-        """
-        An alternative to `.with_raw_response` that doesn't eagerly read the response body.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
-        """
         return MachinesResourceWithStreamingResponse(self)
+
+    def list(
+        self,
+        *,
+        limit: int | Omit = omit,
+        cursor: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> SyncCursorPage[MachineListItem]:
+        """
+        List machines
+
+        Args:
+            limit: Query parameter.
+            cursor: Query parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+
+        Returns:
+            SyncCursorPage[MachineListItem]: OK
+
+        Example:
+            ```python
+            page = client.machines.list()
+            ```
+        """
+        return self._get_api_list(
+            "/v1/machines",
+            page=SyncCursorPage[MachineListItem],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform({"limit": limit, "cursor": cursor}, machine_list_params.MachineListParams),
+            ),
+            model=MachineListItem,
+            method="get",
+        )
 
     def create(
         self,
@@ -83,29 +129,33 @@ class MachinesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """Create machine
+        """
+        Create machine
 
         Args:
-          autosleep: Idle window before autosleep.
+            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            memory_mib: Memory in MiB.
+            storage_gib: Storage in GiB.
+            vcpu: CPU in vCPUs.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-        Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+        Returns:
+            Machine: Create converged inline
 
-          memory_mib: Memory in MiB.
-
-          storage_gib: Storage in GiB.
-
-          vcpu: CPU in vCPUs.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = client.machines.create(
+                autosleep="300s",
+                memory_mib=4096,
+                storage_gib=10,
+                vcpu=1,
+                idempotency_key="",
+            )
+            ```
         """
         return self._post(
             "/v1/machines",
@@ -143,18 +193,26 @@ class MachinesResource(SyncAPIResource):
         Get machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            MachineRetrieveResponse: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
+        Example:
+            ```python
+            machine = client.machines.retrieve(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._get(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -177,34 +235,36 @@ class MachinesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """Update machine
+        """
+        Update machine
 
         Args:
-          autosleep: Idle window before autosleep.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            memory_mib: Memory in MiB.
+            storage_gib: Storage in GiB.
+            vcpu: CPU in vCPUs.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-        Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+        Returns:
+            Machine: OK
 
-          memory_mib: Memory in MiB.
-
-          storage_gib: Storage in GiB.
-
-          vcpu: CPU in vCPUs.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = client.machines.update(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._patch(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             body=maybe_transform(
                 {
                     "autosleep": autosleep,
@@ -224,49 +284,6 @@ class MachinesResource(SyncAPIResource):
             cast_to=Machine,
         )
 
-    def list(
-        self,
-        *,
-        cursor: str | Omit = omit,
-        limit: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncCursorPage[MachineListItem]:
-        """
-        List machines
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        return self._get_api_list(
-            "/v1/machines",
-            page=SyncCursorPage[MachineListItem],
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {
-                        "cursor": cursor,
-                        "limit": limit,
-                    },
-                    machine_list_params.MachineListParams,
-                ),
-            ),
-            model=MachineListItem,
-        )
-
     def delete(
         self,
         *,
@@ -283,20 +300,28 @@ class MachinesResource(SyncAPIResource):
         Destroy machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = client.machines.delete(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._delete(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -323,20 +348,28 @@ class MachinesResource(SyncAPIResource):
         Sleep a running machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = client.machines.sleep(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._post(
-            path_template("/v1/machines/{machine_id}/sleep", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}/sleep", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -363,26 +396,85 @@ class MachinesResource(SyncAPIResource):
         Wake a sleeping machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = client.machines.wake(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return self._post(
-            path_template("/v1/machines/{machine_id}/wake", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}/wake", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
                 idempotency_key=idempotency_key,
+            ),
+            cast_to=Machine,
+        )
+
+    def reboot(
+        self,
+        *,
+        machine_id: str,
+        force: bool | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> Machine:
+        """
+        Checkpoints files and replaces the runtime. The machine ID and filesystem are preserved. RAM, processes, and temporary mounts are cleared. Poll the machine until its phase is running. Retry the same Idempotency-Key after a lost response.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Recover from the last committed filesystem checkpoint without guest cooperation. Unpublished file writes are lost. The default checkpoints files before rebooting.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            Machine: OK
+
+        Example:
+            ```python
+            machine = client.machines.reboot(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return self._post(
+            path_template("/v1/machines/{machine_id}/reboot", **{"machine_id": machine_id}),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+                query=maybe_transform({"force": force}, machine_reboot_params.MachineRebootParams),
             ),
             cast_to=Machine,
         )
@@ -398,23 +490,61 @@ class AsyncMachinesResource(AsyncAPIResource):
         return AsyncExecutionsResource(self._client)
 
     @cached_property
-    def with_raw_response(self) -> AsyncMachinesResourceWithRawResponse:
-        """
-        This property can be used as a prefix for any HTTP method call to return
-        the raw response object instead of the parsed content.
+    def autoresizing(self) -> AsyncAutoresizingResource:
+        return AsyncAutoresizingResource(self._client)
 
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#accessing-raw-response-data-eg-headers
-        """
+    @cached_property
+    def with_raw_response(self) -> AsyncMachinesResourceWithRawResponse:
         return AsyncMachinesResourceWithRawResponse(self)
 
     @cached_property
     def with_streaming_response(self) -> AsyncMachinesResourceWithStreamingResponse:
-        """
-        An alternative to `.with_raw_response` that doesn't eagerly read the response body.
-
-        For more information, see https://www.github.com/dedalus-labs/dedalus-python#with_streaming_response
-        """
         return AsyncMachinesResourceWithStreamingResponse(self)
+
+    def list(
+        self,
+        *,
+        limit: int | Omit = omit,
+        cursor: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> AsyncPaginator[MachineListItem, AsyncCursorPage[MachineListItem]]:
+        """
+        List machines
+
+        Args:
+            limit: Query parameter.
+            cursor: Query parameter.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+
+        Returns:
+            AsyncPaginator[MachineListItem, AsyncCursorPage[MachineListItem]]: OK
+
+        Example:
+            ```python
+            page = client.machines.list()
+            ```
+        """
+        return self._get_api_list(
+            "/v1/machines",
+            page=AsyncCursorPage[MachineListItem],
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                query=maybe_transform({"limit": limit, "cursor": cursor}, machine_list_params.MachineListParams),
+            ),
+            model=MachineListItem,
+            method="get",
+        )
 
     async def create(
         self,
@@ -431,29 +561,33 @@ class AsyncMachinesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """Create machine
+        """
+        Create machine
 
         Args:
-          autosleep: Idle window before autosleep.
+            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            memory_mib: Memory in MiB.
+            storage_gib: Storage in GiB.
+            vcpu: CPU in vCPUs.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-        Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+        Returns:
+            Machine: Create converged inline
 
-          memory_mib: Memory in MiB.
-
-          storage_gib: Storage in GiB.
-
-          vcpu: CPU in vCPUs.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = await client.machines.create(
+                autosleep="300s",
+                memory_mib=4096,
+                storage_gib=10,
+                vcpu=1,
+                idempotency_key="",
+            )
+            ```
         """
         return await self._post(
             "/v1/machines",
@@ -491,18 +625,26 @@ class AsyncMachinesResource(AsyncAPIResource):
         Get machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            MachineRetrieveResponse: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
+        Example:
+            ```python
+            machine = await client.machines.retrieve(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._get(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -525,34 +667,36 @@ class AsyncMachinesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
     ) -> Machine:
-        """Update machine
+        """
+        Update machine
 
         Args:
-          autosleep: Idle window before autosleep.
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            memory_mib: Memory in MiB.
+            storage_gib: Storage in GiB.
+            vcpu: CPU in vCPUs.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-        Accepts fixed duration units like 30s, 30m, 2h,
-              7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+        Returns:
+            Machine: OK
 
-          memory_mib: Memory in MiB.
-
-          storage_gib: Storage in GiB.
-
-          vcpu: CPU in vCPUs.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = await client.machines.update(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._patch(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             body=await async_maybe_transform(
                 {
                     "autosleep": autosleep,
@@ -572,49 +716,6 @@ class AsyncMachinesResource(AsyncAPIResource):
             cast_to=Machine,
         )
 
-    def list(
-        self,
-        *,
-        cursor: str | Omit = omit,
-        limit: int | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[MachineListItem, AsyncCursorPage[MachineListItem]]:
-        """
-        List machines
-
-        Args:
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        return self._get_api_list(
-            "/v1/machines",
-            page=AsyncCursorPage[MachineListItem],
-            options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {
-                        "cursor": cursor,
-                        "limit": limit,
-                    },
-                    machine_list_params.MachineListParams,
-                ),
-            ),
-            model=MachineListItem,
-        )
-
     async def delete(
         self,
         *,
@@ -631,20 +732,28 @@ class AsyncMachinesResource(AsyncAPIResource):
         Destroy machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = await client.machines.delete(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._delete(
-            path_template("/v1/machines/{machine_id}", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -671,20 +780,28 @@ class AsyncMachinesResource(AsyncAPIResource):
         Sleep a running machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = await client.machines.sleep(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._post(
-            path_template("/v1/machines/{machine_id}/sleep", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}/sleep", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -711,20 +828,28 @@ class AsyncMachinesResource(AsyncAPIResource):
         Wake a sleeping machine
 
         Args:
-          extra_headers: Send extra headers
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
 
-          extra_query: Add additional query parameters to the request
+        Returns:
+            Machine: OK
 
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-
-          idempotency_key: Specify a custom idempotency key for this request
+        Example:
+            ```python
+            machine = await client.machines.wake(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
         """
-        if not machine_id:
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
         return await self._post(
-            path_template("/v1/machines/{machine_id}/wake", machine_id=machine_id),
+            path_template("/v1/machines/{machine_id}/wake", **{"machine_id": machine_id}),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -735,11 +860,65 @@ class AsyncMachinesResource(AsyncAPIResource):
             cast_to=Machine,
         )
 
+    async def reboot(
+        self,
+        *,
+        machine_id: str,
+        force: bool | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> Machine:
+        """
+        Checkpoints files and replaces the runtime. The machine ID and filesystem are preserved. RAM, processes, and temporary mounts are cleared. Poll the machine until its phase is running. Retry the same Idempotency-Key after a lost response.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Recover from the last committed filesystem checkpoint without guest cooperation. Unpublished file writes are lost. The default checkpoints files before rebooting.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            Machine: OK
+
+        Example:
+            ```python
+            machine = await client.machines.reboot(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return await self._post(
+            path_template("/v1/machines/{machine_id}/reboot", **{"machine_id": machine_id}),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+                query=await async_maybe_transform({"force": force}, machine_reboot_params.MachineRebootParams),
+            ),
+            cast_to=Machine,
+        )
+
 
 class MachinesResourceWithRawResponse:
     def __init__(self, machines: MachinesResource) -> None:
         self._machines = machines
 
+        self.list = to_raw_response_wrapper(
+            machines.list,
+        )
         self.create = to_raw_response_wrapper(
             machines.create,
         )
@@ -748,9 +927,6 @@ class MachinesResourceWithRawResponse:
         )
         self.update = to_raw_response_wrapper(
             machines.update,
-        )
-        self.list = to_raw_response_wrapper(
-            machines.list,
         )
         self.delete = to_raw_response_wrapper(
             machines.delete,
@@ -761,6 +937,9 @@ class MachinesResourceWithRawResponse:
         self.wake = to_raw_response_wrapper(
             machines.wake,
         )
+        self.reboot = to_raw_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> SSHResourceWithRawResponse:
@@ -770,11 +949,18 @@ class MachinesResourceWithRawResponse:
     def executions(self) -> ExecutionsResourceWithRawResponse:
         return ExecutionsResourceWithRawResponse(self._machines.executions)
 
+    @cached_property
+    def autoresizing(self) -> AutoresizingResourceWithRawResponse:
+        return AutoresizingResourceWithRawResponse(self._machines.autoresizing)
+
 
 class AsyncMachinesResourceWithRawResponse:
     def __init__(self, machines: AsyncMachinesResource) -> None:
         self._machines = machines
 
+        self.list = async_to_raw_response_wrapper(
+            machines.list,
+        )
         self.create = async_to_raw_response_wrapper(
             machines.create,
         )
@@ -783,9 +969,6 @@ class AsyncMachinesResourceWithRawResponse:
         )
         self.update = async_to_raw_response_wrapper(
             machines.update,
-        )
-        self.list = async_to_raw_response_wrapper(
-            machines.list,
         )
         self.delete = async_to_raw_response_wrapper(
             machines.delete,
@@ -796,6 +979,9 @@ class AsyncMachinesResourceWithRawResponse:
         self.wake = async_to_raw_response_wrapper(
             machines.wake,
         )
+        self.reboot = async_to_raw_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithRawResponse:
@@ -805,11 +991,18 @@ class AsyncMachinesResourceWithRawResponse:
     def executions(self) -> AsyncExecutionsResourceWithRawResponse:
         return AsyncExecutionsResourceWithRawResponse(self._machines.executions)
 
+    @cached_property
+    def autoresizing(self) -> AsyncAutoresizingResourceWithRawResponse:
+        return AsyncAutoresizingResourceWithRawResponse(self._machines.autoresizing)
+
 
 class MachinesResourceWithStreamingResponse:
     def __init__(self, machines: MachinesResource) -> None:
         self._machines = machines
 
+        self.list = to_streamed_response_wrapper(
+            machines.list,
+        )
         self.create = to_streamed_response_wrapper(
             machines.create,
         )
@@ -818,9 +1011,6 @@ class MachinesResourceWithStreamingResponse:
         )
         self.update = to_streamed_response_wrapper(
             machines.update,
-        )
-        self.list = to_streamed_response_wrapper(
-            machines.list,
         )
         self.delete = to_streamed_response_wrapper(
             machines.delete,
@@ -831,6 +1021,9 @@ class MachinesResourceWithStreamingResponse:
         self.wake = to_streamed_response_wrapper(
             machines.wake,
         )
+        self.reboot = to_streamed_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> SSHResourceWithStreamingResponse:
@@ -840,11 +1033,18 @@ class MachinesResourceWithStreamingResponse:
     def executions(self) -> ExecutionsResourceWithStreamingResponse:
         return ExecutionsResourceWithStreamingResponse(self._machines.executions)
 
+    @cached_property
+    def autoresizing(self) -> AutoresizingResourceWithStreamingResponse:
+        return AutoresizingResourceWithStreamingResponse(self._machines.autoresizing)
+
 
 class AsyncMachinesResourceWithStreamingResponse:
     def __init__(self, machines: AsyncMachinesResource) -> None:
         self._machines = machines
 
+        self.list = async_to_streamed_response_wrapper(
+            machines.list,
+        )
         self.create = async_to_streamed_response_wrapper(
             machines.create,
         )
@@ -853,9 +1053,6 @@ class AsyncMachinesResourceWithStreamingResponse:
         )
         self.update = async_to_streamed_response_wrapper(
             machines.update,
-        )
-        self.list = async_to_streamed_response_wrapper(
-            machines.list,
         )
         self.delete = async_to_streamed_response_wrapper(
             machines.delete,
@@ -866,6 +1063,9 @@ class AsyncMachinesResourceWithStreamingResponse:
         self.wake = async_to_streamed_response_wrapper(
             machines.wake,
         )
+        self.reboot = async_to_streamed_response_wrapper(
+            machines.reboot,
+        )
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithStreamingResponse:
@@ -874,3 +1074,7 @@ class AsyncMachinesResourceWithStreamingResponse:
     @cached_property
     def executions(self) -> AsyncExecutionsResourceWithStreamingResponse:
         return AsyncExecutionsResourceWithStreamingResponse(self._machines.executions)
+
+    @cached_property
+    def autoresizing(self) -> AsyncAutoresizingResourceWithStreamingResponse:
+        return AsyncAutoresizingResourceWithStreamingResponse(self._machines.autoresizing)

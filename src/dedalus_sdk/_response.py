@@ -25,7 +25,14 @@ import httpx
 import pydantic
 
 from ._types import NoneType
-from ._utils import is_given, extract_type_arg, is_annotated_type, is_type_alias_type, extract_type_var_from_base
+from ._utils import (
+    is_given,
+    is_union_type,
+    extract_type_arg,
+    is_annotated_type,
+    is_type_alias_type,
+    extract_type_var_from_base,
+)
 from ._models import BaseModel, is_basemodel
 from ._constants import RAW_RESPONSE_HEADER, OVERRIDE_CAST_TO_HEADER
 from ._streaming import Stream, AsyncStream, is_stream_class_type, extract_stream_chunk_type
@@ -181,7 +188,7 @@ class BaseAPIResponse(Generic[R]):
                 ),
             )
 
-        if cast_to is NoneType:
+        if cast_to is None or cast_to is NoneType:
             return cast(R, None)
 
         response = self.http_response
@@ -228,8 +235,8 @@ class BaseAPIResponse(Generic[R]):
             cast_to is not object
             and not origin is list
             and not origin is dict
-            and not origin is Union
-            and not issubclass(origin, BaseModel)
+            and not is_union_type(cast_to)
+            and not (inspect.isclass(origin) and issubclass(origin, BaseModel))
         ):
             raise RuntimeError(
                 f"Unsupported type, expected {cast_to} to be a subclass of {BaseModel}, {dict}, {list}, {Union}, {NoneType}, {str} or {httpx.Response}."

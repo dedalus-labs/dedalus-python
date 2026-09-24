@@ -1,4 +1,4 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
-__title__ = "dedalus_sdk"
-__version__ = "0.5.0"  # x-release-please-version
+__title__ = "dedalus"
+__version__ = "0.6.0"  # x-release-please-version

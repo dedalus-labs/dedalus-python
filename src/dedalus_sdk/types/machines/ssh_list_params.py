@@ -1,4 +1,4 @@
-# File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
 
 from __future__ import annotations
 
@@ -9,7 +9,8 @@ __all__ = ["SSHListParams"]
 
 class SSHListParams(TypedDict, total=False):
     machine_id: Required[str]
-
-    cursor: str
+    """Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged."""
 
     limit: int
+
+    cursor: str
