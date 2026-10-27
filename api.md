@@ -45,7 +45,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
+    api_key=os.environ.get("DEDALUS_API_KEY"),
 )
 ```
 
