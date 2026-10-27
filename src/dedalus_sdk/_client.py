@@ -50,6 +50,7 @@ class Dedalus(SyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
+    browser_token: str | None
 
     def __init__(
         self,
@@ -58,6 +59,7 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
@@ -99,6 +101,9 @@ class Dedalus(SyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+        if browser_token is None:
+            browser_token = os.environ.get("DEDALUS_BROWSER_TOKEN")
+        self.browser_token = browser_token
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -155,6 +160,7 @@ class Dedalus(SyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
+            **self._browser_token_header_auth,
         }
 
     @override
@@ -180,6 +186,13 @@ class Dedalus(SyncAPIClient):
         if value is None:
             return {}
         return {"x-api-key": value}
+
+    @property
+    def _browser_token_header_auth(self) -> dict[str, str]:
+        value = self.browser_token
+        if value is None:
+            return {}
+        return {"Authorization": f"Bearer {value}"}
 
     @property
     @override
@@ -210,7 +223,7 @@ class Dedalus(SyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key, browser_token or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -220,6 +233,7 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -251,6 +265,7 @@ class Dedalus(SyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            browser_token=browser_token or self.browser_token,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -290,6 +305,7 @@ class AsyncDedalus(AsyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
+    browser_token: str | None
 
     def __init__(
         self,
@@ -298,6 +314,7 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
@@ -339,6 +356,9 @@ class AsyncDedalus(AsyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+        if browser_token is None:
+            browser_token = os.environ.get("DEDALUS_BROWSER_TOKEN")
+        self.browser_token = browser_token
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -395,6 +415,7 @@ class AsyncDedalus(AsyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
+            **self._browser_token_header_auth,
         }
 
     @override
@@ -420,6 +441,13 @@ class AsyncDedalus(AsyncAPIClient):
         if value is None:
             return {}
         return {"x-api-key": value}
+
+    @property
+    def _browser_token_header_auth(self) -> dict[str, str]:
+        value = self.browser_token
+        if value is None:
+            return {}
+        return {"Authorization": f"Bearer {value}"}
 
     @property
     @override
@@ -450,7 +478,7 @@ class AsyncDedalus(AsyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key, browser_token or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -460,6 +488,7 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -491,6 +520,7 @@ class AsyncDedalus(AsyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            browser_token=browser_token or self.browser_token,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,

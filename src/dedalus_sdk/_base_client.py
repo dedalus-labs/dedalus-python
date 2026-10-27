@@ -36,7 +36,6 @@ from typing_extensions import Literal, override, get_origin
 
 import anyio
 import httpx
-import distro
 import pydantic
 from httpx import URL
 from pydantic import PrivateAttr
@@ -2143,15 +2142,15 @@ def get_platform() -> Platform:
         # system is Linux and platform_name is a string like 'Linux-5.10.81-android12-9-00001-geba40aecb3b7-ab8534902-aarch64-with-libc'
         return "Android"
 
+    # The BSDs are not Linux distributions: `platform.system()` reports them by name (`FreeBSD`,
+    # `OpenBSD`), so the kernel name alone tells them apart and no distribution lookup is needed.
+    if system == "freebsd":
+        return "FreeBSD"
+
+    if system == "openbsd":
+        return "OpenBSD"
+
     if system == "linux":
-        # https://distro.readthedocs.io/en/latest/#distro.id
-        distro_id = distro.id()
-        if distro_id == "freebsd":
-            return "FreeBSD"
-
-        if distro_id == "openbsd":
-            return "OpenBSD"
-
         return "Linux"
 
     if platform_name:
