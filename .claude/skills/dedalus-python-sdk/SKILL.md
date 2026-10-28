@@ -21,7 +21,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
+    browser_token=os.environ.get("DEDALUS_BROWSER_TOKEN"),
 )
 ```
 
@@ -29,6 +29,7 @@ Provide credentials using the options below. Environment variables are read auto
 
 - `x_api_key` (env: `DEDALUS_X_API_KEY`) — Dedalus API key. Alternative to Bearer token.
 - `api_key` (env: `DEDALUS_API_KEY`) — Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>.
+- `browser_token` (env: `DEDALUS_BROWSER_TOKEN`) — Credential for the BrowserAuth scheme.
 
 ## Calling operations
 
@@ -38,7 +39,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
+    browser_token=os.environ.get("DEDALUS_BROWSER_TOKEN"),
 )
 
 machine = client.machines.create(
@@ -84,7 +85,7 @@ except APIStatusError as err:
 
 ## Requirements
 
-- Python 3.8 or newer
+- Python 3.9 or newer
 
 ## Reference files
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.6.0...v0.7.0) (2026-10-28)
+
+
+### Features
+
+* **api:** add auth scheme BrowserAuth (+1 more change) ([b016780](https://github.com/dedalus-labs/dedalus-python/commit/b016780a061a08941ca7d8e935e266cfecc4dabc))
+
+
+### Chores
+
+* **api:** update generated SDK content ([61afcb0](https://github.com/dedalus-labs/dedalus-python/commit/61afcb0d0783d257542428550145370ffd04fce9))
+
 ## [0.6.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.5.0...v0.6.0) (2026-09-24)
 
 

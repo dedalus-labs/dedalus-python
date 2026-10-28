@@ -39,7 +39,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
+    browser_token=os.environ.get("DEDALUS_BROWSER_TOKEN"),
 )
 
 machine = client.machines.create(
@@ -91,13 +91,15 @@ Pass credentials to the generated client constructor. Environment variables are 
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `x_api_key` | `string \| provider` | - | Dedalus API key. Alternative to Bearer token. Defaults to DEDALUS_X_API_KEY. |
-| `api_key` | `string \| provider` | - | Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>. Defaults to DEDALUS_API_KEY. |
+| `x_api_key` | `str \| None` | - | Dedalus API key. Alternative to Bearer token. Defaults to DEDALUS_X_API_KEY. |
+| `api_key` | `str \| None` | - | Dedalus API key or short-lived delegated access token in Authorization: Bearer \<credential>. Defaults to DEDALUS_API_KEY. |
+| `browser_token` | `str \| None` | - | Credential for the BrowserAuth scheme. Defaults to DEDALUS_BROWSER_TOKEN. |
 
 Declared schemes:
 
 - `ApiKeyAuth` API key in header `x-api-key`
 - `BearerAuth` bearer token
+- `BrowserAuth` OAuth2/OpenID Connect
 
 <br />
 
@@ -141,7 +143,8 @@ client = Dedalus(
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `x_api_key` | `str \| None` | `os.environ.get("DEDALUS_X_API_KEY")` | Dedalus API key. Alternative to Bearer token. |
-| `api_key` | `str \| None` | `os.environ.get("DEDALUS_API_KEY")` | Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>. |
+| `api_key` | `str \| None` | `os.environ.get("DEDALUS_API_KEY")` | Dedalus API key or short-lived delegated access token in Authorization: Bearer \<credential>. |
+| `browser_token` | `str \| None` | `os.environ.get("DEDALUS_BROWSER_TOKEN")` | Credential for the BrowserAuth scheme. |
 | `base_url` | `str \| httpx.URL \| None` | - | Override the default API base URL. |
 | `timeout` | `float \| Timeout \| None` | `60.0` | Maximum time in seconds to wait for a response before aborting a request. |
 | `max_retries` | `int` | `2` | Number of retries for temporary failures. |
@@ -182,6 +185,6 @@ page = client.machines.list()
 
 ## Requirements
 
-- Python 3.8 or newer
+- Python 3.9 or newer
 
 Powered by Scalar.
