@@ -39,7 +39,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    api_key=os.environ.get("DEDALUS_API_KEY"),
+    browser_token=os.environ.get("DEDALUS_BROWSER_TOKEN"),
 )
 
 machine = client.machines.create(
