@@ -118,13 +118,11 @@ class Querystring:
         return [(key, serialised)]
 
     def _primitive_value_to_str(self, value: PrimitiveData) -> str:
-        # copied from httpx
-        if value is True:
-            return "true"
-        elif value is False:
-            return "false"
-        elif value is None:
+        """Renders one query value: booleans as lowercase `true` / `false`, and `None` as empty."""
+        if value is None:
             return ""
+        if isinstance(value, bool):
+            return "true" if value else "false"
         return str(value)
 
 

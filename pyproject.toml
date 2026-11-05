@@ -16,6 +16,11 @@ dependencies = [
   "sniffio",
 ]
 
+[project.urls]
+Source = "https://github.com/dedalus-labs/dedalus-python"
+Issues = "https://github.com/dedalus-labs/dedalus-python/issues"
+Changelog = "https://github.com/dedalus-labs/dedalus-python/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]
 
