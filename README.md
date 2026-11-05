@@ -10,6 +10,7 @@ The full API of this library can be found in [api.md](./api.md).
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Image import](#image-import)
 - [API Reference](./api.md)
 - [Async](#async)
 - [Authentication](#authentication)
@@ -30,6 +31,47 @@ pip install dedalus-sdk
 ```
 
 <br />
+
+## Image import
+
+```python
+from dedalus_sdk import Dedalus
+from dedalus_sdk.images import import_image, poll_image
+
+with Dedalus() as client:
+    ready = import_image(client, "my-app.tar", name="my-app", platform="linux/amd64")
+
+    # Return after upload and registration, then wait later.
+    accepted = import_image(client, "my-app.tar", wait=False)
+    image = poll_image(client, accepted["image_id"])
+```
+
+Async clients use `async_import_image` and `async_poll_image` with the same options:
+
+```python
+from dedalus_sdk import AsyncDedalus
+from dedalus_sdk.images import async_import_image
+
+async with AsyncDedalus() as client:
+    ready = await async_import_image(client, "my-app.tar")
+```
+
+The helpers stream a `docker save` archive, register it, and wait for readiness by
+default. Set `wait=False` to return after registration. `timeout` defaults to 3,600
+seconds for the import and `poll_interval` defaults to 2 seconds. `on_progress`
+receives each observed image. `ImagePreparationError.image` preserves the image ID
+on terminal failure or polling deadline expiry; timeout or task cancellation does
+not cancel server preparation.
+
+The synchronous helper checks its deadline between I/O operations, uses the
+remaining budget for request inactivity timeouts, and disables automatic API
+retries. The async helper enforces its deadline with task cancellation and retains
+the client's retry policy. Use the same `idempotency_key` when retrying an import
+with unchanged input.
+
+Archives must be regular, nonempty files of at most 5 GiB. Storage uploads use a
+separate HTTP client without API credentials. The helpers require the image API
+to be deployed and enabled for your organization; they do not bypass access controls.
 
 ## Usage
 
