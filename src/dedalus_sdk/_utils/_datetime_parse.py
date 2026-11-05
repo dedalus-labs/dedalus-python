@@ -1,136 +1,156 @@
 """
-This file contains code from https://github.com/pydantic/pydantic/blob/main/pydantic/v1/datetime_parse.py
-without the Pydantic v1 specific errors.
+Parsing for the `date` and `date-time` values a response carries.
+
+Models built without validation (`construct_type`) turn these values into `date` and `datetime`
+objects here. A string is read as a date or date-time in the RFC 3339 / ISO 8601 shape, with the
+departures `_DATE` and `_DATE_TIME` list; a number, or a string or bytes holding one, is read as a
+Unix timestamp.
+
+`datetime.fromisoformat` is not used: before Python 3.11 it rejects a `Z` offset and fractions that
+are not exactly three or six digits, and the supported floor is lower than that.
 """
 
 from __future__ import annotations
 
 import re
-from typing import Dict, Union, Optional
+from typing import Union, Optional
 from datetime import date, datetime, timezone, timedelta
 
 from .._types import StrBytesIntFloat
 
-date_expr = r"(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})"
-time_expr = (
-    r"(?P<hour>\d{1,2}):(?P<minute>\d{1,2})"
-    r"(?::(?P<second>\d{1,2})(?:\.(?P<microsecond>\d{1,6})\d{0,6})?)?"
-    r"(?P<tzinfo>Z|[+-]\d{2}(?::?\d{2})?)?$"
+# RFC 3339 `full-date`, loosened to accept a one-digit month or day.
+_DATE = re.compile(r"(\d{4})-(\d\d?)-(\d\d?)$")
+
+# RFC 3339 `date-time`, loosened the same way: a space may stand in for `T`, the seconds may be left
+# out, and the offset may be `Z`, `+HH`, `+HHMM` or `+HH:MM`, or missing for a local time. It is also
+# stricter in two places: `T` and `Z` must be uppercase, and a leap second (`:60`) is rejected,
+# because `datetime` cannot hold one.
+_DATE_TIME = re.compile(
+    r"""
+    (\d{4}) - (\d\d?) - (\d\d?)
+    [T ]
+    (\d\d?) : (\d\d?)
+    (?: : (\d\d?) (?: \. (\d{1,12}) )? )?
+    (Z | [+-] \d\d (?: :? \d\d )? )?
+    $
+    """,
+    re.VERBOSE,
 )
 
-date_re = re.compile(f"{date_expr}$")
-datetime_re = re.compile(f"{date_expr}[T ]{time_expr}")
+_UNIX_EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
+# A timestamp whose magnitude is above this is taken to be in milliseconds (or a finer unit): as
+# seconds it would land after the year 2603.
+_SECONDS_LIMIT = 2e10
+# Past this magnitude no unit brings the value inside the range `datetime` can represent.
+_CLAMP_LIMIT = 3e20
 
 
-EPOCH = datetime(1970, 1, 1)
-# if greater than this, the number is in ms, if less than or equal it's in seconds
-# (in seconds this is 11th October 2603, in ms it's 20th August 1970)
-MS_WATERSHED = int(2e10)
-# slightly more than datetime.max in ns - (datetime.max - EPOCH).total_seconds() * 1e9
-MAX_NUMBER = int(3e20)
+def _number_or_text(value: object, kind: str) -> Union[int, float, str]:
+    """Sorts an input into a timestamp (returned as a number) or text to parse as a `kind`.
 
-
-def _get_numeric(value: StrBytesIntFloat, native_expected_type: str) -> Union[None, int, float]:
+    Text that reads as a number, such as `"1700000000"` or even `"2024"`, is a timestamp. Any other
+    type `float()` accepts, such as `Decimal` or a NumPy scalar, is a timestamp too; everything else
+    raises `TypeError`.
+    """
     if isinstance(value, (int, float)):
         return value
+    if isinstance(value, bytes):
+        value = value.decode()
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return value
     try:
-        return float(value)
-    except ValueError:
+        return float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        raise TypeError(f"cannot parse a {type(value).__name__} as a {kind}") from None
+
+
+def _from_timestamp(number: Union[int, float]) -> datetime:
+    """Converts a Unix timestamp to an aware UTC `datetime`.
+
+    The unit is inferred from the size: a value too large to be seconds is read as milliseconds,
+    one too large for that as microseconds, and so on. A value too large for any unit is clamped to
+    the naive `datetime.max` or `datetime.min`.
+    """
+    magnitude = abs(number)
+    if magnitude > _CLAMP_LIMIT:
+        return datetime.max if number > 0 else datetime.min
+    divisor = 1
+    while magnitude > _SECONDS_LIMIT * divisor:
+        divisor *= 1000
+    return _UNIX_EPOCH + timedelta(seconds=number / divisor)
+
+
+def _zone(offset: Optional[str]) -> Optional[timezone]:
+    """Returns the fixed-offset zone a `Z` or `±HH[[:]MM]` suffix names, or `None` for no suffix."""
+    if offset is None:
         return None
-    except TypeError:
-        raise TypeError(f"invalid type; expected {native_expected_type}, string, bytes, int or float") from None
-
-
-def _from_unix_seconds(seconds: Union[int, float]) -> datetime:
-    if seconds > MAX_NUMBER:
-        return datetime.max
-    elif seconds < -MAX_NUMBER:
-        return datetime.min
-
-    while abs(seconds) > MS_WATERSHED:
-        seconds /= 1000
-    dt = EPOCH + timedelta(seconds=seconds)
-    return dt.replace(tzinfo=timezone.utc)
-
-
-def _parse_timezone(value: Optional[str]) -> Union[None, int, timezone]:
-    if value == "Z":
+    if offset == "Z":
         return timezone.utc
-    elif value is not None:
-        offset_mins = int(value[-2:]) if len(value) > 3 else 0
-        offset = 60 * int(value[1:3]) + offset_mins
-        if value[0] == "-":
-            offset = -offset
-        return timezone(timedelta(minutes=offset))
-    else:
-        return None
+    digits = offset[1:].replace(":", "")
+    delta = timedelta(hours=int(digits[:2]), minutes=int(digits[2:] or 0))
+    # `timezone` itself rejects an offset of a day or more with a `ValueError`.
+    return timezone(-delta if offset.startswith("-") else delta)
 
 
 def parse_datetime(value: Union[datetime, StrBytesIntFloat]) -> datetime:
     """
-    Parse a datetime/int/float/string and return a datetime.datetime.
+    Parses a date-time string, or a Unix timestamp in seconds or milliseconds, into a `datetime`.
 
-    This function supports time zone offsets. When the input contains one,
-    the output uses a timezone with a fixed offset from UTC.
+    A string with an offset gives an aware `datetime` with that fixed offset, and one without gives
+    a naive one. A timestamp gives an aware UTC `datetime`, except that one beyond the representable
+    range is clamped to the naive `datetime.max` or `datetime.min`. A `datetime` is returned unchanged.
 
-    Raise ValueError if the input is well formatted but not a valid datetime.
-    Raise ValueError if the input isn't well formatted.
+    Raises `ValueError` for a malformed string or out-of-range fields, and `TypeError` for any other
+    input type.
     """
     if isinstance(value, datetime):
         return value
 
-    number = _get_numeric(value, "datetime")
-    if number is not None:
-        return _from_unix_seconds(number)
+    parsed = _number_or_text(value, "datetime")
+    if not isinstance(parsed, str):
+        return _from_timestamp(parsed)
 
-    if isinstance(value, bytes):
-        value = value.decode()
-
-    assert not isinstance(value, (float, int))
-
-    match = datetime_re.match(value)
+    match = _DATE_TIME.match(parsed)
     if match is None:
-        raise ValueError("invalid datetime format")
-
-    kw = match.groupdict()
-    if kw["microsecond"]:
-        kw["microsecond"] = kw["microsecond"].ljust(6, "0")
-
-    tzinfo = _parse_timezone(kw.pop("tzinfo"))
-    kw_: Dict[str, Union[None, int, timezone]] = {k: int(v) for k, v in kw.items() if v is not None}
-    kw_["tzinfo"] = tzinfo
-
-    return datetime(**kw_)  # type: ignore
+        raise ValueError("invalid date-time format")
+    year, month, day, hour, minute, second, fraction, offset = match.groups()
+    # Pad the fraction out to microseconds, or cut it down to them.
+    microsecond = int(f"{fraction or ''}000000"[:6])
+    return datetime(
+        int(year),
+        int(month),
+        int(day),
+        int(hour),
+        int(minute),
+        int(second or 0),
+        microsecond,
+        tzinfo=_zone(offset),
+    )
 
 
 def parse_date(value: Union[date, StrBytesIntFloat]) -> date:
     """
-    Parse a date/int/float/string and return a datetime.date.
+    Parses a date string, or a Unix timestamp in seconds or milliseconds, into a `date`.
 
-    Raise ValueError if the input is well formatted but not a valid date.
-    Raise ValueError if the input isn't well formatted.
+    A `datetime` gives its date part, and a `date` is returned unchanged.
+
+    Raises `ValueError` for a malformed string or an impossible date, and `TypeError` for any other
+    input type.
     """
+    if isinstance(value, datetime):
+        return value.date()
     if isinstance(value, date):
-        if isinstance(value, datetime):
-            return value.date()
-        else:
-            return value
+        return value
 
-    number = _get_numeric(value, "date")
-    if number is not None:
-        return _from_unix_seconds(number).date()
+    parsed = _number_or_text(value, "date")
+    if not isinstance(parsed, str):
+        return _from_timestamp(parsed).date()
 
-    if isinstance(value, bytes):
-        value = value.decode()
-
-    assert not isinstance(value, (float, int))
-    match = date_re.match(value)
+    match = _DATE.match(parsed)
     if match is None:
         raise ValueError("invalid date format")
-
-    kw = {k: int(v) for k, v in match.groupdict().items()}
-
-    try:
-        return date(**kw)
-    except ValueError:
-        raise ValueError("invalid date format") from None
+    year, month, day = (int(part) for part in match.groups())
+    return date(year, month, day)

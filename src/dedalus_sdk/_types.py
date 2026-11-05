@@ -223,9 +223,14 @@ ResponseT = TypeVar(
 
 StrBytesIntFloat = Union[str, bytes, int, float]
 
-# Note: copied from Pydantic
-# https://github.com/pydantic/pydantic/blob/6f31f8f68ef011f84357330186f603ff295312fd/pydantic/main.py#L79
-IncEx: TypeAlias = Union[Set[int], Set[str], Mapping[int, Union["IncEx", bool]], Mapping[str, Union["IncEx", bool]]]
+# The `include` / `exclude` selection `model_dump` takes: a set of field names (or sequence indexes),
+# or a mapping from each one to `True` or a nested selection for that field's own value.
+IncEx: TypeAlias = Union[
+    Set[str],
+    Set[int],
+    Mapping[str, Union["IncEx", bool]],
+    Mapping[int, Union["IncEx", bool]],
+]
 
 PostParser = Callable[[Any], Any]
 

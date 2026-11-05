@@ -4,6 +4,7 @@ import sys
 import json
 import time
 import uuid
+import zlib
 import email
 import asyncio
 import inspect
@@ -42,6 +43,7 @@ from pydantic import PrivateAttr
 
 from . import _exceptions
 from ._qs import Querystring
+from ._decoding import CodingRefused, BoundedDecoder, decoding_error
 from ._files import to_httpx_files, async_to_httpx_files
 from ._types import (
     Body,
@@ -69,6 +71,10 @@ from ._response import (
     APIResponse,
     BaseAPIResponse,
     AsyncAPIResponse,
+    BinaryAPIResponse,
+    AsyncBinaryAPIResponse,
+    StreamedBinaryAPIResponse,
+    AsyncStreamedBinaryAPIResponse,
     extract_response_type,
 )
 from ._constants import (
@@ -82,6 +88,7 @@ from ._constants import (
 )
 from ._streaming import Stream, SSEDecoder, AsyncStream, SSEBytesDecoder
 from ._exceptions import (
+    APIError,
     APIStatusError,
     APITimeoutError,
     APIConnectionError,
@@ -112,8 +119,420 @@ else:
     try:
         from httpx._config import DEFAULT_TIMEOUT_CONFIG as HTTPX_DEFAULT_TIMEOUT
     except ImportError:
-        # taken from https://github.com/encode/httpx/blob/3ba5fe0d7ac70222590e759c31442b1cab263791/httpx/_config.py#L366
+        # httpx's own default of five seconds, for a version that no longer exposes the constant.
         HTTPX_DEFAULT_TIMEOUT = Timeout(5.0)
+
+
+# The redirect statuses the SDK follows, the ones the fetch spec follows. A 300 only offers choices
+# and a 304 tells a conditional request its copy is current, so neither is a hop: like a redirect
+# without a `Location`, each reaches the caller as a status error.
+_REDIRECT_STATUSES: frozenset[int] = frozenset({301, 302, 303, 307, 308})
+
+# How many redirects one request follows before giving up with a connection error.
+MAX_REDIRECTS = 20
+
+# Every header a credential travels in, lower-cased: `Authorization`, `Proxy-Authorization`, `Cookie`,
+# the conventional key headers, and each header this SDK's auth schemes place (an `apiKey` scheme
+# names its own). A redirect that leaves the origin drops all of them; the log masks the same set.
+_CREDENTIAL_HEADERS: frozenset[str] = frozenset(
+    ("authorization", "proxy-authorization", "api-key", "x-api-key", "cookie", "set-cookie")
+)
+
+# The query parameters this SDK's `apiKey` schemes place a credential in.
+_CREDENTIAL_QUERY: tuple[str, ...] = ()
+
+# The headers that describe a request body, dropped with the body when a redirect turns the request
+# into a bodiless GET (the fetch spec's list, plus the framing headers httpx sets).
+_BODY_HEADERS: tuple[str, ...] = (
+    "content-type",
+    "content-length",
+    "content-encoding",
+    "content-language",
+    "content-location",
+    "transfer-encoding",
+)
+
+_DEFAULT_PORTS: Dict[str, int] = {"http": 80, "https": 443}
+
+# The most bytes a buffered response body may decode to (after transparent decompression), so a
+# hostile or broken server cannot make the client hold an unbounded body in memory. A binary
+# download or a streamed response is handed to the caller unread and is not capped.
+MAX_RESPONSE_BODY_BYTES = 64 * 1024 * 1024
+
+# The most bytes of an error response's body read for its message and `body`; the rest is dropped.
+MAX_ERROR_BODY_BYTES = 64 * 1024
+
+
+class _ResponseRefused(Exception):
+    """A response the SDK will not act on, reported to the caller as an SDK error with `message`."""
+
+    def __init__(self, message: str, *, request: httpx.Request) -> None:
+        super().__init__(message)
+        self.message = message
+        self.request = request
+
+
+class _RedirectRefused(_ResponseRefused):
+    """A redirect the SDK will not follow; it reaches the caller as an `APIConnectionError`."""
+
+
+class _BodyRefused(_ResponseRefused):
+    """A buffered body the SDK will not read; it reaches the caller as an `APIError` and is not retried."""
+
+
+class _BodyTooLarge(_BodyRefused):
+    """A buffered body larger than `MAX_RESPONSE_BODY_BYTES`."""
+
+
+def _origin(url: URL) -> tuple[str, str, int | None]:
+    """Scheme, host and port of `url`, the default port spelled out, so `https://h:443` is `https://h`."""
+    scheme = url.scheme.lower()
+    return (scheme, url.host.lower(), url.port if url.port is not None else _DEFAULT_PORTS.get(scheme))
+
+
+def _is_followed_redirect(response: httpx.Response) -> bool:
+    """Whether `response` is a redirect the SDK follows: a 301, 302, 303, 307 or 308 naming a `Location`."""
+    return response.status_code in _REDIRECT_STATUSES and bool(response.headers.get("location", "").strip())
+
+
+def _is_replayable(stream: object) -> bool:
+    """Whether a request body can be sent again on the next hop.
+
+    Bytes can, and so can a multipart body whose files are bytes or seekable (httpx rewinds each one
+    as it renders the part). An iterator or an unseekable file was consumed by the first request, so
+    resending it would deliver an empty or truncated body the server would act on.
+    """
+    if isinstance(stream, httpx.ByteStream):
+        return True
+    fields = getattr(stream, "fields", None)
+    if fields is None:
+        return False
+    for field in cast("list[Any]", fields):
+        file = getattr(field, "file", None)
+        if file is None or isinstance(file, (bytes, str)):
+            continue
+        seekable = getattr(file, "seekable", None)
+        try:
+            if not (callable(seekable) and seekable()):
+                return False
+        except Exception:
+            return False
+    return True
+
+
+def _redirect_request(
+    request: httpx.Request, response: httpx.Response, *, sent_headers: httpx.Headers, keep_credentials: bool
+) -> tuple[httpx.Request, bool]:
+    """The request a followed redirect sends next, and whether it still carries the credentials.
+
+    `Location` is resolved against the URL that was redirected (RFC 3986 section 5.2). Only http and
+    https are followed, and never from https down to http, which would send the request and its
+    credentials in clear.
+
+    A 303 answering anything but HEAD, and a 301 or 302 answering a POST, is fetched again as a
+    bodiless GET, as the fetch spec does. Every other redirect keeps its method and resends its body
+    (a PUT answered with a 301 must not become a GET that succeeds without doing what was asked), and
+    a body that cannot be replayed is refused rather than resent empty.
+
+    Leaving the origin (scheme, host and port) drops every credential header, whether the client or a
+    per-call `extra_headers` set it, and the drop holds for the rest of the chain, so a chain that
+    comes back to the first origin arrives without them. A query-placed key cannot leave at all: the
+    target's query is the `Location`'s own. On the same origin a relative `Location` cannot carry the
+    query key, so it is carried over exactly as a header credential is.
+
+    The next hop is built from `sent_headers`, the headers as they stood before httpx ran the auth flow:
+    an `httpx.Auth` signs the request object in place, so its headers (whatever their names) must not
+    be copied onto a hop it did not sign. A hop that stays on the origin is signed again on send.
+    """
+    location = response.headers.get("location", "").strip()
+    try:
+        target = request.url.join(location)
+    except Exception as exc:
+        raise _RedirectRefused("Redirect with an unusable Location header", request=request) from exc
+
+    scheme = target.scheme.lower()
+    if scheme not in ("http", "https") or not target.host:
+        raise _RedirectRefused("Redirect to an unsupported URL scheme", request=request)
+    if request.url.scheme.lower() == "https" and scheme == "http":
+        raise _RedirectRefused("Redirect from https to insecure http", request=request)
+    target = target.copy_with(fragment=None)
+
+    headers = httpx.Headers(sent_headers)
+    method = request.method.upper()
+    status = response.status_code
+    stream: Any = request.stream
+    if (status == 303 and method != "HEAD") or (status in (301, 302) and method == "POST"):
+        method = "GET"
+        stream = None
+        for name in _BODY_HEADERS:
+            headers.pop(name, None)
+    elif not _is_replayable(stream):
+        raise _RedirectRefused("Redirect would resend a request body that cannot be replayed", request=request)
+
+    if keep_credentials and _origin(request.url) == _origin(target):
+        present = set(target.params.keys())
+        carried = [
+            (key, value)
+            for key, value in request.url.params.multi_items()
+            if key in _CREDENTIAL_QUERY and key not in present
+        ]
+        if carried:
+            target = target.copy_merge_params(tuple(carried))
+        _merge_set_cookies(headers, response, target)
+    else:
+        keep_credentials = False
+        for name in [name for name in headers if name.lower() in _CREDENTIAL_HEADERS]:
+            del headers[name]
+
+    # httpx only fills `Host` in for a request built without a stream, so it is set here for both.
+    headers["Host"] = target.netloc.decode("ascii")
+    extensions = dict(request.extensions)
+    if "_" in target.host:
+        # work around https://github.com/encode/httpx/discussions/2880, as `_build_request` does
+        extensions["sni_hostname"] = target.host.replace("_", "-")
+    else:
+        extensions.pop("sni_hostname", None)
+
+    return httpx.Request(method, target, headers=headers, stream=stream, extensions=extensions), keep_credentials
+
+
+def _merge_set_cookies(headers: httpx.Headers, response: httpx.Response, target: httpx.URL) -> None:
+    """Folds the cookies a same-origin redirect sets into the next hop's `Cookie` header.
+
+    httpx writes a request's cookies into a header when the request is built, so without this a cookie
+    the 3xx itself sets (a session, say) would be missing from the next hop, as it is not when httpx
+    follows. A cookie the redirect sets replaces the one of the same name the header carried.
+    """
+    if not response.headers.get_list("set-cookie"):
+        return
+    fresh = httpx.Cookies()
+    fresh.extract_cookies(response)
+    probe = httpx.Request("GET", target)
+    fresh.set_cookie_header(probe)
+    added = probe.headers.get("cookie")
+    if not added:
+        return
+    pairs: Dict[str, str] = {}
+    for part in [*headers.get("cookie", "").split(";"), *added.split(";")]:
+        part = part.strip()
+        if part:
+            pairs[part.partition("=")[0]] = part
+    headers["Cookie"] = "; ".join(pairs.values())
+
+
+def _describe_body(value: object) -> str:
+    """A request body as the debug log shows it: its shape and size, never its values.
+
+    A mapping lists its keys, which are the API's field names; every value, nested ones included,
+    stays out of the log.
+    """
+    if isinstance(value, (bytes, bytearray)):
+        return f"<{len(value)} bytes>"
+    if isinstance(value, str):
+        return f"<{len(value)} characters>"
+    if is_mapping(value):
+        keys = ", ".join(sorted(str(key) for key in value))
+        return f"<mapping with keys: {keys}>"
+    if is_list(value) or isinstance(value, tuple):
+        return f"<{len(cast('list[object]', value))} items>"
+    return f"<{type(value).__name__}>"
+
+
+def _read_deadline(request: httpx.Request, started: float) -> float | None:
+    """When reading a buffered body must have finished: the request's read timeout after `started`, when its headers arrived.
+
+    httpx applies its read timeout to each socket read, so a server trickling one byte per read keeps
+    a body arriving forever; this turns the same number into a deadline for reading the whole body.
+    """
+    timeout = cast("Mapping[str, Any]", request.extensions.get("timeout") or {})
+    read = timeout.get("read")
+    return None if read is None else started + float(read)
+
+
+def _is_unbuffered_cast(cast_to: object) -> bool:
+    """Whether `cast_to` hands the body to the caller as it arrived: a binary download or a raw `httpx.Response`.
+
+    Those bodies are the caller's to bound, so neither the size cap nor the read deadline applies.
+    The legacy binary wrapper is matched by name, since its module ships only with the legacy surface.
+    """
+    origin = get_origin(cast_to) or cast_to
+    if not inspect.isclass(origin):
+        return False
+    if issubclass(
+        origin,
+        (
+            httpx.Response,
+            BinaryAPIResponse,
+            AsyncBinaryAPIResponse,
+            StreamedBinaryAPIResponse,
+            AsyncStreamedBinaryAPIResponse,
+        ),
+    ):
+        return True
+    return any(base.__name__ == "HttpxBinaryResponseContent" for base in origin.__mro__)
+
+
+def _body_limit(response: httpx.Response, *, capped: bool) -> tuple[int | None, bool]:
+    """The byte limit for reading `response`, and whether reaching it truncates rather than refuses.
+
+    An error body is read for its message only, so it is cut at `MAX_ERROR_BODY_BYTES`; a success body
+    is refused past `MAX_RESPONSE_BODY_BYTES`, unless `capped` is off for a body the caller takes raw.
+    """
+    if not response.is_success:
+        return MAX_ERROR_BODY_BYTES, True
+    return (MAX_RESPONSE_BODY_BYTES if capped else None), False
+
+
+def _too_large(response: httpx.Response, limit: int) -> _BodyTooLarge:
+    """The error for a success body that decoded past `limit` bytes."""
+    return _BodyTooLarge(
+        f"Response body exceeds the {limit} byte limit ({limit // (1024 * 1024)} MiB) for a buffered response",
+        request=response.request,
+    )
+
+
+class _BodyBuffer:
+    """The decoded bytes of a buffered body read so far, held to the limit `_body_limit` sets."""
+
+    def __init__(self, response: httpx.Response, *, capped: bool) -> None:
+        self._response = response
+        self._limit, self._truncate = _body_limit(response, capped=capped)
+        self._chunks: List[bytes] = []
+        self._size = 0
+
+    def add(self, pieces: Iterable[bytes]) -> bool:
+        """Appends `pieces`; True once a truncated body is full and reading should stop.
+
+        A body refused past the limit raises `_BodyTooLarge` as soon as a piece would cross it, so a
+        decompression bomb stops being inflated there.
+        """
+        for piece in pieces:
+            if self._limit is not None and self._size + len(piece) > self._limit:
+                if not self._truncate:
+                    raise _too_large(self._response, self._limit)
+                self._chunks.append(piece[: self._limit - self._size])
+                return True
+            self._size += len(piece)
+            self._chunks.append(piece)
+        return False
+
+    @property
+    def truncates(self) -> bool:
+        """Whether this is an error body, read for its message: past the limit or the deadline it is cut, not refused."""
+        return self._truncate
+
+    def content(self) -> bytes:
+        """The body read, decoded and joined."""
+        return b"".join(self._chunks)
+
+
+def _read_body(response: httpx.Response, *, capped: bool, deadline: float | None) -> None:
+    """Reads `response`'s body into memory, bounded in size and, when `deadline` is set, in time.
+
+    The bytes are counted after transparent decompression, and gzip and deflate (stacked or not) are
+    inflated by `BoundedDecoder` in bounded steps, so a small compressed body cannot expand past the
+    limit. A read still running at `deadline` raises `httpx.ReadTimeout`, which the request loop
+    retries or reports like any other timeout, except on an error body, which keeps what arrived by
+    then so its status error still stands; httpx cannot interrupt one blocked socket read, so the
+    deadline can be overrun by at most one read timeout.
+    """
+    body = _BodyBuffer(response, capped=capped)
+    try:
+        decoder = BoundedDecoder.for_response(response, capped=capped)
+        if decoder is None:
+            for chunk in response.iter_bytes():
+                if body.add((chunk,)):
+                    break
+                if deadline is not None and time.monotonic() > deadline:
+                    if body.truncates:
+                        break
+                    raise httpx.ReadTimeout("Timed out reading the response body", request=response.request)
+        else:
+            for raw in response.iter_raw():
+                if body.add(decoder.decode(raw)):
+                    break
+                if deadline is not None and time.monotonic() > deadline:
+                    if body.truncates:
+                        break
+                    raise httpx.ReadTimeout("Timed out reading the response body", request=response.request)
+            else:
+                body.add(decoder.flush())
+    except CodingRefused as exc:
+        raise _BodyRefused(exc.message, request=response.request) from None
+    except zlib.error as exc:
+        raise decoding_error(response, exc) from exc
+    finally:
+        response.close()
+    response._content = body.content()  # pyright: ignore[reportPrivateUsage]
+
+
+async def _aread_body(response: httpx.Response, *, capped: bool, deadline: float | None) -> None:
+    """The async twin of `_read_body`, where the deadline cancels a read that is still blocked."""
+    body = _BodyBuffer(response, capped=capped)
+
+    async def read() -> None:
+        """Reads the body into `body` until it ends or `body` is full."""
+        decoder = BoundedDecoder.for_response(response, capped=capped)
+        if decoder is None:
+            async for chunk in response.aiter_bytes():
+                if body.add((chunk,)):
+                    return
+            return
+        async for raw in response.aiter_raw():
+            if body.add(decoder.decode(raw)):
+                return
+        body.add(decoder.flush())
+
+    try:
+        if deadline is None:
+            await read()
+        else:
+            try:
+                with anyio.fail_after(max(0.0, deadline - time.monotonic())):
+                    await read()
+            except TimeoutError as exc:
+                if not body.truncates:
+                    raise httpx.ReadTimeout("Timed out reading the response body", request=response.request) from exc
+    except CodingRefused as exc:
+        raise _BodyRefused(exc.message, request=response.request) from None
+    except zlib.error as exc:
+        raise decoding_error(response, exc) from exc
+    finally:
+        await response.aclose()
+    response._content = body.content()  # pyright: ignore[reportPrivateUsage]
+
+
+@dataclass
+class SchemeCredentials:
+    """The credential one security scheme puts on a request, split by where it is sent."""
+
+    headers: Dict[str, str] = field(default_factory=dict)
+    query: Dict[str, str] = field(default_factory=dict)
+    cookies: Dict[str, str] = field(default_factory=dict)
+
+    @property
+    def configured(self) -> bool:
+        """Whether the scheme's client option(s) are set, so it has a credential to send."""
+        return bool(self.headers or self.query or self.cookies)
+
+
+def _merge_scheme_credentials(parts: List[SchemeCredentials]) -> SchemeCredentials:
+    """The credentials of several schemes sent together, one request's worth."""
+    merged = SchemeCredentials()
+    for part in parts:
+        merged.headers.update(part.headers)
+        merged.query.update(part.query)
+        merged.cookies.update(part.cookies)
+    return merged
+
+
+@dataclass(frozen=True)
+class AuthLocations:
+    """The lower-cased header names, and the query and cookie names, the client's credentials use."""
+
+    headers: frozenset[str] = frozenset()
+    query: frozenset[str] = frozenset()
+    cookies: frozenset[str] = frozenset()
 
 
 @dataclass
@@ -238,6 +657,17 @@ class BasePage(GenericModel, Generic[_T]):
             return options
 
         if not isinstance(info.url, NotGiven):
+            # The next request carries this client's credentials, so a page URL a response names on
+            # another scheme, host or port is refused rather than dialed: a server must not be able
+            # to send the caller's key elsewhere by naming it as the next page. The message names
+            # neither URL, since either may carry a token. The origin compared is the one that served
+            # this page: an operation with its own `servers` entry is sent to an absolute URL, else
+            # to the client's base URL. `_client` is declared by the sync and async page classes,
+            # each with its own client type.
+            current = URL(self._options.url)
+            served_by: URL = current if current.is_absolute_url else cast(Any, self)._client.base_url
+            if info.url.is_absolute_url and _origin(info.url) != _origin(served_by):
+                raise RuntimeError("Refusing to follow a next page URL that points away from the API's origin")
             params = self._params_from_url(info.url)
             url = info.url.copy_with(params=params)
             options.params = dict(url.params)
@@ -258,6 +688,25 @@ class BasePage(GenericModel, Generic[_T]):
             return options
 
         raise ValueError("Unexpected PageInfo state")
+
+    def _next_page_repeats(self) -> bool:
+        """Whether the next page's request would be exactly the request that fetched this page.
+
+        A server that answers with the cursor (or link, or body token) it was just given would make
+        auto-pagination fetch the same page forever, so the walk stops there instead.
+        """
+        info = self.next_page_info()
+        if info is None:
+            return False
+        try:
+            options = self._info_to_options(info)
+        except (TypeError, ValueError):
+            return False
+        return (
+            options.url == self._options.url
+            and options.params == self._options.params
+            and options.json_data == self._options.json_data
+        )
 
 
 class BaseSyncPage(BasePage[_T], Generic[_T]):
@@ -295,7 +744,7 @@ class BaseSyncPage(BasePage[_T], Generic[_T]):
         page = self
         while True:
             yield page
-            if page.has_next_page():
+            if page.has_next_page() and not page._next_page_repeats():
                 page = page.get_next_page()
             else:
                 return
@@ -383,7 +832,7 @@ class BaseAsyncPage(BasePage[_T], Generic[_T]):
         page = self
         while True:
             yield page
-            if page.has_next_page():
+            if page.has_next_page() and not page._next_page_repeats():
                 page = await page.get_next_page()
             else:
                 return
@@ -478,21 +927,106 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
     ) -> _exceptions.APIStatusError:
         raise NotImplementedError()
 
+    @property
+    def _auth_by_scheme(self) -> dict[str, SchemeCredentials]:
+        """The credentials each security scheme is sent with, by the scheme's name in the document."""
+        return {}
+
+    def _select_auth(self, security: SecurityOptions) -> SchemeCredentials:
+        """
+        The credentials an operation with its own `security` requirements is sent with.
+
+        The first alternative whose schemes all have a configured credential wins, and only its
+        credentials are sent: two schemes can share a wire slot (`Authorization` for Basic and
+        Bearer), so merging every configured credential would let one overwrite the one the
+        operation asked for. An empty alternative is the anonymous one and selects nothing.
+
+        With no alternative met, the configured part of the first alternative that has one is sent:
+        the request only goes out at all when the caller supplies the rest some other way (see
+        `_credential_supplied`), and withholding the half the client holds would leave it incomplete.
+        An empty (anonymous) alternative counts as met, so an operation that also accepts `{}` is sent
+        nothing rather than a partial credential. Only schemes the operation names are ever sent.
+        """
+        available = self._auth_by_scheme
+        partial: SchemeCredentials | None = None
+        for alternative in security:
+            parts = [available.get(scheme) for scheme in alternative]
+            configured = [part for part in parts if part is not None and part.configured]
+            if len(configured) == len(parts):
+                return _merge_scheme_credentials(configured)
+            if partial is None and configured:
+                partial = _merge_scheme_credentials(configured)
+        return partial if partial is not None else SchemeCredentials()
+
+    @property
+    def _auth_locations(self) -> AuthLocations:
+        """Where the client's credentials travel, configured or not."""
+        return AuthLocations()
+
+    def _credential_supplied(
+        self,
+        security: SecurityOptions,
+        headers: Mapping[str, str],
+        custom_headers: Headers,
+        params: Query,
+        cookies: Mapping[str, str],
+    ) -> bool:
+        """
+        Whether the request already carries a credential the caller set some other way than a client
+        option — the client's `default_headers` or `default_query`, or the call's `extra_headers` or
+        `extra_query` — or omits a credential header on purpose, as the client-wide check accepts.
+
+        A value `_select_auth` put on the request is the client's own partial credential, not the
+        caller's, so it never counts: a half-configured alternative is refused unless the caller
+        supplies the rest.
+        """
+        locations = self._auth_locations
+        selected = self._select_auth(security)
+        selected_headers = {name.lower(): value for name, value in selected.headers.items()}
+        return (
+            any(
+                name.lower() in locations.headers and value and selected_headers.get(name.lower()) != value
+                for name, value in headers.items()
+            )
+            or any(
+                name.lower() in locations.headers and isinstance(value, Omit) for name, value in custom_headers.items()
+            )
+            or any(
+                params.get(name) is not None and params.get(name) != selected.query.get(name)
+                for name in locations.query
+            )
+            or any(
+                cookies.get(name) is not None and cookies.get(name) != selected.cookies.get(name)
+                for name in locations.cookies
+            )
+        )
+
+    def _security_met(self, security: SecurityOptions) -> bool:
+        """
+        Whether an operation's own requirements can be met: it is public (`[]`), lists the anonymous
+        alternative (an empty one), or the credentials of some alternative are all configured.
+        """
+        available = self._auth_by_scheme
+        return not security or any(
+            all((part := available.get(scheme)) is not None and part.configured for scheme in alternative)
+            for alternative in security
+        )
+
     def _auth_query(
         self,
-        security: SecurityOptions,  # noqa: ARG002
+        security: SecurityOptions | None,  # noqa: ARG002
     ) -> dict[str, str]:
         return {}
 
     def _auth_cookies(
         self,
-        security: SecurityOptions,  # noqa: ARG002
+        security: SecurityOptions | None,  # noqa: ARG002
     ) -> dict[str, str]:
         return {}
 
     def _custom_auth(
         self,
-        security: SecurityOptions,  # noqa: ARG002
+        security: SecurityOptions | None,  # noqa: ARG002
     ) -> httpx.Auth | None:
         # Single hook for custom httpx auth on both the sync and async request paths. It defaults to
         # the legacy public `custom_auth` property so subclasses that already override that property
@@ -511,8 +1045,38 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         custom_headers = options.headers or {}
         # Auth headers are folded into `default_headers` (matching the reference SDKs), so
         # merging `default_headers` here already applies the configured credentials.
-        headers_dict = _merge_mappings(self.default_headers, custom_headers)
-        self._validate_headers(headers_dict, custom_headers, params, cookies)
+        default_headers = self.default_headers
+        if options.security is not None:
+            # The operation names its own requirements: swap the client-wide credential headers for
+            # the selected alternative's, keeping any header the caller configured on the client.
+            auth_names = {name.lower() for name in self.auth_headers}
+            custom_names = {name.lower() for name in self._custom_headers}
+            default_headers = {
+                **{
+                    name: value
+                    for name, value in default_headers.items()
+                    if name.lower() not in auth_names or name.lower() in custom_names
+                },
+                **self._select_auth(options.security).headers,
+                **self._custom_headers,
+            }
+        headers_dict = _merge_mappings(default_headers, custom_headers)
+        if options.security is None:
+            # The client-wide check that some credential is configured.
+            self._validate_headers(headers_dict, custom_headers, params, cookies)
+        elif not self._security_met(options.security) and not self._credential_supplied(
+            options.security, headers_dict, custom_headers, params, cookies
+        ):
+            # An operation naming its own requirements is checked against those alone: a public one
+            # or one met by a query key is never refused for want of a header, and the client-wide
+            # check would both pass a document whose root allows anonymous calls and name credentials
+            # that cannot meet this operation. A credential the caller supplies outside the client's
+            # options takes the place of a configured one; the selected credentials are already
+            # swapped in above, so an unselected configured one does not count.
+            alternatives = " or ".join(" + ".join(alternative) for alternative in options.security)
+            raise TypeError(
+                f"Could not resolve authentication method for this operation. Expected the credentials of {alternatives} to be set."
+            )
 
         # headers are case-insensitive while dictionaries are not.
         headers = httpx.Headers(headers_dict)
@@ -540,13 +1104,15 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         Merge a URL argument together with any 'base_url' on the client,
         to create the URL used for the outgoing request.
         """
-        # Copied from httpx's `_merge_url` method.
-        merge_url = URL(url)
-        if merge_url.is_relative_url:
-            merge_raw_path = self.base_url.raw_path + merge_url.raw_path.lstrip(b"/")
-            return self.base_url.copy_with(raw_path=merge_raw_path)
+        target = URL(url)
+        if target.is_absolute_url:
+            return target
 
-        return merge_url
+        # A relative URL always extends the base path, even when it starts with "/": operation paths
+        # are written from the API root, which is wherever `base_url` points. Exactly one "/" joins
+        # the two halves. `raw_path` carries the query string, so a query on `url` is kept.
+        base_path = self.base_url.raw_path.rstrip(b"/")
+        return self.base_url.copy_with(raw_path=b"/".join((base_path, target.raw_path.lstrip(b"/"))))
 
     def _make_sse_decoder(self) -> SSEDecoder | SSEBytesDecoder:
         return SSEDecoder()
@@ -558,19 +1124,19 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         retries_taken: int = 0,
     ) -> httpx.Request:
         if log.isEnabledFor(logging.DEBUG):
-            log.debug(
-                "Request options: %s",
-                model_dump(
-                    options,
-                    exclude_unset=True,
-                    # Pydantic v1 can't dump every type we support in content, so we exclude it for now.
-                    exclude={
-                        "content",
-                    }
-                    if PYDANTIC_V1
-                    else {},
-                ),
+            # The request bodies are described, never dumped: a body carries whatever the caller
+            # sends (passwords, tokens, personal data), and the log redaction only knows credential
+            # header and query names. The headers and params are dumped, masked by that redaction.
+            dumped = model_dump(
+                options,
+                exclude_unset=True,
+                exclude={"content", "json_data", "extra_json", "files"},
             )
+            for name in ("content", "json_data", "extra_json", "files"):
+                value: object = getattr(options, name, None)
+                if value is not None and is_given(value):
+                    dumped[name] = _describe_body(value)
+            log.debug("Request options: %s", dumped)
         kwargs: dict[str, Any] = {}
 
         json_data = options.json_data
@@ -751,6 +1317,9 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
     def default_headers(self) -> dict[str, str | Omit]:
         return {
             "Accept": "application/json",
+            # Only the codings `BoundedDecoder` inflates in bounded steps; httpx would otherwise add br
+            # and zstd whenever their optional packages are installed, and inflates those unbounded.
+            "Accept-Encoding": "gzip, deflate",
             "Content-Type": "application/json",
             "User-Agent": self.user_agent,
             **self.platform_headers(),
@@ -896,7 +1465,8 @@ class _DefaultHttpxClient(httpx.Client):
     def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
         kwargs.setdefault("limits", DEFAULT_CONNECTION_LIMITS)
-        kwargs.setdefault("follow_redirects", True)
+        # The SDK follows redirects itself (see `_send_following_redirects`), so httpx never does.
+        kwargs.setdefault("follow_redirects", False)
         super().__init__(**kwargs)
 
 
@@ -1018,6 +1588,48 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
         """
         return None
 
+    def _send_following_redirects(
+        self,
+        request: httpx.Request,
+        *,
+        options: FinalRequestOptions,
+        auth: httpx.Auth | None,
+    ) -> httpx.Response:
+        """Sends `request`, following redirects in the SDK rather than in httpx, and returns the final response unread.
+
+        httpx is told not to follow on every send, so a caller-supplied `http_client` built with
+        `follow_redirects=True` cannot follow either: httpx strips only `Authorization` on a
+        cross-origin hop and would resend an API key header, cookies and a 307/308 body to whatever
+        host the server names. See `_redirect_request` for what each hop keeps. A hop that has left
+        the origin is sent with a no-op `auth`, so neither `custom_auth`, the caller's client-level
+        `auth=` nor a `.netrc` entry (httpx < 0.24 reads one by default) signs it.
+
+        `options.follow_redirects=False` turns following off altogether: the 3xx itself reaches the
+        caller as a status error. Unset or `True`, the SDK follows at most `MAX_REDIRECTS` hops.
+        """
+        keep_credentials = True
+        hops = 0
+        while True:
+            kwargs: HttpxSendArgs = {"follow_redirects": False}
+            if not keep_credentials:
+                kwargs["auth"] = httpx.Auth()
+            elif auth is not None:
+                kwargs["auth"] = auth
+            sent_headers = httpx.Headers(request.headers)
+            response = self._client.send(request, stream=True, **kwargs)
+            if options.follow_redirects is False or not _is_followed_redirect(response):
+                return response
+            try:
+                if hops >= MAX_REDIRECTS:
+                    raise _RedirectRefused(f"Maximum redirects ({MAX_REDIRECTS}) exceeded", request=request)
+                request, keep_credentials = _redirect_request(
+                    request, response, sent_headers=sent_headers, keep_credentials=keep_credentials
+                )
+            finally:
+                response.close()
+            hops += 1
+            log.debug("Following redirect %i to %s", response.status_code, request.url)
+
     @overload
     def request(
         self,
@@ -1077,23 +1689,32 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
             request = self._build_request(options, retries_taken=retries_taken)
             self._prepare_request(request)
 
-            kwargs: HttpxSendArgs = {}
             custom_auth = self._custom_auth(options.security)
-            if custom_auth is not None:
-                kwargs["auth"] = custom_auth
-
-            if options.follow_redirects is not None:
-                kwargs["follow_redirects"] = options.follow_redirects
+            streamed = stream or self._should_stream_response_body(request=request)
 
             log.debug("Sending HTTP Request: %s %s", request.method, request.url)
 
             response = None
             try:
-                response = self._client.send(
-                    request,
-                    stream=stream or self._should_stream_response_body(request=request),
-                    **kwargs,
-                )
+                response = self._send_following_redirects(request, options=options, auth=custom_auth)
+                # The body's deadline starts once the headers are in: sending the request and waiting
+                # for the answer are bounded by httpx's own write and read timeouts.
+                started = time.monotonic()
+                if not streamed:
+                    # Only a successful download is the caller's to bound; an error body is read for
+                    # its message, capped and on the deadline like any other.
+                    unbounded = _is_unbuffered_cast(cast_to) and response.is_success
+                    _read_body(
+                        response,
+                        capped=not unbounded,
+                        deadline=None if unbounded else _read_deadline(request, started),
+                    )
+            except _RedirectRefused as err:
+                log.debug("Refusing redirect: %s", err.message)
+                raise APIConnectionError(message=err.message, request=err.request) from None
+            except _BodyRefused as err:
+                log.debug("Refusing response body: %s", err.message)
+                raise APIError(err.message, err.request, body=None) from None
             except httpx.TimeoutException as err:
                 log.debug("Encountered httpx.TimeoutException", exc_info=True)
 
@@ -1125,8 +1746,8 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
 
             log.debug(
                 'HTTP Response: %s %s "%i %s" %s',
-                request.method,
-                request.url,
+                response.request.method,
+                response.request.url,
                 response.status_code,
                 response.reason_phrase,
                 response.headers,
@@ -1134,7 +1755,7 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
 
             try:
                 response.raise_for_status()
-            except httpx.HTTPStatusError as err:  # thrown on 4xx and 5xx status code
+            except httpx.HTTPStatusError as err:  # thrown on 3xx (one not followed), 4xx and 5xx
                 log.debug("Encountered httpx.HTTPStatusError", exc_info=True)
 
                 if remaining_retries > 0 and self._should_retry(err.response):
@@ -1147,10 +1768,13 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
                     )
                     continue
 
-                # If the response is streamed then we need to explicitly read the response
-                # to completion before attempting to access the response text.
+                # A streamed response is still unread: read the first `MAX_ERROR_BODY_BYTES` of it
+                # for the message, within the read deadline, never the whole body a hostile server
+                # could make endless or trickle forever.
                 if not err.response.is_closed:
-                    err.response.read()
+                    _read_body(
+                        err.response, capped=True, deadline=_read_deadline(err.response.request, time.monotonic())
+                    )
 
                 log.debug("Re-raising status error")
                 raise self._make_status_error_from_response(err.response) from None
@@ -1465,7 +2089,8 @@ class _DefaultAsyncHttpxClient(httpx.AsyncClient):
     def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
         kwargs.setdefault("limits", DEFAULT_CONNECTION_LIMITS)
-        kwargs.setdefault("follow_redirects", True)
+        # The SDK follows redirects itself (see `_send_following_redirects`), so httpx never does.
+        kwargs.setdefault("follow_redirects", False)
         super().__init__(**kwargs)
 
 
@@ -1482,7 +2107,8 @@ else:
         def __init__(self, **kwargs: Any) -> None:
             kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
             kwargs.setdefault("limits", DEFAULT_CONNECTION_LIMITS)
-            kwargs.setdefault("follow_redirects", True)
+            # The SDK follows redirects itself (see `_send_following_redirects`), so httpx never does.
+            kwargs.setdefault("follow_redirects", False)
 
             super().__init__(**kwargs)
 
@@ -1607,6 +2233,37 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
         """
         return None
 
+    async def _send_following_redirects(
+        self,
+        request: httpx.Request,
+        *,
+        options: FinalRequestOptions,
+        auth: httpx.Auth | None,
+    ) -> httpx.Response:
+        """The async twin of `SyncAPIClient._send_following_redirects`, which documents the rules."""
+        keep_credentials = True
+        hops = 0
+        while True:
+            kwargs: HttpxSendArgs = {"follow_redirects": False}
+            if not keep_credentials:
+                kwargs["auth"] = httpx.Auth()
+            elif auth is not None:
+                kwargs["auth"] = auth
+            sent_headers = httpx.Headers(request.headers)
+            response = await self._client.send(request, stream=True, **kwargs)
+            if options.follow_redirects is False or not _is_followed_redirect(response):
+                return response
+            try:
+                if hops >= MAX_REDIRECTS:
+                    raise _RedirectRefused(f"Maximum redirects ({MAX_REDIRECTS}) exceeded", request=request)
+                request, keep_credentials = _redirect_request(
+                    request, response, sent_headers=sent_headers, keep_credentials=keep_credentials
+                )
+            finally:
+                await response.aclose()
+            hops += 1
+            log.debug("Following redirect %i to %s", response.status_code, request.url)
+
     @overload
     async def request(
         self,
@@ -1671,23 +2328,32 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
             request = self._build_request(options, retries_taken=retries_taken)
             await self._prepare_request(request)
 
-            kwargs: HttpxSendArgs = {}
             custom_auth = self._custom_auth(options.security)
-            if custom_auth is not None:
-                kwargs["auth"] = custom_auth
-
-            if options.follow_redirects is not None:
-                kwargs["follow_redirects"] = options.follow_redirects
+            streamed = stream or self._should_stream_response_body(request=request)
 
             log.debug("Sending HTTP Request: %s %s", request.method, request.url)
 
             response = None
             try:
-                response = await self._client.send(
-                    request,
-                    stream=stream or self._should_stream_response_body(request=request),
-                    **kwargs,
-                )
+                response = await self._send_following_redirects(request, options=options, auth=custom_auth)
+                # The body's deadline starts once the headers are in: sending the request and waiting
+                # for the answer are bounded by httpx's own write and read timeouts.
+                started = time.monotonic()
+                if not streamed:
+                    # Only a successful download is the caller's to bound; an error body is read for
+                    # its message, capped and on the deadline like any other.
+                    unbounded = _is_unbuffered_cast(cast_to) and response.is_success
+                    await _aread_body(
+                        response,
+                        capped=not unbounded,
+                        deadline=None if unbounded else _read_deadline(request, started),
+                    )
+            except _RedirectRefused as err:
+                log.debug("Refusing redirect: %s", err.message)
+                raise APIConnectionError(message=err.message, request=err.request) from None
+            except _BodyRefused as err:
+                log.debug("Refusing response body: %s", err.message)
+                raise APIError(err.message, err.request, body=None) from None
             except httpx.TimeoutException as err:
                 log.debug("Encountered httpx.TimeoutException", exc_info=True)
 
@@ -1719,8 +2385,8 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
 
             log.debug(
                 'HTTP Response: %s %s "%i %s" %s',
-                request.method,
-                request.url,
+                response.request.method,
+                response.request.url,
                 response.status_code,
                 response.reason_phrase,
                 response.headers,
@@ -1728,7 +2394,7 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
 
             try:
                 response.raise_for_status()
-            except httpx.HTTPStatusError as err:  # thrown on 4xx and 5xx status code
+            except httpx.HTTPStatusError as err:  # thrown on 3xx (one not followed), 4xx and 5xx
                 log.debug("Encountered httpx.HTTPStatusError", exc_info=True)
 
                 if remaining_retries > 0 and self._should_retry(err.response):
@@ -1741,10 +2407,13 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
                     )
                     continue
 
-                # If the response is streamed then we need to explicitly read the response
-                # to completion before attempting to access the response text.
+                # A streamed response is still unread: read the first `MAX_ERROR_BODY_BYTES` of it
+                # for the message, within the read deadline, never the whole body a hostile server
+                # could make endless or trickle forever.
                 if not err.response.is_closed:
-                    await err.response.aread()
+                    await _aread_body(
+                        err.response, capped=True, deadline=_read_deadline(err.response.request, time.monotonic())
+                    )
 
                 log.debug("Re-raising status error")
                 raise self._make_status_error_from_response(err.response) from None
