@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.7.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.6.0...v0.7.0) (2026-11-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** 30 breaking changes to the SDK surface.
+    - Removed body field `memory_mib` from `machines.update`.
+    - Removed body field `vcpu` from `machines.update`.
+    - Response of `machines.autoresizing.retrieve` changed from `settings` to `policy`.
+    - Operation `machines.autoresizing.update` route changed from `PUT /v1/machines/{machine_id}/autoresizing` to `PATCH /v1/machines/{machine_id}/autoresizing`.
+    - Removed body field `enabled` from `machines.autoresizing.update`.
+    - Response of `machines.autoresizing.update` changed from `settings` to `policy`.
+    - Operation `organization.autoresizing.update` route changed from `PUT /v1/organization/autoresizing` to `PATCH /v1/organization/autoresizing`.
+    - Removed body field `enabled` from `organization.autoresizing.update`.
+    - Removed operation `machines.executions.logs.reauthorize` (`POST /v1/machines/{machine_id}/executions/{execution_id}/logs/reauthorize`).
+    - Added required property `policy.cpu`.
+    - Added required property `policy.cpu_limit_source`.
+    - Added required property `policy.cpu_max_vcpu`.
+    - Added required property `policy.effective_cpu_max_vcpu`.
+    - Added required property `policy.effective_memory_max_mib`.
+    - Added required property `policy.memory`.
+    - Added required property `policy.memory_limit_source`.
+    - Added required property `policy.memory_max_mib`.
+    - Removed optional property `status.code`.
+    - Removed optional property `status.publication`.
+    - Added required property `lifecycle_status.autoresize`.
+    - Removed optional property `lifecycle_status.memory_assigned_mib`.
+    - Removed required property `lifecycle_status.memory_configured_mib`.
+    - Removed optional property `lifecycle_status.memory_last_autoresized_at`.
+    - Removed optional property `lifecycle_status.memory_resize_state`.
+    - Removed optional property `lifecycle_status.memory_target_mib`.
+    - Removed optional property `update_params.memory_mib`.
+    - Removed optional property `update_params.vcpu`.
+    - Removed schema `settings`.
+    - Removed schema `publication`.
+    - Removed schema `ReauthorizeResponseHeaders`.
+
+### Features
+
+* **api:** add auth scheme BrowserAuth (+1 more change) ([b016780](https://github.com/dedalus-labs/dedalus-python/commit/b016780a061a08941ca7d8e935e266cfecc4dabc))
+* **api:** integrate regenerated custom image contract ([0af3158](https://github.com/dedalus-labs/dedalus-python/commit/0af3158bfefb6b2f846ced27fd241a839920fc51))
+* **api:** update SDK surface (76 changes) ([bc3e12c](https://github.com/dedalus-labs/dedalus-python/commit/bc3e12c4dd8d4d0557b5e2847049a2ecc7df21df))
+* **images:** add python import workflows ([155dd8f](https://github.com/dedalus-labs/dedalus-python/commit/155dd8f56923c9ea5b6f3d737c333c27490678ea))
+* **images:** regenerate SDK with Python image workflows ([#18](https://github.com/dedalus-labs/dedalus-python/issues/18)) ([e088f07](https://github.com/dedalus-labs/dedalus-python/commit/e088f077c29cbd83bef42fa955eb72d5203a656b))
+
+
+### Bug Fixes
+
+* **images:** retain image identity on request timeout ([65814a1](https://github.com/dedalus-labs/dedalus-python/commit/65814a1074df2b18ba4b063a51bc09fa717937b8))
+
+
+### Chores
+
+* **api:** regenerate SDK ([7e6002f](https://github.com/dedalus-labs/dedalus-python/commit/7e6002f5a35a097dd9c4bec6ee9a97cf7ca2d7c7))
+* **api:** update generated SDK content ([61afcb0](https://github.com/dedalus-labs/dedalus-python/commit/61afcb0d0783d257542428550145370ffd04fce9))
+
 ## [0.6.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.5.0...v0.6.0) (2026-09-24)
 
 
