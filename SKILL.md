@@ -28,7 +28,7 @@ client = Dedalus(
 Provide credentials using the options below. Environment variables are read automatically when the target runtime supports them:
 
 - `x_api_key` (env: `DEDALUS_X_API_KEY`) — Dedalus API key. Alternative to Bearer token.
-- `api_key` (env: `DEDALUS_API_KEY`) — Dedalus API key or short-lived delegated access token in Authorization: Bearer <credential>.
+- `api_key` (env: `DEDALUS_API_KEY`) — Dedalus API key or short-lived delegated access token in `Authorization: Bearer <credential>`.
 - `browser_token` (env: `DEDALUS_BROWSER_TOKEN`) — Credential for the BrowserAuth scheme.
 
 ## Calling operations

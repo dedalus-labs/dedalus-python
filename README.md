@@ -92,7 +92,7 @@ Pass credentials to the generated client constructor. Environment variables are 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `x_api_key` | `str \| None` | - | Dedalus API key. Alternative to Bearer token. Defaults to DEDALUS_X_API_KEY. |
-| `api_key` | `str \| None` | - | Dedalus API key or short-lived delegated access token in Authorization: Bearer \<credential>. Defaults to DEDALUS_API_KEY. |
+| `api_key` | `str \| None` | - | Dedalus API key or short-lived delegated access token in `Authorization: Bearer <credential>`. Defaults to DEDALUS_API_KEY. |
 | `browser_token` | `str \| None` | - | Credential for the BrowserAuth scheme. Defaults to DEDALUS_BROWSER_TOKEN. |
 
 Declared schemes:
@@ -123,7 +123,7 @@ except APIStatusError as err:
     raise
 ```
 
-Documented error statuses: `401`, `403`, `409`, `429`, `503`, `default`.
+Documented error statuses: `400`, `401`, `402`, `403`, `404`, `409`, `422`, `429`, `500`, `503`, `504`, `default`.
 
 <br />
 
@@ -143,7 +143,7 @@ client = Dedalus(
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `x_api_key` | `str \| None` | `os.environ.get("DEDALUS_X_API_KEY")` | Dedalus API key. Alternative to Bearer token. |
-| `api_key` | `str \| None` | `os.environ.get("DEDALUS_API_KEY")` | Dedalus API key or short-lived delegated access token in Authorization: Bearer \<credential>. |
+| `api_key` | `str \| None` | `os.environ.get("DEDALUS_API_KEY")` | Dedalus API key or short-lived delegated access token in `Authorization: Bearer <credential>`. |
 | `browser_token` | `str \| None` | `os.environ.get("DEDALUS_BROWSER_TOKEN")` | Credential for the BrowserAuth scheme. |
 | `base_url` | `str \| httpx.URL \| None` | - | Override the default API base URL. |
 | `timeout` | `float \| Timeout \| None` | `60.0` | Maximum time in seconds to wait for a response before aborting a request. |
