@@ -1,0 +1,28 @@
+# File generated from our OpenAPI spec by Scalar. See README.md for details.
+
+from typing_extensions import Literal
+
+from .._models import BaseModel
+
+from .lifecycle_status import LifecycleStatus
+
+__all__ = ["MachineResizeResponse"]
+
+
+class MachineResizeResponse(BaseModel):
+    autosleep_seconds: int
+    """Seconds of inactivity before autosleep. 0 disables autosleep."""
+
+    desired_state: Literal["running", "sleeping", "destroyed"]
+
+    machine_id: str
+
+    memory_mib: int
+    """Memory in MiB."""
+
+    status: LifecycleStatus
+
+    storage_gib: int
+
+    vcpu: float
+    """CPU in vCPUs."""

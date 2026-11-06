@@ -11,6 +11,9 @@ class MachineCreateParams(TypedDict, total=False):
     autosleep: str
     """Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable."""
 
+    image_id: str
+    """Organization-owned ready custom image ID. Requires Pro. Omit for the platform default."""
+
     memory_mib: int
     """Memory in MiB."""
 

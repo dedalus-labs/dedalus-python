@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import httpx
 
-from ..._types import Body, Query, Headers, NotGiven, not_given
+from typing import Optional
+from typing_extensions import Literal
+
+from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
 from ..._utils import maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
@@ -15,7 +18,7 @@ from ..._response import (
     async_to_streamed_response_wrapper,
 )
 from ..._base_client import make_request_options
-from ...types.organization.policy import Policy
+from ...types.machines.policy import Policy
 from ...types.organization import autoresizing_update_params
 
 __all__ = ["AutoresizingResource", "AsyncAutoresizingResource"]
@@ -41,7 +44,7 @@ class AutoresizingResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Policy:
         """
-        Read organization RAM autoresizing policy
+        Read organization autoresizing policy
 
         Args:
             extra_headers: Send extra headers with the request.
@@ -68,7 +71,10 @@ class AutoresizingResource(SyncAPIResource):
     def update(
         self,
         *,
-        enabled: bool,
+        cpu: Literal["on", "off"] | Omit = omit,
+        cpu_max_vcpu: Optional[float] | Omit = omit,
+        memory: Literal["on", "off"] | Omit = omit,
+        memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -78,10 +84,13 @@ class AutoresizingResource(SyncAPIResource):
         idempotency_key: str | None = None,
     ) -> Policy:
         """
-        Set organization RAM autoresizing policy
+        Changes defaults copied to new Machines. Existing Machines retain their own policy.
 
         Args:
-            enabled: Allow automatic RAM increases for all organization machines. Disabling preserves applied RAM and already admitted resizes.
+            cpu: Body parameter.
+            cpu_max_vcpu: Body parameter.
+            memory: Body parameter.
+            memory_max_mib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -94,15 +103,19 @@ class AutoresizingResource(SyncAPIResource):
         Example:
             ```python
             autoresizing = client.organization.autoresizing.update(
-                enabled=False,
                 idempotency_key="",
             )
             ```
         """
-        return self._put(
+        return self._patch(
             "/v1/organization/autoresizing",
             body=maybe_transform(
-                {"enabled": enabled},
+                {
+                    "cpu": cpu,
+                    "cpu_max_vcpu": cpu_max_vcpu,
+                    "memory": memory,
+                    "memory_max_mib": memory_max_mib,
+                },
                 autoresizing_update_params.AutoresizingUpdateParams,
             ),
             options=make_request_options(
@@ -136,7 +149,7 @@ class AsyncAutoresizingResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Policy:
         """
-        Read organization RAM autoresizing policy
+        Read organization autoresizing policy
 
         Args:
             extra_headers: Send extra headers with the request.
@@ -163,7 +176,10 @@ class AsyncAutoresizingResource(AsyncAPIResource):
     async def update(
         self,
         *,
-        enabled: bool,
+        cpu: Literal["on", "off"] | Omit = omit,
+        cpu_max_vcpu: Optional[float] | Omit = omit,
+        memory: Literal["on", "off"] | Omit = omit,
+        memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -173,10 +189,13 @@ class AsyncAutoresizingResource(AsyncAPIResource):
         idempotency_key: str | None = None,
     ) -> Policy:
         """
-        Set organization RAM autoresizing policy
+        Changes defaults copied to new Machines. Existing Machines retain their own policy.
 
         Args:
-            enabled: Allow automatic RAM increases for all organization machines. Disabling preserves applied RAM and already admitted resizes.
+            cpu: Body parameter.
+            cpu_max_vcpu: Body parameter.
+            memory: Body parameter.
+            memory_max_mib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -189,15 +208,19 @@ class AsyncAutoresizingResource(AsyncAPIResource):
         Example:
             ```python
             autoresizing = await client.organization.autoresizing.update(
-                enabled=False,
                 idempotency_key="",
             )
             ```
         """
-        return await self._put(
+        return await self._patch(
             "/v1/organization/autoresizing",
             body=await async_maybe_transform(
-                {"enabled": enabled},
+                {
+                    "cpu": cpu,
+                    "cpu_max_vcpu": cpu_max_vcpu,
+                    "memory": memory,
+                    "memory_max_mib": memory_max_mib,
+                },
                 autoresizing_update_params.AutoresizingUpdateParams,
             ),
             options=make_request_options(

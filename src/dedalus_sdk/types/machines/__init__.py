@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from .artifact_ref import ArtifactRef as ArtifactRef
+from .policy import Policy as Policy
 from .execution_event import ExecutionEvent as ExecutionEvent
 from .execution_events import ExecutionEvents as ExecutionEvents
 from .execution_list import ExecutionList as ExecutionList
 from .execution_output import ExecutionOutput as ExecutionOutput
 from .execution import Execution as Execution
-from .settings import Settings as Settings
 from .ssh_connection import SSHConnection as SSHConnection
 from .ssh_host_trust import SSHHostTrust as SSHHostTrust
 from .ssh_session_list import SSHSessionList as SSHSessionList

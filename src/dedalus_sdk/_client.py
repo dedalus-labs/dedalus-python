@@ -36,9 +36,10 @@ from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._version import __version__
 
 if TYPE_CHECKING:
-    from .resources import machines, organization
+    from .resources import machines, organization, images
     from .resources.machines import MachinesResource, AsyncMachinesResource
     from .resources.organization import OrganizationResource, AsyncOrganizationResource
+    from .resources.images import ImagesResource, AsyncImagesResource
 
 # Serializes lazy resource imports so concurrent cold access from multiple
 # threads cannot deadlock on CPython import locks (see CPython 3.14).
@@ -144,6 +145,12 @@ class Dedalus(SyncAPIClient):
         with _RESOURCE_IMPORT_LOCK:
             from .resources.organization import OrganizationResource
         return OrganizationResource(self)
+
+    @cached_property
+    def images(self) -> "ImagesResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResource
+        return ImagesResource(self)
 
     @cached_property
     def with_raw_response(self) -> DedalusWithRawResponse:
@@ -418,6 +425,12 @@ class AsyncDedalus(AsyncAPIClient):
         return AsyncOrganizationResource(self)
 
     @cached_property
+    def images(self) -> "AsyncImagesResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResource
+        return AsyncImagesResource(self)
+
+    @cached_property
     def with_raw_response(self) -> AsyncDedalusWithRawResponse:
         return AsyncDedalusWithRawResponse(self)
 
@@ -609,6 +622,12 @@ class DedalusWithRawResponse:
             from .resources.organization import OrganizationResourceWithRawResponse
         return OrganizationResourceWithRawResponse(self._client.organization)
 
+    @cached_property
+    def images(self) -> images.ImagesResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResourceWithRawResponse
+        return ImagesResourceWithRawResponse(self._client.images)
+
 
 class AsyncDedalusWithRawResponse:
     _client: AsyncDedalus
@@ -627,6 +646,12 @@ class AsyncDedalusWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.organization import AsyncOrganizationResourceWithRawResponse
         return AsyncOrganizationResourceWithRawResponse(self._client.organization)
+
+    @cached_property
+    def images(self) -> images.AsyncImagesResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResourceWithRawResponse
+        return AsyncImagesResourceWithRawResponse(self._client.images)
 
 
 class DedalusWithStreamedResponse:
@@ -647,6 +672,12 @@ class DedalusWithStreamedResponse:
             from .resources.organization import OrganizationResourceWithStreamingResponse
         return OrganizationResourceWithStreamingResponse(self._client.organization)
 
+    @cached_property
+    def images(self) -> images.ImagesResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResourceWithStreamingResponse
+        return ImagesResourceWithStreamingResponse(self._client.images)
+
 
 class AsyncDedalusWithStreamedResponse:
     _client: AsyncDedalus
@@ -665,6 +696,12 @@ class AsyncDedalusWithStreamedResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.organization import AsyncOrganizationResourceWithStreamingResponse
         return AsyncOrganizationResourceWithStreamingResponse(self._client.organization)
+
+    @cached_property
+    def images(self) -> images.AsyncImagesResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResourceWithStreamingResponse
+        return AsyncImagesResourceWithStreamingResponse(self._client.images)
 
 
 # Alias names for the documented `Client` / `AsyncClient` symbols.
