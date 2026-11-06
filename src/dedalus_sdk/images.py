@@ -17,7 +17,7 @@ import anyio
 import httpx
 from typing_extensions import TypedDict
 
-from . import AsyncDedalus, Dedalus
+from . import APITimeoutError, AsyncDedalus, Dedalus
 
 
 class Image(TypedDict):
@@ -102,11 +102,17 @@ def poll_image(
     while True:
         remaining = _remaining(end, current or Image(image_id=image_id, state="unknown"))
         if current is None:
-            response = client.get(
-                f"/v1/images/{quote(image_id, safe='')}",
-                cast_to=httpx.Response,
-                options={"timeout": remaining, "max_retries": 0},
-            )
+            try:
+                response = client.get(
+                    f"/v1/images/{quote(image_id, safe='')}",
+                    cast_to=httpx.Response,
+                    options={"timeout": remaining, "max_retries": 0},
+                )
+            except APITimeoutError as error:
+                raise ImagePreparationError(
+                    Image(image_id=image_id, state="unknown"),
+                    "Status request timed out. Preparation continues; use this image ID to resume polling.",
+                ) from error
             current = _image(response.json(), image_id)
         _remaining(end, current)
         if _ready(current, on_progress):
@@ -138,11 +144,11 @@ async def async_poll_image(
                     return current
                 await anyio.sleep(interval)
                 current = None
-    except TimeoutError:
+    except (TimeoutError, APITimeoutError) as error:
         raise ImagePreparationError(
             Image(image_id=image_id, state="unknown"),
             "Timed out waiting. Preparation continues; use this image ID to resume polling.",
-        ) from None
+        ) from error
 
 
 def _hash(file: BinaryIO, end: float) -> tuple[str, int]:

@@ -7,8 +7,8 @@ import json
 import httpx
 import pytest
 
-from dedalus_sdk import AsyncDedalus, Dedalus
-from dedalus_sdk.images import async_import_image, async_poll_image, import_image, poll_image, ImagePreparationError
+from dedalus_sdk import APITimeoutError, AsyncDedalus, Dedalus
+from dedalus_sdk.images import ImagePreparationError, async_import_image, async_poll_image, import_image, poll_image
 
 IMAGE_ID = "01994a10-1234-7000-8000-000000000001"
 ARCHIVE = b"fixture docker-save archive"
@@ -133,6 +133,55 @@ def test_failure_preserves_image_id(state):
     assert requests == [f"/v1/images/{IMAGE_ID}"]
 
 
+def test_sync_status_request_timeout_preserves_accepted_image(archive):
+    api, storage, requests, _, _ = fixture()
+    timeout = httpx.ReadTimeout("status response timed out")
+
+    def handle(request):
+        if request.method == "GET":
+            timeout.request = request
+            raise timeout
+        return api.handle_request(request)
+
+    with (
+        Dedalus(api_key="fixture-secret", http_client=httpx.Client(transport=httpx.MockTransport(handle))) as client,
+        pytest.raises(ImagePreparationError, match="Preparation continues.*resume polling") as error,
+    ):
+        import_image(client, archive, poll_interval=0.001, upload_transport=storage)
+
+    assert requests == ["/v1/images/uploads", "/v1/images"]
+    assert error.value.image == {"image_id": IMAGE_ID, "state": "unknown"}
+    assert IMAGE_ID in str(error.value)
+    assert isinstance(error.value.__cause__, APITimeoutError)
+    assert error.value.__cause__.__cause__ is timeout
+    assert timeout.request.url.path == f"/v1/images/{IMAGE_ID}"
+
+
+@pytest.mark.asyncio
+async def test_async_status_request_timeout_preserves_accepted_image(archive):
+    api, storage, requests, _, _ = fixture()
+    timeout = httpx.ReadTimeout("status response timed out")
+
+    async def handle(request):
+        if request.method == "GET":
+            timeout.request = request
+            raise timeout
+        return await api.handle_async_request(request)
+
+    async with AsyncDedalus(
+        api_key="fixture-secret", max_retries=0, http_client=httpx.AsyncClient(transport=httpx.MockTransport(handle))
+    ) as client:
+        with pytest.raises(ImagePreparationError, match="Preparation continues.*resume polling") as error:
+            await async_import_image(client, archive, poll_interval=0.001, upload_transport=storage)
+
+    assert requests == ["/v1/images/uploads", "/v1/images"]
+    assert error.value.image == {"image_id": IMAGE_ID, "state": "unknown"}
+    assert IMAGE_ID in str(error.value)
+    assert isinstance(error.value.__cause__, APITimeoutError)
+    assert error.value.__cause__.__cause__ is timeout
+    assert timeout.request.url.path == f"/v1/images/{IMAGE_ID}"
+
+
 @pytest.mark.asyncio
 async def test_async_failure_timeout_and_cancellation():
     import asyncio
@@ -141,8 +190,10 @@ async def test_async_failure_timeout_and_cancellation():
     async with AsyncDedalus(api_key="fixture-secret", http_client=httpx.AsyncClient(transport=api)) as client:
         with pytest.raises(ImagePreparationError, match="failed"):
             await async_poll_image(client, IMAGE_ID)
-        with pytest.raises(ImagePreparationError, match="Preparation continues"):
+        with pytest.raises(ImagePreparationError, match="Preparation continues") as error:
             await async_poll_image(client, IMAGE_ID, timeout=0.02, poll_interval=0.005)
+        assert error.value.image["image_id"] == IMAGE_ID
+        assert isinstance(error.value.__cause__, TimeoutError)
         task = asyncio.create_task(async_poll_image(client, IMAGE_ID, poll_interval=0.005))
         await asyncio.sleep(0.01)
         task.cancel()
