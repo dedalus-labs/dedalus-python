@@ -218,7 +218,7 @@ def import_image(
     *,
     wait: bool = True,
     name: Optional[str] = None,
-    platform: Literal["linux/amd64", "linux/arm64"] = "linux/amd64",
+    platform: Literal["linux/amd64"] = "linux/amd64",
     timeout: float = 3600,
     poll_interval: float = 2,
     idempotency_key: Optional[str] = None,
@@ -230,6 +230,8 @@ def import_image(
     The sync deadline is checked between I/O operations; each request has a
     remaining-budget inactivity timeout and automatic API retries are disabled.
     """
+    if platform != "linux/amd64":
+        raise ValueError("Custom images currently require linux/amd64")
     end = time.monotonic() + _duration(timeout, "timeout")
     _duration(poll_interval, "poll_interval")
     key = idempotency_key or str(uuid4())
@@ -265,7 +267,7 @@ async def async_import_image(
     *,
     wait: bool = True,
     name: Optional[str] = None,
-    platform: Literal["linux/amd64", "linux/arm64"] = "linux/amd64",
+    platform: Literal["linux/amd64"] = "linux/amd64",
     timeout: float = 3600,
     poll_interval: float = 2,
     idempotency_key: Optional[str] = None,
@@ -273,6 +275,8 @@ async def async_import_image(
     upload_transport: Optional[httpx.AsyncBaseTransport] = None,
 ) -> Image:
     """Async import with automatic waiting; cancellation never deletes an image."""
+    if platform != "linux/amd64":
+        raise ValueError("Custom images currently require linux/amd64")
     end = time.monotonic() + _duration(timeout, "timeout")
     _duration(poll_interval, "poll_interval")
     key = idempotency_key or str(uuid4())

@@ -41,6 +41,20 @@ def fixture(states=None, mutate=lambda grant: None, upload_status=200):
         if request.url.path.endswith("/uploads"):
             assert json.loads(request.content)["sha256"] == DIGEST
             return httpx.Response(200, json=grant)
+        if request.url.path == "/v1/machines":
+            assert json.loads(request.content)["image_id"] == IMAGE_ID
+            return httpx.Response(
+                200,
+                json={
+                    "machine_id": "fixture",
+                    "lifecycle_status": {
+                        "autoresize": {
+                            "cpu": {"blocked_reason": "MACHINE_QUOTA_EXCEEDED", "blocked_at": "2026-01-01T00:00:00Z"},
+                            "memory": None,
+                        }
+                    },
+                },
+            )
         state = "submitted" if request.method == "POST" else next(states, "preparing")
         return httpx.Response(202 if request.method == "POST" else 200, json={"image_id": IMAGE_ID, "state": state})
 
@@ -155,3 +169,91 @@ def test_upload_failure_never_registers_but_repeated_put_can(archive, status):
             with pytest.raises(RuntimeError, match=f"HTTP {status}"):
                 import_image(client, archive, upload_transport=storage)
             assert len(requests) == 1
+
+
+def test_ready_image_to_generated_machine(archive):
+    api, storage, requests, _, _ = fixture(["ready"])
+    with Dedalus(api_key="fixture-secret", http_client=httpx.Client(transport=api)) as client:
+        ready = import_image(client, archive, upload_transport=storage, poll_interval=0.001)
+        machine = client.machines.create(image_id=ready["image_id"])
+        assert machine.machine_id == "fixture"
+    assert requests == ["/v1/images/uploads", "/v1/images", f"/v1/images/{IMAGE_ID}", "/v1/machines"]
+
+
+@pytest.mark.asyncio
+async def test_async_ready_image_to_generated_machine(archive):
+    api, storage, requests, _, _ = fixture(["ready"])
+    async with AsyncDedalus(api_key="fixture-secret", http_client=httpx.AsyncClient(transport=api)) as client:
+        ready = await async_import_image(client, archive, upload_transport=storage, poll_interval=0.001)
+        machine = await client.machines.create(image_id=ready["image_id"])
+        assert machine.machine_id == "fixture"
+    assert requests[-1] == "/v1/machines"
+
+
+def test_generated_patch_resize_and_flat_errors():
+    from dedalus_sdk import APIStatusError
+
+    requests = []
+    envelope = {
+        "error_code": "IMAGE_SOURCE_INVALID",
+        "message": "archive rejected",
+        "retryable": False,
+        "details": {"stage": "validation"},
+        "retry_after_ms": 500,
+    }
+
+    def api(request):
+        requests.append((request.method, request.url.path))
+        return (
+            httpx.Response(422, json=envelope)
+            if "/images/" in request.url.path
+            else httpx.Response(
+                200,
+                json={
+                    "status": {
+                        "phase": "running",
+                        "reason": "",
+                        "retryable": False,
+                        "revision": "1",
+                        "last_transition_at": "2026-01-01T00:00:00Z",
+                        "last_progress_at": "2026-01-01T00:00:00Z",
+                        "autoresize": {"cpu": {"blocked_reason": "MACHINE_QUOTA_EXCEEDED"}, "memory": None},
+                    }
+                },
+            )
+        )
+
+    with Dedalus(
+        api_key="fixture", max_retries=0, http_client=httpx.Client(transport=httpx.MockTransport(api))
+    ) as client:
+        client.machines.autoresizing.update(machine_id=IMAGE_ID)
+        client.organization.autoresizing.update()
+        resized = client.machines.resize(machine_id=IMAGE_ID, vcpu=2)
+        assert resized.status.autoresize.cpu.blocked_reason == "MACHINE_QUOTA_EXCEEDED"
+        assert resized.status.autoresize.memory is None
+        with pytest.raises(APIStatusError) as error:
+            client.images.retrieve(image_id=IMAGE_ID)
+        assert error.value.body == envelope
+        assert "archive rejected" in str(error.value)
+    assert requests[:3] == [
+        ("PATCH", f"/v1/machines/{IMAGE_ID}/autoresizing"),
+        ("PATCH", "/v1/organization/autoresizing"),
+        ("POST", f"/v1/machines/{IMAGE_ID}/resize"),
+    ]
+
+
+def test_unsupported_platform_never_reserves(archive):
+    api, storage, requests, uploads, _ = fixture()
+    with Dedalus(api_key="fixture-secret", http_client=httpx.Client(transport=api)) as client:
+        with pytest.raises(ValueError, match="linux/amd64"):
+            import_image(client, archive, platform="linux/arm64", upload_transport=storage)
+    assert not requests and not uploads
+
+
+@pytest.mark.asyncio
+async def test_async_unsupported_platform_never_reserves(archive):
+    api, storage, requests, uploads, _ = fixture()
+    async with AsyncDedalus(api_key="fixture-secret", http_client=httpx.AsyncClient(transport=api)) as client:
+        with pytest.raises(ValueError, match="linux/amd64"):
+            await async_import_image(client, archive, platform="linux/arm64", upload_transport=storage)
+    assert not requests and not uploads

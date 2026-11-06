@@ -40,10 +40,18 @@ from .autoresizing import (
     AutoresizingResourceWithStreamingResponse,
     AsyncAutoresizingResourceWithStreamingResponse,
 )
-from ...types import machine_list_params, machine_create_params, machine_update_params, machine_reboot_params
+from ...types import (
+    machine_list_params,
+    machine_create_params,
+    machine_update_params,
+    machine_delete_params,
+    machine_reboot_params,
+    machine_resize_params,
+)
 from ...types.machine_list_item import MachineListItem
 from ...types.machine import Machine
 from ...types.machine_retrieve_response import MachineRetrieveResponse
+from ...types.machine_resize_response import MachineResizeResponse
 
 __all__ = ["MachinesResource", "AsyncMachinesResource"]
 
@@ -118,6 +126,7 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         autosleep: str | Omit = omit,
+        image_id: str | Omit = omit,
         memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
         vcpu: float | Omit = omit,
@@ -134,6 +143,7 @@ class MachinesResource(SyncAPIResource):
 
         Args:
             autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            image_id: Organization-owned ready custom image ID. Requires Pro. Omit for the platform default.
             memory_mib: Memory in MiB.
             storage_gib: Storage in GiB.
             vcpu: CPU in vCPUs.
@@ -144,7 +154,7 @@ class MachinesResource(SyncAPIResource):
             idempotency_key: Override or provide the idempotency key for this request.
 
         Returns:
-            Machine: Create converged inline
+            Machine: Create has converged
 
         Example:
             ```python
@@ -162,6 +172,7 @@ class MachinesResource(SyncAPIResource):
             body=maybe_transform(
                 {
                     "autosleep": autosleep,
+                    "image_id": image_id,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
@@ -224,9 +235,7 @@ class MachinesResource(SyncAPIResource):
         *,
         machine_id: str,
         autosleep: str | Omit = omit,
-        memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
-        vcpu: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -236,14 +245,12 @@ class MachinesResource(SyncAPIResource):
         idempotency_key: str | None = None,
     ) -> Machine:
         """
-        Update machine
+        Changes settings such as autosleep.
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
-            memory_mib: Memory in MiB.
-            storage_gib: Storage in GiB.
-            vcpu: CPU in vCPUs.
+            autosleep: Body parameter.
+            storage_gib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -268,9 +275,7 @@ class MachinesResource(SyncAPIResource):
             body=maybe_transform(
                 {
                     "autosleep": autosleep,
-                    "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
-                    "vcpu": vcpu,
                 },
                 machine_update_params.MachineUpdateParams,
             ),
@@ -288,6 +293,7 @@ class MachinesResource(SyncAPIResource):
         self,
         *,
         machine_id: str,
+        force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -301,6 +307,7 @@ class MachinesResource(SyncAPIResource):
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Destroy from the last published filesystem checkpoint without publishing the Machine's remaining writes, whether the Machine is running or failed. Unpublished file writes are lost. The default publishes them first, and waits while it cannot.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -328,6 +335,7 @@ class MachinesResource(SyncAPIResource):
                 extra_body=extra_body,
                 timeout=timeout,
                 idempotency_key=idempotency_key,
+                query=maybe_transform({"force": force}, machine_delete_params.MachineDeleteParams),
             ),
             cast_to=Machine,
         )
@@ -479,6 +487,65 @@ class MachinesResource(SyncAPIResource):
             cast_to=Machine,
         )
 
+    def resize(
+        self,
+        *,
+        machine_id: str,
+        memory_mib: int | Omit = omit,
+        vcpu: float | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> MachineResizeResponse:
+        """
+        Wakes a sleeping Machine, then waits up to 30 seconds for the host to confirm CPU and RAM. Returns the Machine with its confirmed size. After RESIZE_TIMEOUT, repeat the same request and Idempotency-Key to wait again.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            memory_mib: RAM in MiB.
+            vcpu: CPU in 0.25-vCPU steps.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            MachineResizeResponse: Machine with the confirmed size.
+
+        Example:
+            ```python
+            machine = client.machines.resize(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return self._post(
+            path_template("/v1/machines/{machine_id}/resize", **{"machine_id": machine_id}),
+            body=maybe_transform(
+                {
+                    "memory_mib": memory_mib,
+                    "vcpu": vcpu,
+                },
+                machine_resize_params.MachineResizeParams,
+            ),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+            ),
+            cast_to=MachineResizeResponse,
+        )
+
 
 class AsyncMachinesResource(AsyncAPIResource):
     @cached_property
@@ -550,6 +617,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         autosleep: str | Omit = omit,
+        image_id: str | Omit = omit,
         memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
         vcpu: float | Omit = omit,
@@ -566,6 +634,7 @@ class AsyncMachinesResource(AsyncAPIResource):
 
         Args:
             autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
+            image_id: Organization-owned ready custom image ID. Requires Pro. Omit for the platform default.
             memory_mib: Memory in MiB.
             storage_gib: Storage in GiB.
             vcpu: CPU in vCPUs.
@@ -576,7 +645,7 @@ class AsyncMachinesResource(AsyncAPIResource):
             idempotency_key: Override or provide the idempotency key for this request.
 
         Returns:
-            Machine: Create converged inline
+            Machine: Create has converged
 
         Example:
             ```python
@@ -594,6 +663,7 @@ class AsyncMachinesResource(AsyncAPIResource):
             body=await async_maybe_transform(
                 {
                     "autosleep": autosleep,
+                    "image_id": image_id,
                     "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
                     "vcpu": vcpu,
@@ -656,9 +726,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         *,
         machine_id: str,
         autosleep: str | Omit = omit,
-        memory_mib: int | Omit = omit,
         storage_gib: int | Omit = omit,
-        vcpu: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -668,14 +736,12 @@ class AsyncMachinesResource(AsyncAPIResource):
         idempotency_key: str | None = None,
     ) -> Machine:
         """
-        Update machine
+        Changes settings such as autosleep.
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            autosleep: Idle window before autosleep. Accepts fixed duration units like 30s, 30m, 2h, 7d3h4s, or 1w3d, raw seconds ("1800"), or never to disable.
-            memory_mib: Memory in MiB.
-            storage_gib: Storage in GiB.
-            vcpu: CPU in vCPUs.
+            autosleep: Body parameter.
+            storage_gib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -700,9 +766,7 @@ class AsyncMachinesResource(AsyncAPIResource):
             body=await async_maybe_transform(
                 {
                     "autosleep": autosleep,
-                    "memory_mib": memory_mib,
                     "storage_gib": storage_gib,
-                    "vcpu": vcpu,
                 },
                 machine_update_params.MachineUpdateParams,
             ),
@@ -720,6 +784,7 @@ class AsyncMachinesResource(AsyncAPIResource):
         self,
         *,
         machine_id: str,
+        force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -733,6 +798,7 @@ class AsyncMachinesResource(AsyncAPIResource):
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            force: Destroy from the last published filesystem checkpoint without publishing the Machine's remaining writes, whether the Machine is running or failed. Unpublished file writes are lost. The default publishes them first, and waits while it cannot.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -760,6 +826,7 @@ class AsyncMachinesResource(AsyncAPIResource):
                 extra_body=extra_body,
                 timeout=timeout,
                 idempotency_key=idempotency_key,
+                query=await async_maybe_transform({"force": force}, machine_delete_params.MachineDeleteParams),
             ),
             cast_to=Machine,
         )
@@ -911,6 +978,65 @@ class AsyncMachinesResource(AsyncAPIResource):
             cast_to=Machine,
         )
 
+    async def resize(
+        self,
+        *,
+        machine_id: str,
+        memory_mib: int | Omit = omit,
+        vcpu: float | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+        idempotency_key: str | None = None,
+    ) -> MachineResizeResponse:
+        """
+        Wakes a sleeping Machine, then waits up to 30 seconds for the host to confirm CPU and RAM. Returns the Machine with its confirmed size. After RESIZE_TIMEOUT, repeat the same request and Idempotency-Key to wait again.
+
+        Args:
+            machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
+            memory_mib: RAM in MiB.
+            vcpu: CPU in 0.25-vCPU steps.
+            extra_headers: Send extra headers with the request.
+            extra_query: Send extra query parameters with the request.
+            extra_body: Send extra JSON properties with the request.
+            timeout: Override the client-level default timeout for this request, in seconds.
+            idempotency_key: Override or provide the idempotency key for this request.
+
+        Returns:
+            MachineResizeResponse: Machine with the confirmed size.
+
+        Example:
+            ```python
+            machine = await client.machines.resize(
+                machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+                idempotency_key="",
+            )
+            ```
+        """
+        if machine_id is None or (isinstance(machine_id, str) and not machine_id):
+            raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
+        return await self._post(
+            path_template("/v1/machines/{machine_id}/resize", **{"machine_id": machine_id}),
+            body=await async_maybe_transform(
+                {
+                    "memory_mib": memory_mib,
+                    "vcpu": vcpu,
+                },
+                machine_resize_params.MachineResizeParams,
+            ),
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                idempotency_key=idempotency_key,
+            ),
+            cast_to=MachineResizeResponse,
+        )
+
 
 class MachinesResourceWithRawResponse:
     def __init__(self, machines: MachinesResource) -> None:
@@ -939,6 +1065,9 @@ class MachinesResourceWithRawResponse:
         )
         self.reboot = to_raw_response_wrapper(
             machines.reboot,
+        )
+        self.resize = to_raw_response_wrapper(
+            machines.resize,
         )
 
     @cached_property
@@ -982,6 +1111,9 @@ class AsyncMachinesResourceWithRawResponse:
         self.reboot = async_to_raw_response_wrapper(
             machines.reboot,
         )
+        self.resize = async_to_raw_response_wrapper(
+            machines.resize,
+        )
 
     @cached_property
     def ssh(self) -> AsyncSSHResourceWithRawResponse:
@@ -1024,6 +1156,9 @@ class MachinesResourceWithStreamingResponse:
         self.reboot = to_streamed_response_wrapper(
             machines.reboot,
         )
+        self.resize = to_streamed_response_wrapper(
+            machines.resize,
+        )
 
     @cached_property
     def ssh(self) -> SSHResourceWithStreamingResponse:
@@ -1065,6 +1200,9 @@ class AsyncMachinesResourceWithStreamingResponse:
         )
         self.reboot = async_to_streamed_response_wrapper(
             machines.reboot,
+        )
+        self.resize = async_to_streamed_response_wrapper(
+            machines.resize,
         )
 
     @cached_property
