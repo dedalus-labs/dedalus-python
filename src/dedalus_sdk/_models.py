@@ -237,6 +237,12 @@ class BaseModel(pydantic.BaseModel):
         _extra = {}
         for key, value in values.items():
             if key not in model_fields:
+                if PYDANTIC_V1 and hasattr(__cls, key):
+                    # Pydantic v1 keeps an extra key in the instance `__dict__`, which outranks the
+                    # class: a response key named `json`, `dict` or `to_dict` would replace that method
+                    # on this object with the server's value. Such a key is dropped instead; v2 keeps
+                    # extras in `__pydantic_extra__`, which only answers names the class lacks.
+                    continue
                 parsed = construct_type(value=value, type_=extra_field_type) if extra_field_type is not None else value
 
                 if PYDANTIC_V1:
@@ -251,10 +257,11 @@ class BaseModel(pydantic.BaseModel):
             # init_private_attributes() does not exist in v2
             m._init_private_attributes()  # type: ignore
 
-            # copied from Pydantic v1's `construct()` method
+            # Record which fields were set, under the attribute Pydantic v1 reads them from.
             object.__setattr__(m, "__fields_set__", _fields_set)
         else:
-            # these properties are copied from Pydantic's `model_construct()` method
+            # Pydantic v2 reads private, extra and set fields from these attributes; a model built
+            # without validation has to set all three itself.
             object.__setattr__(m, "__pydantic_private__", None)
             object.__setattr__(m, "__pydantic_extra__", _extra)
             object.__setattr__(m, "__pydantic_fields_set__", _fields_set)
@@ -291,33 +298,26 @@ class BaseModel(pydantic.BaseModel):
             fallback: Callable[[Any], Any] | None = None,
             serialize_as_any: bool = False,
         ) -> dict[str, Any]:
-            """Usage docs: https://docs.pydantic.dev/2.4/concepts/serialization/#modelmodel_dump
+            """Returns the model's fields as a dictionary, the Pydantic v2 `model_dump` call on Pydantic v1.
 
-            Generate a dictionary representation of the model, optionally specifying which fields to include or exclude.
+            See https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump for the
+            full semantics.
 
             Args:
-                mode: The mode in which `to_python` should run.
-                    If mode is 'json', the output will only contain JSON serializable types.
-                    If mode is 'python', the output may contain non-JSON-serializable Python objects.
-                include: A set of fields to include in the output.
-                exclude: A set of fields to exclude from the output.
-                context: Additional context to pass to the serializer.
-                by_alias: Whether to use the field's alias in the dictionary key if defined.
-                exclude_unset: Whether to exclude fields that have not been explicitly set.
-                exclude_defaults: Whether to exclude fields that are set to their default value.
-                exclude_none: Whether to exclude fields that have a value of `None`.
-                exclude_computed_fields: Whether to exclude computed fields.
-                    While this can be useful for round-tripping, it is usually recommended to use the dedicated
-                    `round_trip` parameter instead.
-                round_trip: If True, dumped values should be valid as input for non-idempotent types such as Json[T].
-                warnings: How to handle serialization errors. False/"none" ignores them, True/"warn" logs errors,
-                    "error" raises a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError].
-                fallback: A function to call when an unknown value is encountered. If not provided,
-                    a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError] error is raised.
-                serialize_as_any: Whether to serialize fields with duck-typing serialization behavior.
-
-            Returns:
-                A dictionary representation of the model.
+                mode: `"python"` keeps Python objects such as `datetime`; `"json"` converts every value
+                    to a JSON-compatible type.
+                include: The fields to keep, as a set or a nested mapping.
+                exclude: The fields to drop, as a set or a nested mapping.
+                by_alias: Key the output by each field's alias rather than its attribute name.
+                exclude_unset: Drop fields that were never set explicitly.
+                exclude_defaults: Drop fields still equal to their default.
+                exclude_none: Drop fields whose value is `None`.
+                context: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                exclude_computed_fields: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                round_trip: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                warnings: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                fallback: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                serialize_as_any: Pydantic v2 only; must keep its default, or this raises `ValueError`.
             """
             if mode not in {"json", "python"}:
                 raise ValueError("mode must be either 'json' or 'python'")
@@ -363,23 +363,26 @@ class BaseModel(pydantic.BaseModel):
             fallback: Callable[[Any], Any] | None = None,
             serialize_as_any: bool = False,
         ) -> str:
-            """Usage docs: https://docs.pydantic.dev/2.4/concepts/serialization/#modelmodel_dump_json
+            """Returns the model serialized as a JSON string, the Pydantic v2 `model_dump_json` call on Pydantic v1.
 
-            Generates a JSON representation of the model using Pydantic's `to_json` method.
+            See https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_dump_json
+            for the full semantics.
 
             Args:
-                indent: Indentation to use in the JSON output. If None is passed, the output will be compact.
-                include: Field(s) to include in the JSON output. Can take either a string or set of strings.
-                exclude: Field(s) to exclude from the JSON output. Can take either a string or set of strings.
-                by_alias: Whether to serialize using field aliases.
-                exclude_unset: Whether to exclude fields that have not been explicitly set.
-                exclude_defaults: Whether to exclude fields that have the default value.
-                exclude_none: Whether to exclude fields that have a value of `None`.
-                round_trip: Whether to use serialization/deserialization between JSON and class instance.
-                warnings: Whether to show any warnings that occurred during serialization.
-
-            Returns:
-                A JSON string representation of the model.
+                indent: Spaces to indent nested values by; `None` writes compact JSON.
+                include: The fields to keep, as a set or a nested mapping.
+                exclude: The fields to drop, as a set or a nested mapping.
+                by_alias: Key the output by each field's alias rather than its attribute name.
+                exclude_unset: Drop fields that were never set explicitly.
+                exclude_defaults: Drop fields still equal to their default.
+                exclude_none: Drop fields whose value is `None`.
+                ensure_ascii: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                context: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                exclude_computed_fields: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                round_trip: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                warnings: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                fallback: Pydantic v2 only; must keep its default, or this raises `ValueError`.
+                serialize_as_any: Pydantic v2 only; must keep its default, or this raises `ValueError`.
             """
             if round_trip != False:
                 raise ValueError("round_trip is only supported in Pydantic v2")
@@ -871,9 +874,12 @@ elif not TYPE_CHECKING:  # TODO: condition is weird
         return RootModel[type_]  # type: ignore
 
 
-class SecurityOptions(TypedDict, total=False):
-    api_key_auth: bool
-    bearer_auth: bool
+# An operation's own security requirements, by security scheme name: alternatives (any one
+# suffices), each the schemes sent together. The client sends only the schemes these name: the
+# first alternative whose credentials are all configured, else the configured part of the first
+# alternative that has one. An empty list sends no credential. `None` is an operation that inherits
+# the client's default and is sent every configured credential.
+SecurityOptions: TypeAlias = List[List[str]]
 
 
 class FinalRequestOptionsInput(TypedDict, total=False):
@@ -904,10 +910,7 @@ class FinalRequestOptions(pydantic.BaseModel):
     idempotency_key: Union[str, None] = None
     post_parser: Union[Callable[[Any], Any], NotGiven] = NotGiven()
     follow_redirects: Union[bool, None] = None
-    security: SecurityOptions = {
-        "api_key_auth": True,
-        "bearer_auth": True,
-    }
+    security: Union[SecurityOptions, None] = None
 
     content: Union[bytes, bytearray, IO[bytes], Iterable[bytes], AsyncIterable[bytes], None] = None
     # It should be noted that we cannot use `json` here as that would override

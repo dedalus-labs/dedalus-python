@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from typing_extensions import Required, TypedDict
+from typing import Optional
+from typing_extensions import Literal, TypedDict
 
 __all__ = ["AutoresizingUpdateParams"]
 
 
 class AutoresizingUpdateParams(TypedDict, total=False):
-    enabled: Required[bool]
-    """Allow automatic RAM increases for all organization machines. Disabling preserves applied RAM and already admitted resizes."""
+    cpu: Literal["on", "off"]
+
+    cpu_max_vcpu: Optional[float]
+
+    memory: Literal["on", "off"]
+
+    memory_max_mib: Optional[int]

@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import httpx
 
-from ..._types import Body, Query, Headers, NotGiven, not_given
+from typing import Optional
+from typing_extensions import Literal
+
+from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
 from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
@@ -15,7 +18,7 @@ from ..._response import (
     async_to_streamed_response_wrapper,
 )
 from ..._base_client import make_request_options
-from ...types.machines.settings import Settings
+from ...types.machines.policy import Policy
 from ...types.machines import autoresizing_update_params
 
 __all__ = ["AutoresizingResource", "AsyncAutoresizingResource"]
@@ -40,9 +43,9 @@ class AutoresizingResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Settings:
+    ) -> Policy:
         """
-        Read this machine's RAM autoresizing settings
+        Read this machine's autoresizing settings
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
@@ -52,7 +55,7 @@ class AutoresizingResource(SyncAPIResource):
             timeout: Override the client-level default timeout for this request, in seconds.
 
         Returns:
-            Settings: OK
+            Policy: OK
 
         Example:
             ```python
@@ -68,14 +71,17 @@ class AutoresizingResource(SyncAPIResource):
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Settings,
+            cast_to=Policy,
         )
 
     def update(
         self,
         *,
         machine_id: str,
-        enabled: bool,
+        cpu: Literal["on", "off"] | Omit = omit,
+        cpu_max_vcpu: Optional[float] | Omit = omit,
+        memory: Literal["on", "off"] | Omit = omit,
+        memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -83,13 +89,16 @@ class AutoresizingResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Settings:
+    ) -> Policy:
         """
-        Set this machine's RAM autoresizing settings
+        Changes RAM, CPU or both for this machine. An absent resource keeps its setting.
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            enabled: Body parameter.
+            cpu: Body parameter.
+            cpu_max_vcpu: Body parameter.
+            memory: Body parameter.
+            memory_max_mib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -97,23 +106,27 @@ class AutoresizingResource(SyncAPIResource):
             idempotency_key: Override or provide the idempotency key for this request.
 
         Returns:
-            Settings: OK
+            Policy: OK
 
         Example:
             ```python
             autoresizing = client.machines.autoresizing.update(
                 machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
-                enabled=False,
                 idempotency_key="",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        return self._put(
+        return self._patch(
             path_template("/v1/machines/{machine_id}/autoresizing", **{"machine_id": machine_id}),
             body=maybe_transform(
-                {"enabled": enabled},
+                {
+                    "cpu": cpu,
+                    "cpu_max_vcpu": cpu_max_vcpu,
+                    "memory": memory,
+                    "memory_max_mib": memory_max_mib,
+                },
                 autoresizing_update_params.AutoresizingUpdateParams,
             ),
             options=make_request_options(
@@ -123,7 +136,7 @@ class AutoresizingResource(SyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Settings,
+            cast_to=Policy,
         )
 
 
@@ -146,9 +159,9 @@ class AsyncAutoresizingResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Settings:
+    ) -> Policy:
         """
-        Read this machine's RAM autoresizing settings
+        Read this machine's autoresizing settings
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
@@ -158,7 +171,7 @@ class AsyncAutoresizingResource(AsyncAPIResource):
             timeout: Override the client-level default timeout for this request, in seconds.
 
         Returns:
-            Settings: OK
+            Policy: OK
 
         Example:
             ```python
@@ -174,14 +187,17 @@ class AsyncAutoresizingResource(AsyncAPIResource):
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=Settings,
+            cast_to=Policy,
         )
 
     async def update(
         self,
         *,
         machine_id: str,
-        enabled: bool,
+        cpu: Literal["on", "off"] | Omit = omit,
+        cpu_max_vcpu: Optional[float] | Omit = omit,
+        memory: Literal["on", "off"] | Omit = omit,
+        memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -189,13 +205,16 @@ class AsyncAutoresizingResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
         idempotency_key: str | None = None,
-    ) -> Settings:
+    ) -> Policy:
         """
-        Set this machine's RAM autoresizing settings
+        Changes RAM, CPU or both for this machine. An absent resource keeps its setting.
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            enabled: Body parameter.
+            cpu: Body parameter.
+            cpu_max_vcpu: Body parameter.
+            memory: Body parameter.
+            memory_max_mib: Body parameter.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
             extra_body: Send extra JSON properties with the request.
@@ -203,23 +222,27 @@ class AsyncAutoresizingResource(AsyncAPIResource):
             idempotency_key: Override or provide the idempotency key for this request.
 
         Returns:
-            Settings: OK
+            Policy: OK
 
         Example:
             ```python
             autoresizing = await client.machines.autoresizing.update(
                 machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
-                enabled=False,
                 idempotency_key="",
             )
             ```
         """
         if machine_id is None or (isinstance(machine_id, str) and not machine_id):
             raise ValueError(f"Expected a non-empty value for `machine_id` but received {machine_id!r}")
-        return await self._put(
+        return await self._patch(
             path_template("/v1/machines/{machine_id}/autoresizing", **{"machine_id": machine_id}),
             body=await async_maybe_transform(
-                {"enabled": enabled},
+                {
+                    "cpu": cpu,
+                    "cpu_max_vcpu": cpu_max_vcpu,
+                    "memory": memory,
+                    "memory_max_mib": memory_max_mib,
+                },
                 autoresizing_update_params.AutoresizingUpdateParams,
             ),
             options=make_request_options(
@@ -229,7 +252,7 @@ class AsyncAutoresizingResource(AsyncAPIResource):
                 timeout=timeout,
                 idempotency_key=idempotency_key,
             ),
-            cast_to=Settings,
+            cast_to=Policy,
         )
 
 

@@ -203,19 +203,14 @@ def is_iterable(obj: object) -> TypeGuard[Iterable[object]]:
     return isinstance(obj, Iterable)
 
 
-# copied from https://github.com/Rapptz/RoboDanny
 def human_join(seq: Sequence[str], *, delim: str = ", ", final: str = "or") -> str:
-    size = len(seq)
-    if size == 0:
+    """Joins `seq` into an English list: `"a"`, `"a or b"`, `"a, b or c"` (no comma before `final`)."""
+    if not seq:
         return ""
-
-    if size == 1:
-        return seq[0]
-
-    if size == 2:
-        return f"{seq[0]} {final} {seq[1]}"
-
-    return delim.join(seq[:-1]) + f" {final} {seq[-1]}"
+    *head, last = seq
+    if not head:
+        return last
+    return f"{delim.join(head)} {final} {last}"
 
 
 def quote(string: str) -> str:

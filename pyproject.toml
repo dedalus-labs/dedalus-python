@@ -1,7 +1,7 @@
 [project]
 name = "dedalus-sdk"
-version = "0.6.0" # x-release-please-version
-description = "Controlplane API for Dedalus Cloud Services (DCS)."
+version = "0.7.0" # x-release-please-version
+description = "Create, run, and manage Dedalus Machines."
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
@@ -13,9 +13,13 @@ dependencies = [
   "pydantic>=1.9.0, <3",
   "typing-extensions>=4.14, <5",
   "anyio>=3.5.0, <5",
-  "distro>=1.7.0, <2",
   "sniffio",
 ]
+
+[project.urls]
+Source = "https://github.com/dedalus-labs/dedalus-python"
+Issues = "https://github.com/dedalus-labs/dedalus-python/issues"
+Changelog = "https://github.com/dedalus-labs/dedalus-python/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]

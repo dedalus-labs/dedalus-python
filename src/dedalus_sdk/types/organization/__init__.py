@@ -2,5 +2,4 @@
 
 from __future__ import annotations
 
-from .policy import Policy as Policy
 from .autoresizing_update_params import AutoresizingUpdateParams as AutoresizingUpdateParams

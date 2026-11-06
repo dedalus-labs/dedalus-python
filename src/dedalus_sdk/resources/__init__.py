@@ -16,6 +16,14 @@ from .organization import (
     OrganizationResourceWithStreamingResponse,
     AsyncOrganizationResourceWithStreamingResponse,
 )
+from .images import (
+    ImagesResource,
+    AsyncImagesResource,
+    ImagesResourceWithRawResponse,
+    AsyncImagesResourceWithRawResponse,
+    ImagesResourceWithStreamingResponse,
+    AsyncImagesResourceWithStreamingResponse,
+)
 
 __all__ = [
     "MachinesResource",
@@ -30,4 +38,10 @@ __all__ = [
     "AsyncOrganizationResourceWithRawResponse",
     "OrganizationResourceWithStreamingResponse",
     "AsyncOrganizationResourceWithStreamingResponse",
+    "ImagesResource",
+    "AsyncImagesResource",
+    "ImagesResourceWithRawResponse",
+    "AsyncImagesResourceWithRawResponse",
+    "ImagesResourceWithStreamingResponse",
+    "AsyncImagesResourceWithStreamingResponse",
 ]

@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Union, Generic, TypeVar, Callable, cast, overload
+from typing import TYPE_CHECKING, Any, Union, TypeVar, cast
 from datetime import date, datetime
-from typing_extensions import Self, Literal, TypedDict
+from typing_extensions import Literal, TypedDict
 
 import pydantic
 from pydantic.fields import FieldInfo
 
 from ._types import IncEx, StrBytesIntFloat
 
-_T = TypeVar("_T")
 _ModelT = TypeVar("_ModelT", bound=pydantic.BaseModel)
 
 # --------------- Pydantic v2, v3 compatibility ---------------
@@ -192,35 +191,5 @@ else:
 # cached properties
 if TYPE_CHECKING:
     cached_property = property
-
-    # we define a separate type (copied from typeshed)
-    # that represents that `cached_property` is `set`able
-    # at runtime, which differs from `@property`.
-    #
-    # this is a separate type as editors likely special case
-    # `@property` and we don't want to cause issues just to have
-    # more helpful internal types.
-
-    class typed_cached_property(Generic[_T]):
-        func: Callable[[Any], _T]
-        attrname: str | None
-
-        def __init__(self, func: Callable[[Any], _T]) -> None: ...
-
-        @overload
-        def __get__(self, instance: None, owner: type[Any] | None = None) -> Self: ...
-
-        @overload
-        def __get__(self, instance: object, owner: type[Any] | None = None) -> _T: ...
-
-        def __get__(self, instance: object, owner: type[Any] | None = None) -> _T | Self:
-            raise NotImplementedError()
-
-        def __set_name__(self, owner: type[Any], name: str) -> None: ...
-
-        # __set__ is not defined at runtime, but @cached_property is designed to be settable
-        def __set__(self, instance: object, value: _T) -> None: ...
 else:
     from functools import cached_property as cached_property
-
-    typed_cached_property = cached_property

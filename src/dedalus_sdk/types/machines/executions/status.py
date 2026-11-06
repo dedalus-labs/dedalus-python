@@ -5,17 +5,7 @@ from typing_extensions import Literal
 
 from ...._models import BaseModel
 
-__all__ = ["Status", "Capture", "Publication"]
-
-
-class Publication(BaseModel):
-    code: Optional[str] = None
-
-    complete: bool
-
-    queued_messages: int
-
-    state: Literal["active", "finishing", "failed", "closed"]
+__all__ = ["Status", "Capture"]
 
 
 class Capture(BaseModel):
@@ -31,10 +21,6 @@ class Capture(BaseModel):
 class Status(BaseModel):
     capture: Capture
 
-    code: Optional[str] = None
-
     execution_id: str
-
-    publication: Optional[Publication] = None
 
     stream_id: Optional[str] = None

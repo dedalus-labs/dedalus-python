@@ -24,8 +24,11 @@ from ._types import (
 from ._utils import is_given, is_mapping_t, get_async_library
 from ._compat import cached_property
 from ._exceptions import APIStatusError
+from ._models import SecurityOptions
 from ._base_client import (
     DEFAULT_MAX_RETRIES,
+    AuthLocations,
+    SchemeCredentials,
     SyncAPIClient,
     AsyncAPIClient,
 )
@@ -33,9 +36,10 @@ from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._version import __version__
 
 if TYPE_CHECKING:
-    from .resources import machines, organization
+    from .resources import machines, organization, images
     from .resources.machines import MachinesResource, AsyncMachinesResource
     from .resources.organization import OrganizationResource, AsyncOrganizationResource
+    from .resources.images import ImagesResource, AsyncImagesResource
 
 # Serializes lazy resource imports so concurrent cold access from multiple
 # threads cannot deadlock on CPython import locks (see CPython 3.14).
@@ -50,6 +54,7 @@ class Dedalus(SyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
+    browser_token: str | None
 
     def __init__(
         self,
@@ -58,13 +63,15 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
         # Configure a custom httpx client.
-        # We provide a `DefaultHttpxClient` class that you can pass to retain the default values we use for `limits`, `timeout` & `follow_redirects`.
+        # We provide a `DefaultHttpxClient` class that you can pass to retain the default values we use for `limits` & `timeout`.
+        # The SDK follows redirects itself, whatever the client's `follow_redirects` says.
         # See the [httpx documentation](https://www.python-httpx.org/api/#client) for more details.
         http_client: httpx.Client | None = None,
         # Enable or disable schema validation for data returned by the API.
@@ -99,6 +106,9 @@ class Dedalus(SyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+        if browser_token is None:
+            browser_token = os.environ.get("DEDALUS_BROWSER_TOKEN")
+        self.browser_token = browser_token
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -137,6 +147,12 @@ class Dedalus(SyncAPIClient):
         return OrganizationResource(self)
 
     @cached_property
+    def images(self) -> "ImagesResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResource
+        return ImagesResource(self)
+
+    @cached_property
     def with_raw_response(self) -> DedalusWithRawResponse:
         return DedalusWithRawResponse(self)
 
@@ -155,17 +171,34 @@ class Dedalus(SyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
+            **self._browser_token_header_auth,
         }
 
     @override
-    def _auth_query(self, security: dict[str, bool]) -> dict[str, str]:
-        _ = security
+    def _auth_query(self, security: SecurityOptions | None) -> dict[str, str]:
+        if security is not None:
+            return self._select_auth(security).query
         return {}
 
     @override
-    def _auth_cookies(self, security: dict[str, bool]) -> dict[str, str]:
-        _ = security
+    def _auth_cookies(self, security: SecurityOptions | None) -> dict[str, str]:
+        if security is not None:
+            return self._select_auth(security).cookies
         return {}
+
+    @property
+    @override
+    def _auth_by_scheme(self) -> dict[str, SchemeCredentials]:
+        return {
+            "BearerAuth": SchemeCredentials(headers=self._api_key_header_auth),
+            "ApiKeyAuth": SchemeCredentials(headers=self._x_api_key_header_auth),
+            "BrowserAuth": SchemeCredentials(headers=self._browser_token_header_auth),
+        }
+
+    @property
+    @override
+    def _auth_locations(self) -> AuthLocations:
+        return AuthLocations(headers=frozenset({"authorization", "x-api-key"}))
 
     @property
     def _api_key_header_auth(self) -> dict[str, str]:
@@ -180,6 +213,13 @@ class Dedalus(SyncAPIClient):
         if value is None:
             return {}
         return {"x-api-key": value}
+
+    @property
+    def _browser_token_header_auth(self) -> dict[str, str]:
+        value = self.browser_token
+        if value is None:
+            return {}
+        return {"Authorization": f"Bearer {value}"}
 
     @property
     @override
@@ -210,7 +250,7 @@ class Dedalus(SyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key, browser_token or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -220,6 +260,7 @@ class Dedalus(SyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -251,6 +292,7 @@ class Dedalus(SyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            browser_token=browser_token or self.browser_token,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -290,6 +332,7 @@ class AsyncDedalus(AsyncAPIClient):
     x_api_key: str | None
     as_base_url: str | None
     dedalus_org_id: str | None
+    browser_token: str | None
 
     def __init__(
         self,
@@ -298,13 +341,15 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
         # Configure a custom httpx client.
-        # We provide a `DefaultAsyncHttpxClient` class that you can pass to retain the default values we use for `limits`, `timeout` & `follow_redirects`.
+        # We provide a `DefaultAsyncHttpxClient` class that you can pass to retain the default values we use for `limits` & `timeout`.
+        # The SDK follows redirects itself, whatever the client's `follow_redirects` says.
         # See the [httpx documentation](https://www.python-httpx.org/api/#asyncclient) for more details.
         http_client: httpx.AsyncClient | None = None,
         # Enable or disable schema validation for data returned by the API.
@@ -339,6 +384,9 @@ class AsyncDedalus(AsyncAPIClient):
         if dedalus_org_id is None:
             dedalus_org_id = os.environ.get("DEDALUS_ORG_ID")
         self.dedalus_org_id = dedalus_org_id
+        if browser_token is None:
+            browser_token = os.environ.get("DEDALUS_BROWSER_TOKEN")
+        self.browser_token = browser_token
         if base_url is None:
             base_url = os.environ.get("DEDALUS_BASE_URL")
         if base_url is None:
@@ -377,6 +425,12 @@ class AsyncDedalus(AsyncAPIClient):
         return AsyncOrganizationResource(self)
 
     @cached_property
+    def images(self) -> "AsyncImagesResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResource
+        return AsyncImagesResource(self)
+
+    @cached_property
     def with_raw_response(self) -> AsyncDedalusWithRawResponse:
         return AsyncDedalusWithRawResponse(self)
 
@@ -395,17 +449,34 @@ class AsyncDedalus(AsyncAPIClient):
         return {
             **self._api_key_header_auth,
             **self._x_api_key_header_auth,
+            **self._browser_token_header_auth,
         }
 
     @override
-    def _auth_query(self, security: dict[str, bool]) -> dict[str, str]:
-        _ = security
+    def _auth_query(self, security: SecurityOptions | None) -> dict[str, str]:
+        if security is not None:
+            return self._select_auth(security).query
         return {}
 
     @override
-    def _auth_cookies(self, security: dict[str, bool]) -> dict[str, str]:
-        _ = security
+    def _auth_cookies(self, security: SecurityOptions | None) -> dict[str, str]:
+        if security is not None:
+            return self._select_auth(security).cookies
         return {}
+
+    @property
+    @override
+    def _auth_by_scheme(self) -> dict[str, SchemeCredentials]:
+        return {
+            "BearerAuth": SchemeCredentials(headers=self._api_key_header_auth),
+            "ApiKeyAuth": SchemeCredentials(headers=self._x_api_key_header_auth),
+            "BrowserAuth": SchemeCredentials(headers=self._browser_token_header_auth),
+        }
+
+    @property
+    @override
+    def _auth_locations(self) -> AuthLocations:
+        return AuthLocations(headers=frozenset({"authorization", "x-api-key"}))
 
     @property
     def _api_key_header_auth(self) -> dict[str, str]:
@@ -420,6 +491,13 @@ class AsyncDedalus(AsyncAPIClient):
         if value is None:
             return {}
         return {"x-api-key": value}
+
+    @property
+    def _browser_token_header_auth(self) -> dict[str, str]:
+        value = self.browser_token
+        if value is None:
+            return {}
+        return {"Authorization": f"Bearer {value}"}
 
     @property
     @override
@@ -450,7 +528,7 @@ class AsyncDedalus(AsyncAPIClient):
         if isinstance(custom_headers.get("x-api-key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected either api_key or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected either api_key, browser_token or x_api_key to be set. Or for one of the `Authorization` or `x-api-key` headers to be explicitly omitted"'
         )
 
     def copy(
@@ -460,6 +538,7 @@ class AsyncDedalus(AsyncAPIClient):
         x_api_key: str | None = None,
         as_base_url: str | None = None,
         dedalus_org_id: str | None = None,
+        browser_token: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -491,6 +570,7 @@ class AsyncDedalus(AsyncAPIClient):
             x_api_key=x_api_key or self.x_api_key,
             as_base_url=as_base_url or self.as_base_url,
             dedalus_org_id=dedalus_org_id or self.dedalus_org_id,
+            browser_token=browser_token or self.browser_token,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -542,6 +622,12 @@ class DedalusWithRawResponse:
             from .resources.organization import OrganizationResourceWithRawResponse
         return OrganizationResourceWithRawResponse(self._client.organization)
 
+    @cached_property
+    def images(self) -> images.ImagesResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResourceWithRawResponse
+        return ImagesResourceWithRawResponse(self._client.images)
+
 
 class AsyncDedalusWithRawResponse:
     _client: AsyncDedalus
@@ -560,6 +646,12 @@ class AsyncDedalusWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.organization import AsyncOrganizationResourceWithRawResponse
         return AsyncOrganizationResourceWithRawResponse(self._client.organization)
+
+    @cached_property
+    def images(self) -> images.AsyncImagesResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResourceWithRawResponse
+        return AsyncImagesResourceWithRawResponse(self._client.images)
 
 
 class DedalusWithStreamedResponse:
@@ -580,6 +672,12 @@ class DedalusWithStreamedResponse:
             from .resources.organization import OrganizationResourceWithStreamingResponse
         return OrganizationResourceWithStreamingResponse(self._client.organization)
 
+    @cached_property
+    def images(self) -> images.ImagesResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import ImagesResourceWithStreamingResponse
+        return ImagesResourceWithStreamingResponse(self._client.images)
+
 
 class AsyncDedalusWithStreamedResponse:
     _client: AsyncDedalus
@@ -598,6 +696,12 @@ class AsyncDedalusWithStreamedResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.organization import AsyncOrganizationResourceWithStreamingResponse
         return AsyncOrganizationResourceWithStreamingResponse(self._client.organization)
+
+    @cached_property
+    def images(self) -> images.AsyncImagesResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.images import AsyncImagesResourceWithStreamingResponse
+        return AsyncImagesResourceWithStreamingResponse(self._client.images)
 
 
 # Alias names for the documented `Client` / `AsyncClient` symbols.

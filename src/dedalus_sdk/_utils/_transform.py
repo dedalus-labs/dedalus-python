@@ -454,4 +454,19 @@ def get_type_hints(
     localns: Mapping[str, Any] | None = None,
     include_extras: bool = False,
 ) -> dict[str, Any]:
-    return _get_type_hints(obj, globalns=globalns, localns=localns, include_extras=include_extras)
+    # `typing` caches a subscripted generic by its arguments, so `Optional["Value"]` written in a request
+    # module and in a response module is one object holding one shared `ForwardRef("Value")`. Whenever the
+    # two namespaces it is evaluated with are the same mapping -- which a `TypedDict` field always gets --
+    # `typing` returns whatever that reference resolved to first, wherever that was: usually the response
+    # model, built at import time, so the request `TypedDict` drops every wire alias and format below it.
+    # A `localns` distinct from the globals makes `typing` evaluate every reference again in this namespace.
+    # That re-evaluation still writes into the shared `ForwardRef` (Python 3.9-3.13). Pydantic v2 never reads
+    # that value back, and v1 does only while the package imports, before any request is transformed; what
+    # remains is a response model built for the first time on another thread at the same instant, which this
+    # call can race once per `TypedDict` before its `lru_cache` holds the result.
+    return _get_type_hints(
+        obj,
+        globalns=globalns,
+        localns={} if localns is None else localns,
+        include_extras=include_extras,
+    )

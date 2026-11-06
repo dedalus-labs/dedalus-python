@@ -13,6 +13,7 @@ Complete reference of every operation, grouped by resource. See [the README](./R
   - [Sleep a running machine](#sleep-a-running-machine)
   - [Wake a sleeping machine](#wake-a-sleeping-machine)
   - [Reboot a machine with fresh memory](#reboot-a-machine-with-fresh-memory)
+  - [Resize machine](#resize-machine)
   - [`Machines Ssh`](#machines-ssh)
     - [List SSH sessions](#list-ssh-sessions)
     - [Create SSH session](#create-ssh-session)
@@ -27,15 +28,22 @@ Complete reference of every operation, grouped by resource. See [the README](./R
     - [List execution events](#list-execution-events)
     - [`Machines Executions Logs`](#machines-executions-logs)
       - [Get execution log status](#get-execution-log-status)
-      - [Reauthorize execution log publication](#reauthorize-execution-log-publication)
       - [Create execution log read token](#create-execution-log-read-token)
   - [`Machines Autoresizing`](#machines-autoresizing)
-    - [Read this machine's RAM autoresizing settings](#read-this-machines-ram-autoresizing-settings)
-    - [Set this machine's RAM autoresizing settings](#set-this-machines-ram-autoresizing-settings)
+    - [Read this machine's autoresizing settings](#read-this-machines-autoresizing-settings)
+    - [Set this machine's autoresizing settings](#set-this-machines-autoresizing-settings)
 - [`Organization`](#organization)
   - [`Organization Autoresizing`](#organization-autoresizing)
-    - [Read organization RAM autoresizing policy](#read-organization-ram-autoresizing-policy)
-    - [Set organization RAM autoresizing policy](#set-organization-ram-autoresizing-policy)
+    - [Read organization autoresizing policy](#read-organization-autoresizing-policy)
+    - [Set organization autoresizing policy](#set-organization-autoresizing-policy)
+- [`Images`](#images)
+  - [List image IDs owned by the authenticated organization](#list-image-ids-owned-by-the-authenticated-organization)
+  - [Register an immutable OCI image for preparation](#register-an-immutable-oci-image-for-preparation)
+  - [Read preparation status for an organization-owned image](#read-preparation-status-for-an-organization-owned-image)
+  - [Rename an organization-owned image](#rename-an-organization-owned-image)
+  - [Delete an organization-owned image](#delete-an-organization-owned-image)
+  - [`Images Uploads`](#images-uploads)
+    - [Reserve an immutable Docker image archive upload](#reserve-an-immutable-docker-image-archive-upload)
 
 ## Setup
 
@@ -45,7 +53,7 @@ import os
 from dedalus_sdk import Dedalus
 
 client = Dedalus(
-    x_api_key=os.environ.get("DEDALUS_X_API_KEY"),
+    browser_token=os.environ.get("DEDALUS_BROWSER_TOKEN"),
 )
 ```
 
@@ -92,6 +100,8 @@ machine = client.machines.retrieve(
 
 ### Update machine
 
+Changes settings such as autosleep.
+
 | Direction | Type |
 | --- | --- |
 | Request | [`MachineUpdateParams`](./src/dedalus_sdk/types/machine_update_params.py) |
@@ -108,6 +118,7 @@ machine = client.machines.update(
 
 | Direction | Type |
 | --- | --- |
+| Request | [`MachineDeleteParams`](./src/dedalus_sdk/types/machine_delete_params.py) |
 | Response | [`Machine`](./src/dedalus_sdk/types/machine.py) |
 
 ```python
@@ -154,6 +165,22 @@ Checkpoints files and replaces the runtime. The machine ID and filesystem are pr
 
 ```python
 machine = client.machines.reboot(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    idempotency_key="",
+)
+```
+
+### Resize machine
+
+Wakes a sleeping Machine, then waits up to 30 seconds for the host to confirm CPU and RAM. Returns the Machine with its confirmed size. After RESIZE_TIMEOUT, repeat the same request and Idempotency-Key to wait again.
+
+| Direction | Type |
+| --- | --- |
+| Request | [`MachineResizeParams`](./src/dedalus_sdk/types/machine_resize_params.py) |
+| Response | [`MachineResizeResponse`](./src/dedalus_sdk/types/machine_resize_response.py) |
+
+```python
+machine = client.machines.resize(
     machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
     idempotency_key="",
 )
@@ -312,20 +339,6 @@ log = client.machines.executions.logs.retrieve(
 )
 ```
 
-##### Reauthorize execution log publication
-
-| Direction | Type |
-| --- | --- |
-| Response | [`Status`](./src/dedalus_sdk/types/machines/executions/status.py) |
-
-```python
-log = client.machines.executions.logs.reauthorize(
-    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
-    execution_id="executionID",
-    idempotency_key="",
-)
-```
-
 ##### Create execution log read token
 
 | Direction | Type |
@@ -342,11 +355,11 @@ log = client.machines.executions.logs.create_token(
 
 ### `Machines Autoresizing`
 
-#### Read this machine's RAM autoresizing settings
+#### Read this machine's autoresizing settings
 
 | Direction | Type |
 | --- | --- |
-| Response | [`Settings`](./src/dedalus_sdk/types/machines/settings.py) |
+| Response | [`Policy`](./src/dedalus_sdk/types/machines/policy.py) |
 
 ```python
 autoresizing = client.machines.autoresizing.retrieve(
@@ -354,17 +367,18 @@ autoresizing = client.machines.autoresizing.retrieve(
 )
 ```
 
-#### Set this machine's RAM autoresizing settings
+#### Set this machine's autoresizing settings
+
+Changes RAM, CPU or both for this machine. An absent resource keeps its setting.
 
 | Direction | Type |
 | --- | --- |
 | Request | [`AutoresizingUpdateParams`](./src/dedalus_sdk/types/machines/autoresizing_update_params.py) |
-| Response | [`Settings`](./src/dedalus_sdk/types/machines/settings.py) |
+| Response | [`Policy`](./src/dedalus_sdk/types/machines/policy.py) |
 
 ```python
 autoresizing = client.machines.autoresizing.update(
     machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
-    enabled=False,
     idempotency_key="",
 )
 ```
@@ -373,26 +387,125 @@ autoresizing = client.machines.autoresizing.update(
 
 ### `Organization Autoresizing`
 
-#### Read organization RAM autoresizing policy
+#### Read organization autoresizing policy
 
 | Direction | Type |
 | --- | --- |
-| Response | [`Policy`](./src/dedalus_sdk/types/organization/policy.py) |
+| Response | [`Policy`](./src/dedalus_sdk/types/machines/policy.py) |
 
 ```python
 autoresizing = client.organization.autoresizing.retrieve()
 ```
 
-#### Set organization RAM autoresizing policy
+#### Set organization autoresizing policy
+
+Changes defaults copied to new Machines. Existing Machines retain their own policy.
 
 | Direction | Type |
 | --- | --- |
 | Request | [`AutoresizingUpdateParams`](./src/dedalus_sdk/types/organization/autoresizing_update_params.py) |
-| Response | [`Policy`](./src/dedalus_sdk/types/organization/policy.py) |
+| Response | [`Policy`](./src/dedalus_sdk/types/machines/policy.py) |
 
 ```python
 autoresizing = client.organization.autoresizing.update(
-    enabled=False,
+    idempotency_key="",
+)
+```
+
+## `Images`
+
+### List image IDs owned by the authenticated organization
+
+Pages through the organization's images in ID order. A deleted image is left out; it still reads by ID.
+
+| Direction | Type |
+| --- | --- |
+| Request | [`ImageListParams`](./src/dedalus_sdk/types/image_list_params.py) |
+| Response | [`ImageList`](./src/dedalus_sdk/types/image_list.py) |
+
+```python
+image = client.images.list(
+    limit=100,
+)
+```
+
+### Register an immutable OCI image for preparation
+
+Requires an entitled organization and linux/amd64 on the current fleet. Acceptance queues preparation; only a ready image can launch a machine. Private registry credentials are not yet supported.
+
+| Direction | Type |
+| --- | --- |
+| Request | [`ImageCreateParams`](./src/dedalus_sdk/types/image_create_params.py) |
+| Response | [`Image`](./src/dedalus_sdk/types/image.py) |
+
+```python
+image = client.images.create(
+    platform="linux/amd64",
+    source={"kind": ""},
+    idempotency_key="",
+)
+```
+
+### Read preparation status for an organization-owned image
+
+A preparing image reports its stage, the worker's last step and an estimated percent of the whole preparation. A failed image names the cause: IMAGE_OS_UNSUPPORTED, IMAGE_SOURCE_INVALID, IMAGE_SOURCE_NOT_FOUND and IMAGE_SOURCE_UNAUTHORIZED describe the image or its reference and are final; IMAGE_SOURCE_UNAVAILABLE, IMAGE_REGISTRY_UNREACHABLE, IMAGE_REGISTRY_RATE_LIMITED, IMAGE_ARCHIVE_UNAVAILABLE and IMAGE_EXECUTION_FAILED describe this attempt and are retryable with a new idempotency key.
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Image`](./src/dedalus_sdk/types/image.py) |
+
+```python
+image = client.images.retrieve(
+    image_id="imageID",
+)
+```
+
+### Rename an organization-owned image
+
+Changes only the name. The image's source, platform and state are immutable.
+
+| Direction | Type |
+| --- | --- |
+| Request | [`ImageUpdateParams`](./src/dedalus_sdk/types/image_update_params.py) |
+| Response | [`Image`](./src/dedalus_sdk/types/image.py) |
+
+```python
+image = client.images.update(
+    image_id="imageID",
+    name="",
+    idempotency_key="",
+)
+```
+
+### Delete an organization-owned image
+
+The image can create no new Machine and no longer counts against the organization's image limit. Machines already running from it keep working. The image stays readable, and deleting it again returns the same image.
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Image`](./src/dedalus_sdk/types/image.py) |
+
+```python
+image = client.images.delete(
+    image_id="imageID",
+    idempotency_key="",
+)
+```
+
+### `Images Uploads`
+
+#### Reserve an immutable Docker image archive upload
+
+| Direction | Type |
+| --- | --- |
+| Request | [`UploadCreateParams`](./src/dedalus_sdk/types/images/upload_create_params.py) |
+| Response | [`Reservation`](./src/dedalus_sdk/types/images/reservation.py) |
+
+```python
+upload = client.images.uploads.create(
+    platform="",
+    sha256="",
+    size_bytes=0,
     idempotency_key="",
 )
 ```
