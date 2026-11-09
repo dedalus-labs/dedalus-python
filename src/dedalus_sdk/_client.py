@@ -241,9 +241,11 @@ class Dedalus(SyncAPIClient):
         params: Mapping[str, object],
         cookies: Mapping[str, str],
     ) -> None:
-        if headers.get("Authorization"):
+        headers = {key.lower(): value for key, value in headers.items()}
+        custom_headers = {key.lower(): value for key, value in custom_headers.items()}
+        if headers.get("authorization"):
             return
-        if isinstance(custom_headers.get("Authorization"), Omit):
+        if isinstance(custom_headers.get("authorization"), Omit):
             return
         if headers.get("x-api-key"):
             return
@@ -519,9 +521,11 @@ class AsyncDedalus(AsyncAPIClient):
         params: Mapping[str, object],
         cookies: Mapping[str, str],
     ) -> None:
-        if headers.get("Authorization"):
+        headers = {key.lower(): value for key, value in headers.items()}
+        custom_headers = {key.lower(): value for key, value in custom_headers.items()}
+        if headers.get("authorization"):
             return
-        if isinstance(custom_headers.get("Authorization"), Omit):
+        if isinstance(custom_headers.get("authorization"), Omit):
             return
         if headers.get("x-api-key"):
             return
