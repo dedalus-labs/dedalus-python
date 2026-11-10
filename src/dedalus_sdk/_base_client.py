@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 import json
 import time
-import uuid
 import zlib
 import email
 import asyncio
@@ -1458,7 +1457,9 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         return False
 
     def _idempotency_key(self) -> str:
-        return f"scalar-python-retry-{uuid.uuid4()}"
+        from ._uuid7 import uuid7
+
+        return uuid7().hex
 
 
 class _DefaultHttpxClient(httpx.Client):
