@@ -20,6 +20,8 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install --upgrade build
       - run: python -m build
+      - run: python -m pip install dist/*.whl pytest pytest-asyncio
+      - run: python -m pytest tests -q
       # Verification only, never auto-fix: the SDK is generated formatted, so a diff here means
       # either hand-edited custom code or a regenerate that was not committed. ruff is pinned to
       # the release that produced these bytes, since a formatter minor can change them.
