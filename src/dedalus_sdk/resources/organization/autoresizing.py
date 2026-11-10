@@ -5,7 +5,6 @@ from __future__ import annotations
 import httpx
 
 from typing import Optional
-from typing_extensions import Literal
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
 from ..._utils import maybe_transform, async_maybe_transform
@@ -19,6 +18,7 @@ from ..._response import (
 )
 from ..._base_client import make_request_options
 from ...types.machines.policy import Policy
+from ...types.autoresizing_switch import AutoresizingSwitch
 from ...types.organization import autoresizing_update_params
 
 __all__ = ["AutoresizingResource", "AsyncAutoresizingResource"]
@@ -71,9 +71,9 @@ class AutoresizingResource(SyncAPIResource):
     def update(
         self,
         *,
-        cpu: Literal["on", "off"] | Omit = omit,
+        cpu: AutoresizingSwitch | Omit = omit,
         cpu_max_vcpu: Optional[float] | Omit = omit,
-        memory: Literal["on", "off"] | Omit = omit,
+        memory: AutoresizingSwitch | Omit = omit,
         memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -176,9 +176,9 @@ class AsyncAutoresizingResource(AsyncAPIResource):
     async def update(
         self,
         *,
-        cpu: Literal["on", "off"] | Omit = omit,
+        cpu: AutoresizingSwitch | Omit = omit,
         cpu_max_vcpu: Optional[float] | Omit = omit,
-        memory: Literal["on", "off"] | Omit = omit,
+        memory: AutoresizingSwitch | Omit = omit,
         memory_max_mib: Optional[int] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
