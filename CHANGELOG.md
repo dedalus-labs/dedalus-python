@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.7.0...v0.8.0) (2026-11-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** 4 breaking changes to the SDK surface.
+    - Property `policy.cpu` type changed from `enum(on | off)` to `autoresizing_switch`.
+    - Property `policy.memory` type changed from `enum(on | off)` to `autoresizing_switch`.
+    - Property `autoresizing_update.cpu` type changed from `enum(on | off)` to `autoresizing_switch`.
+    - Property `autoresizing_update.memory` type changed from `enum(on | off)` to `autoresizing_switch`.
+
+### Features
+
+* **api:** share autoresizing switch type ([3a15ddf](https://github.com/dedalus-labs/dedalus-python/commit/3a15ddf961720e90a49aa5eb4a8f417d56e0f17d))
+* **api:** update property policy.cpu (+4 more changes) ([eb49ee9](https://github.com/dedalus-labs/dedalus-python/commit/eb49ee968e265f7ecadaa263f376049dc7048ec6))
+
+
+### Chores
+
+* **api:** update generated SDK content ([947b94c](https://github.com/dedalus-labs/dedalus-python/commit/947b94cdb9da7800aa5fea9c117e49616bc966a4))
+* **api:** update generated SDK content ([584e0fd](https://github.com/dedalus-labs/dedalus-python/commit/584e0fdd70741545f8a92bc173095ea8df43f3c2))
+
 ## [0.7.0](https://github.com/dedalus-labs/dedalus-python/compare/v0.6.0...v0.7.0) (2026-11-06)
 
 
