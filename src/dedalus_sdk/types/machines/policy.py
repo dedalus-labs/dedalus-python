@@ -5,11 +5,13 @@ from typing_extensions import Literal
 
 from ..._models import BaseModel
 
+from ..autoresizing_switch import AutoresizingSwitch
+
 __all__ = ["Policy"]
 
 
 class Policy(BaseModel):
-    cpu: Literal["on", "off"]
+    cpu: AutoresizingSwitch
     """Permit automatic CPU growth independently of RAM."""
 
     cpu_limit_source: Literal["plan", "configured", "platform"]
@@ -26,7 +28,7 @@ class Policy(BaseModel):
     enabled: bool
     """Deprecated RAM permission alias. Use memory."""
 
-    memory: Literal["on", "off"]
+    memory: AutoresizingSwitch
     """Permit automatic RAM growth. Automatic shrink remains internal."""
 
     memory_limit_source: Literal["plan", "configured", "platform"]
