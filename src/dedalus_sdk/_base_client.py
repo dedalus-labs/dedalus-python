@@ -3,7 +3,6 @@ from __future__ import annotations
 import sys
 import json
 import time
-import uuid
 import zlib
 import email
 import asyncio
@@ -1458,10 +1457,9 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         return False
 
     def _idempotency_key(self) -> str:
-        # @custom start
-        # The API requires a compact UUIDv7; retries reuse this generated key.
-        return f"{time.time_ns() // 1_000_000:012x}7{uuid.uuid4().hex[13:]}"
-        # @custom end
+        from ._uuid7 import uuid7
+
+        return uuid7().hex
 
 
 class _DefaultHttpxClient(httpx.Client):

@@ -10,6 +10,7 @@ from .machine_list_item import MachineListItem as MachineListItem
 from .machine_list import MachineList as MachineList
 from .image import Image as Image
 from .source import Source as Source
+from .autoresizing_switch import AutoresizingSwitch as AutoresizingSwitch
 from .source_param import SourceParam as SourceParam
 from .machine_list_params import MachineListParams as MachineListParams
 from .machine_create_params import MachineCreateParams as MachineCreateParams
