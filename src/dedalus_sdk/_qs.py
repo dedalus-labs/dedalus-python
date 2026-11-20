@@ -54,11 +54,19 @@ class Querystring:
         *,
         array_format: ArrayFormat | NotGiven = not_given,
         nested_format: NestedFormat | NotGiven = not_given,
+        keep_empty: bool = False,
     ) -> list[tuple[str, str]]:
+        """Flattens params into `(key, value)` pairs.
+
+        An empty-string value is dropped unless `keep_empty` is set: a query string has always left
+        it out, while a form body sends it as `key=` so a field can be cleared. `None` is always
+        dropped.
+        """
         opts = Options(
             qs=self,
             array_format=array_format,
             nested_format=nested_format,
+            keep_empty=keep_empty,
         )
         return flatten([self._stringify_item(key, value, opts) for key, value in params.items()])
 
@@ -113,7 +121,7 @@ class Querystring:
                 )
 
         serialised = self._primitive_value_to_str(value)
-        if not serialised:
+        if not serialised and (value is None or not opts.keep_empty):
             return []
         return [(key, serialised)]
 
@@ -135,6 +143,7 @@ stringify_items = _qs.stringify_items
 class Options:
     array_format: ArrayFormat
     nested_format: NestedFormat
+    keep_empty: bool
 
     def __init__(
         self,
@@ -142,6 +151,8 @@ class Options:
         *,
         array_format: ArrayFormat | NotGiven = not_given,
         nested_format: NestedFormat | NotGiven = not_given,
+        keep_empty: bool = False,
     ) -> None:
         self.array_format = qs.array_format if isinstance(array_format, NotGiven) else array_format
         self.nested_format = qs.nested_format if isinstance(nested_format, NotGiven) else nested_format
+        self.keep_empty = keep_empty

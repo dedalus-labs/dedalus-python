@@ -14,6 +14,7 @@ class ExecutionCreateParams(TypedDict, total=False):
     """Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged."""
 
     command: Required[Optional[SequenceNotStr[str]]]
+    """Program and its arguments as an array of strings, such as ["ls", "-la"]. A single string is not split into arguments. To run a shell command line, pass ["sh", "-c", "<command line>"]."""
 
     cwd: str
 

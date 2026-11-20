@@ -40,6 +40,14 @@ from .autoresizing import (
     AutoresizingResourceWithStreamingResponse,
     AsyncAutoresizingResourceWithStreamingResponse,
 )
+from .ports import (
+    PortsResource,
+    AsyncPortsResource,
+    PortsResourceWithRawResponse,
+    AsyncPortsResourceWithRawResponse,
+    PortsResourceWithStreamingResponse,
+    AsyncPortsResourceWithStreamingResponse,
+)
 from ...types import (
     machine_list_params,
     machine_create_params,
@@ -68,6 +76,10 @@ class MachinesResource(SyncAPIResource):
     @cached_property
     def autoresizing(self) -> AutoresizingResource:
         return AutoresizingResource(self._client)
+
+    @cached_property
+    def ports(self) -> PortsResource:
+        return PortsResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> MachinesResourceWithRawResponse:
@@ -559,6 +571,10 @@ class AsyncMachinesResource(AsyncAPIResource):
     @cached_property
     def autoresizing(self) -> AsyncAutoresizingResource:
         return AsyncAutoresizingResource(self._client)
+
+    @cached_property
+    def ports(self) -> AsyncPortsResource:
+        return AsyncPortsResource(self._client)
 
     @cached_property
     def with_raw_response(self) -> AsyncMachinesResourceWithRawResponse:
@@ -1082,6 +1098,10 @@ class MachinesResourceWithRawResponse:
     def autoresizing(self) -> AutoresizingResourceWithRawResponse:
         return AutoresizingResourceWithRawResponse(self._machines.autoresizing)
 
+    @cached_property
+    def ports(self) -> PortsResourceWithRawResponse:
+        return PortsResourceWithRawResponse(self._machines.ports)
+
 
 class AsyncMachinesResourceWithRawResponse:
     def __init__(self, machines: AsyncMachinesResource) -> None:
@@ -1126,6 +1146,10 @@ class AsyncMachinesResourceWithRawResponse:
     @cached_property
     def autoresizing(self) -> AsyncAutoresizingResourceWithRawResponse:
         return AsyncAutoresizingResourceWithRawResponse(self._machines.autoresizing)
+
+    @cached_property
+    def ports(self) -> AsyncPortsResourceWithRawResponse:
+        return AsyncPortsResourceWithRawResponse(self._machines.ports)
 
 
 class MachinesResourceWithStreamingResponse:
@@ -1172,6 +1196,10 @@ class MachinesResourceWithStreamingResponse:
     def autoresizing(self) -> AutoresizingResourceWithStreamingResponse:
         return AutoresizingResourceWithStreamingResponse(self._machines.autoresizing)
 
+    @cached_property
+    def ports(self) -> PortsResourceWithStreamingResponse:
+        return PortsResourceWithStreamingResponse(self._machines.ports)
+
 
 class AsyncMachinesResourceWithStreamingResponse:
     def __init__(self, machines: AsyncMachinesResource) -> None:
@@ -1216,3 +1244,7 @@ class AsyncMachinesResourceWithStreamingResponse:
     @cached_property
     def autoresizing(self) -> AsyncAutoresizingResourceWithStreamingResponse:
         return AsyncAutoresizingResourceWithStreamingResponse(self._machines.autoresizing)
+
+    @cached_property
+    def ports(self) -> AsyncPortsResourceWithStreamingResponse:
+        return AsyncPortsResourceWithStreamingResponse(self._machines.ports)

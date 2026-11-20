@@ -11,6 +11,7 @@ import logging
 import platform
 import warnings
 import email.utils
+from urllib.parse import urlencode
 from types import TracebackType
 from random import random
 from dataclasses import field, dataclass
@@ -43,7 +44,7 @@ from pydantic import PrivateAttr
 from . import _exceptions
 from ._qs import Querystring
 from ._decoding import CodingRefused, BoundedDecoder, decoding_error
-from ._files import to_httpx_files, async_to_httpx_files
+from ._files import to_httpx_files, read_form_files, async_to_httpx_files, async_read_form_files
 from ._types import (
     Body,
     Omit,
@@ -317,6 +318,59 @@ def _merge_set_cookies(headers: httpx.Headers, response: httpx.Response, target:
         if part:
             pairs[part.partition("=")[0]] = part
     headers["Cookie"] = "; ".join(pairs.values())
+
+
+_FORM_URLENCODED = "application/x-www-form-urlencoded"
+
+
+def _is_form_urlencoded(content_type: object) -> bool:
+    """Whether a `Content-Type` names the form media type, in any casing and with any parameters."""
+    return isinstance(content_type, str) and content_type.split(";", 1)[0].strip().lower() == _FORM_URLENCODED
+
+
+def _options_content_type(options: FinalRequestOptions) -> str | None:
+    """The `Content-Type` a request's own headers set, matched case-insensitively, if any.
+
+    The last match wins, as it does when `_build_request` collapses duplicate entries, so both agree
+    on whether a request is a form.
+    """
+    if not is_given(options.headers):
+        return None
+    content_type: str | None = None
+    for name, value in options.headers.items():
+        if name.lower() == "content-type" and isinstance(value, str):
+            content_type = value
+    return content_type
+
+
+def _form_text(value: object, array_format: str) -> object:
+    """A form body prepared for the query encoder.
+
+    Each bytes value is decoded with `surrogateescape`: `Querystring` renders a leaf with `str()`,
+    which spells bytes as `b'...'`, and encoding the pairs back with the same error handler keeps
+    every byte as it was. An empty list is dropped, since `comma` would otherwise send `key=`, which a
+    server reads as one empty element. Under `comma` a list holding objects or lists is refused: the
+    format joins items with `str()`, so they would go out as Python repr.
+    """
+    if isinstance(value, (bytes, bytearray)):
+        return bytes(value).decode("utf-8", "surrogateescape")
+    if is_mapping(value):
+        return {
+            key: _form_text(item, array_format)
+            for key, item in value.items()
+            if not ((is_list(item) or isinstance(item, tuple)) and len(cast("list[object]", item)) == 0)
+        }
+    if is_list(value) or isinstance(value, tuple):
+        items = cast("list[object]", value)
+        if array_format == "comma" and any(
+            is_mapping(item) or is_list(item) or isinstance(item, tuple) for item in items
+        ):
+            raise TypeError(
+                "A list of objects or lists cannot be sent in a form body under `arrayFormat: comma`;"
+                " use `brackets`, `indices` or `repeat`."
+            )
+        return [_form_text(item, array_format) for item in items]
+    return value
 
 
 def _describe_body(value: object) -> str:
@@ -1150,8 +1204,32 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
         params = _merge_mappings({**self._auth_query(options.security), **self.default_query}, options.params)
         cookies = self._auth_cookies(options.security)
         headers = self._build_headers(options, retries_taken=retries_taken, params=params, cookies=cookies)
+        content_types = headers.get_list("Content-Type")
+        if len(content_types) > 1:
+            # A `Content-Type` spelled in another casing than an earlier one is a second entry rather
+            # than a replacement, and two entries would join into a value neither encoder recognizes.
+            # The request's own headers (the method's, then the caller's `extra_headers`) win over a
+            # client-wide default, the same value `request()` read file fields for.
+            own_content_type = _options_content_type(options)
+            headers["Content-Type"] = own_content_type if own_content_type is not None else content_types[-1]
         content_type = headers.get("Content-Type")
         files = options.files
+
+        # A body under the form media type, in any casing, goes out encoded the way the query string
+        # is, through the client's own `qs`. A string or bytes body is a form already encoded and is
+        # sent as it is.
+        if _is_form_urlencoded(content_type) and json_data is not None and is_given(json_data):
+            if files:
+                # httpx sends `content` and drops `files` silently, so file parts would never arrive
+                raise TypeError("A form-urlencoded request body cannot carry multipart files")
+            if isinstance(json_data, str):
+                json_data = json_data.encode("utf-8")
+            elif not isinstance(json_data, bytes):
+                if not is_mapping(json_data):
+                    raise TypeError(
+                        f"Expected a mapping for a form-urlencoded request body but got {type(json_data)} instead."
+                    )
+                json_data = self._serialize_form_urlencoded(json_data)
 
         # If the given Content-Type header is multipart/form-data then it
         # has to be removed so that httpx can generate the header with
@@ -1226,12 +1304,29 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
             **kwargs,
         )
 
+    def _serialize_form_urlencoded(self, data: Mapping[str, object]) -> bytes:
+        """Encodes a form-urlencoded body exactly as the query string is encoded.
+
+        Lists follow the client's `array_format` and object keys its `nested_format`, and a boolean
+        goes out as `true` / `false`, all from `self.qs`. A space is written `+`, the form convention.
+        An empty string goes out as `key=`, which the query string drops, so a field can be cleared;
+        only `None` is left out.
+        A bytes value (a file field's contents, by now) is decoded with `surrogateescape` and encoded
+        back the same way, so bytes that are not UTF-8 reach the wire unchanged rather than as the
+        `b'...'` spelling `str()` would give them.
+        """
+        qs = self.qs
+        items = qs.stringify_items(cast(Mapping[str, Any], _form_text(data, qs.array_format)), keep_empty=True)
+        return urlencode(items, encoding="utf-8", errors="surrogateescape").encode("ascii")
+
     def _serialize_multipartform(self, data: Mapping[object, object]) -> dict[str, object]:
         items = self.qs.stringify_items(
             # TODO: type ignore is required as stringify_items is well typed but we can't be
             # well typed without heavy validation.
             data,  # type: ignore
             array_format="brackets",
+            # multipart part names keep their bracketed form whatever the query string's nesting is
+            nested_format="brackets",
         )
         serialized: dict[str, object] = {}
         for key, value in items:
@@ -1347,7 +1442,9 @@ class BaseClient(Generic[_HttpxClientT, _DefaultStreamT]):
 
     @property
     def user_agent(self) -> str:
-        return f"{self.__class__.__name__}/Python {self._version}"
+        # A literal rather than `self.__class__.__name__`, so the sync and async clients send the
+        # same product and a subclass cannot change it.
+        return f"Dedalus/Python {self._version}"
 
     @property
     def base_url(self) -> URL:
@@ -1677,6 +1774,10 @@ class SyncAPIClient(BaseClient[httpx.Client, Stream[Any]]):
         if input_options.idempotency_key is None and input_options.method.lower() != "get":
             # ensure the idempotency key is reused between requests
             input_options.idempotency_key = self._idempotency_key()
+        if _is_form_urlencoded(_options_content_type(input_options)):
+            # read file fields once, so every attempt sends the same contents
+            input_options.json_data = read_form_files(input_options.json_data)
+            input_options.extra_json = read_form_files(input_options.extra_json)
 
         response: httpx.Response | None = None
         max_retries = input_options.get_max_retries(self.max_retries)
@@ -2316,6 +2417,10 @@ class AsyncAPIClient(BaseClient[httpx.AsyncClient, AsyncStream[Any]]):
         if input_options.idempotency_key is None and input_options.method.lower() != "get":
             # ensure the idempotency key is reused between requests
             input_options.idempotency_key = self._idempotency_key()
+        if _is_form_urlencoded(_options_content_type(input_options)):
+            # read file fields once, so every attempt sends the same contents
+            input_options.json_data = await async_read_form_files(input_options.json_data)
+            input_options.extra_json = await async_read_form_files(input_options.extra_json)
 
         response: httpx.Response | None = None
         max_retries = input_options.get_max_retries(self.max_retries)
