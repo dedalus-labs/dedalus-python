@@ -21,7 +21,7 @@ from typing_extensions import TypeGuard, get_args
 
 import sniffio
 
-from .._types import Omit, NotGiven, FileTypes, ArrayFormat, HeadersLike
+from .._types import Omit, Headers, NotGiven, FileTypes, ArrayFormat, HeadersLike
 
 _T = TypeVar("_T")
 _TupleT = TypeVar("_TupleT", bound=Tuple[object, ...])
@@ -318,6 +318,20 @@ def strip_not_given(obj: object | None) -> object:
         return obj
 
     return {key: value for key, value in obj.items() if not isinstance(value, NotGiven)}
+
+
+def merge_default_headers(defaults: Mapping[str, str], headers: Headers | None) -> dict[str, str | Omit]:
+    """Merge an operation's configured default headers under `headers`, which win per header name.
+
+    Header names are case-insensitive, and `httpx.Headers` keeps every spelling it is handed, so a
+    default is dropped whenever `headers` already names that header in any casing. A plain dict merge
+    would send both `x-beta: <default>` and the caller's `X-Beta: <theirs>`.
+    """
+    named = {name.lower() for name in headers} if headers else set()
+    merged: dict[str, str | Omit] = {name: value for name, value in defaults.items() if name.lower() not in named}
+    if headers:
+        merged.update(headers)
+    return merged
 
 
 def coerce_integer(val: str) -> int:

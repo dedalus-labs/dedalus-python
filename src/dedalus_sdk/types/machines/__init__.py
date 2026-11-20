@@ -9,6 +9,8 @@ from .execution_events import ExecutionEvents as ExecutionEvents
 from .execution_list import ExecutionList as ExecutionList
 from .execution_output import ExecutionOutput as ExecutionOutput
 from .execution import Execution as Execution
+from .port_list import PortList as PortList
+from .port import Port as Port
 from .ssh_connection import SSHConnection as SSHConnection
 from .ssh_host_trust import SSHHostTrust as SSHHostTrust
 from .ssh_session_list import SSHSessionList as SSHSessionList
@@ -19,3 +21,6 @@ from .execution_list_params import ExecutionListParams as ExecutionListParams
 from .execution_create_params import ExecutionCreateParams as ExecutionCreateParams
 from .execution_events_params import ExecutionEventsParams as ExecutionEventsParams
 from .autoresizing_update_params import AutoresizingUpdateParams as AutoresizingUpdateParams
+from .port_list_params import PortListParams as PortListParams
+from .port_create_params import PortCreateParams as PortCreateParams
+from .port_update_params import PortUpdateParams as PortUpdateParams

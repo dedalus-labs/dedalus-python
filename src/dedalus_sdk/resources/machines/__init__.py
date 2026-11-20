@@ -32,6 +32,14 @@ from .autoresizing import (
     AutoresizingResourceWithStreamingResponse,
     AsyncAutoresizingResourceWithStreamingResponse,
 )
+from .ports import (
+    PortsResource,
+    AsyncPortsResource,
+    PortsResourceWithRawResponse,
+    AsyncPortsResourceWithRawResponse,
+    PortsResourceWithStreamingResponse,
+    AsyncPortsResourceWithStreamingResponse,
+)
 
 __all__ = [
     "MachinesResource",
@@ -58,4 +66,10 @@ __all__ = [
     "AsyncAutoresizingResourceWithRawResponse",
     "AutoresizingResourceWithStreamingResponse",
     "AsyncAutoresizingResourceWithStreamingResponse",
+    "PortsResource",
+    "AsyncPortsResource",
+    "PortsResourceWithRawResponse",
+    "AsyncPortsResourceWithRawResponse",
+    "PortsResourceWithStreamingResponse",
+    "AsyncPortsResourceWithStreamingResponse",
 ]

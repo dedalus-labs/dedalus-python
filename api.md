@@ -32,12 +32,23 @@ Complete reference of every operation, grouped by resource. See [the README](./R
   - [`Machines Autoresizing`](#machines-autoresizing)
     - [Read this machine's autoresizing settings](#read-this-machines-autoresizing-settings)
     - [Set this machine's autoresizing settings](#set-this-machines-autoresizing-settings)
+  - [`Machines Ports`](#machines-ports)
+    - [List ports](#list-ports)
+    - [Create port](#create-port)
+    - [Get port](#get-port)
+    - [Update port](#update-port)
+    - [Delete port](#delete-port)
+    - [`Machines Ports AccessKeys`](#machines-ports-accesskeys)
+      - [List port access keys](#list-port-access-keys)
+      - [Mint port access key](#mint-port-access-key)
+      - [Revoke port access key](#revoke-port-access-key)
+      - [Rotate port access key](#rotate-port-access-key)
 - [`Organization`](#organization)
   - [`Organization Autoresizing`](#organization-autoresizing)
     - [Read organization autoresizing policy](#read-organization-autoresizing-policy)
     - [Set organization autoresizing policy](#set-organization-autoresizing-policy)
 - [`Images`](#images)
-  - [List image IDs owned by the authenticated organization](#list-image-ids-owned-by-the-authenticated-organization)
+  - [List images owned by the authenticated organization](#list-images-owned-by-the-authenticated-organization)
   - [Register an immutable OCI image for preparation](#register-an-immutable-oci-image-for-preparation)
   - [Read preparation status for an organization-owned image](#read-preparation-status-for-an-organization-owned-image)
   - [Rename an organization-owned image](#rename-an-organization-owned-image)
@@ -383,6 +394,144 @@ autoresizing = client.machines.autoresizing.update(
 )
 ```
 
+### `Machines Ports`
+
+#### List ports
+
+| Direction | Type |
+| --- | --- |
+| Request | [`PortListParams`](./src/dedalus_sdk/types/machines/port_list_params.py) |
+
+```python
+page = client.machines.ports.list(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+)
+```
+
+#### Create port
+
+| Direction | Type |
+| --- | --- |
+| Request | [`PortCreateParams`](./src/dedalus_sdk/types/machines/port_create_params.py) |
+| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
+
+```python
+port = client.machines.ports.create(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port=0,
+    protocol="http",
+    visibility="private",
+    idempotency_key="",
+)
+```
+
+#### Get port
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
+
+```python
+port = client.machines.ports.retrieve(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+)
+```
+
+#### Update port
+
+| Direction | Type |
+| --- | --- |
+| Request | [`PortUpdateParams`](./src/dedalus_sdk/types/machines/port_update_params.py) |
+| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
+
+```python
+port = client.machines.ports.update(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+    visibility="public",
+    idempotency_key="",
+)
+```
+
+#### Delete port
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Port`](./src/dedalus_sdk/types/machines/port.py) |
+
+```python
+port = client.machines.ports.delete(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+    idempotency_key="",
+)
+```
+
+#### `Machines Ports AccessKeys`
+
+##### List port access keys
+
+| Direction | Type |
+| --- | --- |
+| Request | [`AccessKeyListParams`](./src/dedalus_sdk/types/machines/ports/access_key_list_params.py) |
+| Response | [`AccessKeyListResponse`](./src/dedalus_sdk/types/machines/ports/access_key_list_response.py) |
+
+```python
+access_key = client.machines.ports.access_keys.list(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+)
+```
+
+##### Mint port access key
+
+| Direction | Type |
+| --- | --- |
+| Request | [`AccessKeyMintParams`](./src/dedalus_sdk/types/machines/ports/access_key_mint_params.py) |
+| Response | [`AccessKeyMintResponse`](./src/dedalus_sdk/types/machines/ports/access_key_mint_response.py) |
+
+```python
+access_key = client.machines.ports.access_keys.mint(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+    expires_in=1,
+    idempotency_key="",
+)
+```
+
+##### Revoke port access key
+
+| Direction | Type |
+| --- | --- |
+| Response | [`AccessKeyRevokeResponse`](./src/dedalus_sdk/types/machines/ports/access_key_revoke_response.py) |
+
+```python
+access_key = client.machines.ports.access_keys.revoke(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+    access_key_id="accessKeyID",
+    idempotency_key="",
+)
+```
+
+##### Rotate port access key
+
+| Direction | Type |
+| --- | --- |
+| Request | [`AccessKeyRotateParams`](./src/dedalus_sdk/types/machines/ports/access_key_rotate_params.py) |
+| Response | [`AccessKeyRotateResponse`](./src/dedalus_sdk/types/machines/ports/access_key_rotate_response.py) |
+
+```python
+access_key = client.machines.ports.access_keys.rotate(
+    machine_id="017f22e2-79b0-7cc3-98c4-dc0c0c07398f",
+    port_id="portID",
+    access_key_id="accessKeyID",
+    expires_in=1,
+    idempotency_key="",
+)
+```
+
 ## `Organization`
 
 ### `Organization Autoresizing`
@@ -414,9 +563,9 @@ autoresizing = client.organization.autoresizing.update(
 
 ## `Images`
 
-### List image IDs owned by the authenticated organization
+### List images owned by the authenticated organization
 
-Pages through the organization's images in ID order. A deleted image is left out; it still reads by ID.
+Pages through the organization's images in ID order. Each item has the same shape as a single image read. A deleted image is left out; it still reads by ID.
 
 | Direction | Type |
 | --- | --- |
@@ -424,7 +573,7 @@ Pages through the organization's images in ID order. A deleted image is left out
 | Response | [`ImageList`](./src/dedalus_sdk/types/image_list.py) |
 
 ```python
-image = client.images.list(
+images = client.images.list(
     limit=100,
 )
 ```

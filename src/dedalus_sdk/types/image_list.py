@@ -4,10 +4,12 @@ from typing import List, Optional
 
 from .._models import BaseModel
 
+from .image import Image
+
 __all__ = ["ImageList"]
 
 
 class ImageList(BaseModel):
-    image_ids: Optional[List[str]] = None
+    items: Optional[List[Image]] = None
 
     next_cursor: Optional[str] = None
