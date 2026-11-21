@@ -60,7 +60,7 @@ class ImagesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> ImageList:
         """
-        Pages through the organization's images in ID order. A deleted image is left out; it still reads by ID.
+        Pages through the organization's images in ID order. Each item has the same shape as a single image read. A deleted image is left out; it still reads by ID.
 
         Args:
             limit: Query parameter.
@@ -75,7 +75,7 @@ class ImagesResource(SyncAPIResource):
 
         Example:
             ```python
-            image = client.images.list(
+            images = client.images.list(
                 limit=100,
             )
             ```
@@ -325,7 +325,7 @@ class AsyncImagesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> ImageList:
         """
-        Pages through the organization's images in ID order. A deleted image is left out; it still reads by ID.
+        Pages through the organization's images in ID order. Each item has the same shape as a single image read. A deleted image is left out; it still reads by ID.
 
         Args:
             limit: Query parameter.
@@ -340,7 +340,7 @@ class AsyncImagesResource(AsyncAPIResource):
 
         Example:
             ```python
-            image = await client.images.list(
+            images = await client.images.list(
                 limit=100,
             )
             ```

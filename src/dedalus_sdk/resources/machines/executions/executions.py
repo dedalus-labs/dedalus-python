@@ -121,7 +121,7 @@ class ExecutionsResource(SyncAPIResource):
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            command: Body parameter.
+            command: Program and its arguments as an array of strings, such as ["ls", "-la"]. A single string is not split into arguments. To run a shell command line, pass ["sh", "-c", "<command line>"].
             cwd: Body parameter.
             env: Body parameter.
             stdin: Body parameter.
@@ -470,7 +470,7 @@ class AsyncExecutionsResource(AsyncAPIResource):
 
         Args:
             machine_id: Bare, lowercase, hyphenated Machine UUID. Pass the returned machine_id unchanged.
-            command: Body parameter.
+            command: Program and its arguments as an array of strings, such as ["ls", "-la"]. A single string is not split into arguments. To run a shell command line, pass ["sh", "-c", "<command line>"].
             cwd: Body parameter.
             env: Body parameter.
             stdin: Body parameter.

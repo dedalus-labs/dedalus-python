@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import os
+import inspect
 import pathlib
 from typing import Sequence, cast, overload
 from typing_extensions import TypeVar, TypeGuard
@@ -123,6 +124,100 @@ async def async_read_file_content(file: FileContent) -> HttpxFileContent:
         return await anyio.Path(file).read_bytes()
 
     return file
+
+
+def _is_form_file(obj: object) -> bool:
+    """Whether a value in a form-urlencoded body is a file whose contents the field carries.
+
+    Bytes, a file object and a path are files. A file object is anything with a callable `read`, not
+    only an `io.IOBase`: `IO[bytes]` admits wrappers that are not one (`SpooledTemporaryFile` before
+    Python 3.11, framework upload objects, whose `read()` may be async), and an unrecognized one
+    would reach the query encoder's `str()` and go out as its repr. A tuple is one only in the `(filename, content, ...)` shape
+    `FileTypes` allows, so a tuple of strings stays the list the query encoder reads it as.
+    """
+    if _is_form_file_content(obj):
+        return True
+    return (
+        isinstance(obj, tuple)
+        and 2 <= len(cast("tuple[object, ...]", obj)) <= 4
+        and (obj[0] is None or isinstance(obj[0], str))
+        and _is_form_file_content(obj[1])
+    )
+
+
+def _is_form_file_content(obj: object) -> bool:
+    """Whether a value is file content: bytes, a path, or an object with a callable `read`."""
+    return isinstance(obj, (bytes, bytearray, os.PathLike)) or callable(getattr(obj, "read", None))
+
+
+def _form_file_source(obj: object) -> object:
+    """The content half of a form file value: the tuple's second item, or the value itself."""
+    return cast("tuple[object, ...]", obj)[1] if isinstance(obj, tuple) else obj
+
+
+def _checked_form_contents(source: object, contents: object) -> object:
+    """A file object's `read()` result, refused unless it is bytes or text.
+
+    Anything else would reach the query encoder's `str()` and go out as its repr.
+    """
+    if isinstance(contents, (bytes, bytearray, str)):
+        return contents
+    raise TypeError(f"Expected {type(source).__name__}.read() to return bytes or str but got {type(contents)} instead.")
+
+
+def read_form_files(data: _T) -> _T:
+    """Returns a form-urlencoded body with every file value replaced by its contents.
+
+    A form has no file parts, so a file field goes out as its contents, the way a string field would.
+    A file object is read whole from its current position and a path from the start, with no size
+    bound, which suits form fields but not large files; those belong in a multipart body. It runs
+    once per call rather than per attempt, so a retry resends the same bytes instead of an exhausted
+    file object's empty read. Every container is copied, so the caller's own body is left as it was.
+    """
+    if _is_form_file(data):
+        source = _form_file_source(data)
+        if isinstance(source, os.PathLike):
+            return cast(_T, pathlib.Path(cast("os.PathLike[str]", source)).read_bytes())
+        if isinstance(source, (bytes, bytearray)):
+            return cast(_T, bytes(source))
+        contents: object = cast("io.BufferedIOBase", source).read()
+        if inspect.isawaitable(contents):
+            # an async `read()` (an ASGI upload object) cannot be awaited here; close it unawaited
+            # rather than leave a warning, and point the caller at the client that can
+            if inspect.iscoroutine(contents):
+                contents.close()
+            raise TypeError(
+                f"{type(source).__name__}.read() is asynchronous; send it through the async client, or pass its bytes"
+            )
+        return cast(_T, _checked_form_contents(source, contents))
+    if is_mapping(data):
+        return cast(_T, {key: read_form_files(value) for key, value in data.items()})
+    if is_list(data) or isinstance(data, tuple):
+        return cast(_T, [read_form_files(item) for item in cast("Sequence[object]", data)])
+    return data
+
+
+async def async_read_form_files(data: _T) -> _T:
+    """`read_form_files` for an async client.
+
+    It reads a path without blocking the event loop, and awaits a file object whose `read()` is
+    asynchronous, as an ASGI framework's upload object's is.
+    """
+    if _is_form_file(data):
+        source = _form_file_source(data)
+        if isinstance(source, os.PathLike):
+            return cast(_T, await anyio.Path(cast("os.PathLike[str]", source)).read_bytes())
+        if isinstance(source, (bytes, bytearray)):
+            return cast(_T, bytes(source))
+        contents: object = cast("io.BufferedIOBase", source).read()
+        if inspect.isawaitable(contents):
+            contents = await contents
+        return cast(_T, _checked_form_contents(source, contents))
+    if is_mapping(data):
+        return cast(_T, {key: await async_read_form_files(value) for key, value in data.items()})
+    if is_list(data) or isinstance(data, tuple):
+        return cast(_T, [await async_read_form_files(item) for item in cast("Sequence[object]", data)])
+    return data
 
 
 def deepcopy_with_paths(item: _T, paths: Sequence[Sequence[str]]) -> _T:

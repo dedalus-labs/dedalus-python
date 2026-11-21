@@ -1,6 +1,6 @@
 [project]
 name = "dedalus-sdk"
-version = "0.7.0" # x-release-please-version
+version = "0.8.0" # x-release-please-version
 description = "Create, run, and manage Dedalus Machines."
 readme = "README.md"
 license = "Apache-2.0"
@@ -24,6 +24,9 @@ Changelog = "https://github.com/dedalus-labs/dedalus-python/blob/main/CHANGELOG.
 [project.optional-dependencies]
 aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]
 
+[dependency-groups]
+dev = ["pytest>=8.3.4"]
+
 [build-system]
 requires = ["hatchling>=1.18.0"]
 build-backend = "hatchling.build"
@@ -33,3 +36,6 @@ packages = ["src/dedalus_sdk"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
